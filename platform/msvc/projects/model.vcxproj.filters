@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="obj">
+      <UniqueIdentifier>{64c6f577-1389-405b-a122-b77daf96e4ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="surface">
+      <UniqueIdentifier>{9f2d748d-19cc-44f5-a52d-1d638d5f844c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\source\ModelObj.cpp">
+      <Filter>obj</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\ModelParametric.cpp">
+      <Filter>surface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\ParametricEquations.cpp">
+      <Filter>surface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\ParametricSurface.cpp">
+      <Filter>surface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\SurfaceFactory.cpp">
+      <Filter>surface</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\Material.cpp" />
+    <ClCompile Include="..\..\..\source\Mesh.cpp" />
+    <ClCompile Include="..\..\..\source\Model.cpp" />
+    <ClCompile Include="..\..\..\source\ModelFactory.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\include\model\ModelObj.h">
+      <Filter>obj</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\ModelParametric.h">
+      <Filter>surface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\ParametricEquations.h">
+      <Filter>surface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\ParametricSurface.h">
+      <Filter>surface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\Surface.h">
+      <Filter>surface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\SurfaceFactory.h">
+      <Filter>surface</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\Material.h" />
+    <ClInclude Include="..\..\..\include\model\Mesh.h" />
+    <ClInclude Include="..\..\..\include\model\Model.h" />
+    <ClInclude Include="..\..\..\include\model\ModelFactory.h" />
+    <ClInclude Include="..\..\..\include\model\typedef.h" />
+  </ItemGroup>
+</Project>
