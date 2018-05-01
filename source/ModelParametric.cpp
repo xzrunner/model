@@ -50,6 +50,14 @@ void ModelParametric::LoadFromJson(const rapidjson::Value& val)
 	}
 }
 
+bool ModelParametric::LoadFromFile(const std::string& filepath)
+{
+	pt3::AABB aabb;
+	auto surface = SurfaceFactory::Create(filepath.substr(0, filepath.find(".param")));
+	m_meshes.push_back(CreateMeshFromSurface(surface, aabb));
+	return true;
+}
+
 MeshPtr ModelParametric::CreateMeshFromSurface(const Surface* surface, pt3::AABB& aabb)
 {
 	auto mesh = std::make_shared<Mesh>();

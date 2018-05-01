@@ -22,6 +22,9 @@ public:
 		rapidjson::MemoryPoolAllocator<>& alloc) const override;
 	virtual void LoadFromJson(const rapidjson::Value& val) override;
 
+	// for ResPool
+	bool LoadFromFile(const std::string& filepath);
+
 	static const char* const TYPE_NAME;
 
 private:
