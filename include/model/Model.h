@@ -2,6 +2,8 @@
 
 #include "model/Mesh.h"
 
+#include <painting3/AABB.h>
+
 #include <rapidjson/document.h>
 
 #include <boost/noncopyable.hpp>
@@ -27,9 +29,13 @@ public:
 
 	void AddMesh(const MeshPtr& mesh) { m_meshes.push_back(mesh); }
 
+	auto& GetAABB() const { return m_aabb; }
+
 protected:
 	std::vector<MeshPtr> m_meshes;
 	
+	pt3::AABB m_aabb;
+
 }; // Model
 
 }

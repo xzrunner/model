@@ -4,8 +4,6 @@
 #include "model/typedef.h"
 #include "model/SurfaceFactory.h"
 
-#include <painting3/AABB.h>
-
 namespace model
 {
 
@@ -15,9 +13,9 @@ ModelParametric::ModelParametric()
 {
 }
 
-ModelParametric::ModelParametric(const Surface* surface, pt3::AABB& aabb)
+ModelParametric::ModelParametric(const Surface* surface)
 {
-	m_meshes.push_back(CreateMeshFromSurface(surface, aabb));
+	m_meshes.push_back(CreateMeshFromSurface(surface));
 }
 
 bool ModelParametric::StoreToJson(rapidjson::Value& val, rapidjson::MemoryPoolAllocator<>& alloc) const
@@ -43,22 +41,20 @@ void ModelParametric::LoadFromJson(const rapidjson::Value& val)
 		return;
 	}
 
-	pt3::AABB aabb;
 	for (auto& val_mesh : val["meshes"].GetArray()) {
 		auto surface = SurfaceFactory::Create(val_mesh.GetString());
-		m_meshes.push_back(CreateMeshFromSurface(surface, aabb));
+		m_meshes.push_back(CreateMeshFromSurface(surface));
 	}
 }
 
 bool ModelParametric::LoadFromFile(const std::string& filepath)
 {
-	pt3::AABB aabb;
 	auto surface = SurfaceFactory::Create(filepath.substr(0, filepath.find(".param")));
-	m_meshes.push_back(CreateMeshFromSurface(surface, aabb));
+	m_meshes.push_back(CreateMeshFromSurface(surface));
 	return true;
 }
 
-MeshPtr ModelParametric::CreateMeshFromSurface(const Surface* surface, pt3::AABB& aabb)
+MeshPtr ModelParametric::CreateMeshFromSurface(const Surface* surface)
 {
 	auto mesh = std::make_shared<Mesh>();
 
@@ -94,7 +90,7 @@ MeshPtr ModelParametric::CreateMeshFromSurface(const Surface* surface, pt3::AABB
 		pos.x = vertices[i];
 		pos.y = vertices[i + 1];
 		pos.z = vertices[i + 2];
-		aabb.Combine(pos);
+		m_aabb.Combine(pos);
 		i += stride;
 	}
 
