@@ -2,27 +2,28 @@
 
 #include <SM_Vector.h>
 
+#include <boost/noncopyable.hpp>
+
 namespace model
 {
 
-class Material
+struct MaterialOld : boost::noncopyable
 {
-public:
-	sm::vec3 ambient;
-	sm::vec3 diffuse;
-	sm::vec3 specular;
-	float    shininess;
-	void*    texture;
+	sm::vec3 ambient = { 0.04f, 0.04f, 0.04f };
+	sm::vec3 diffuse = { 1, 1, 1 };
+	sm::vec3 specular = { 1, 1, 1 };
+	float    shininess = 50;
+	void*    texture = nullptr;
 
-public:
-	Material() 
-		: ambient(0.04f, 0.04f, 0.04f)
-		, diffuse(1, 1, 1)
-		, specular(1, 1, 1)
-		, shininess(50)
-		, texture(nullptr)
-	{}
+	~MaterialOld();
 
-}; // Material
+}; // MaterialOld
+
+struct Material
+{
+	sm::vec4 DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
+	sm::vec3 FresnelR0     = { 0.01f, 0.01f, 0.01f };
+	float Roughness        = .25f;
+};
 
 }

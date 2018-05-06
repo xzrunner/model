@@ -5,10 +5,10 @@
 #include <SM_Vector.h>
 #include <sm_const.h>
 
-namespace model 
+namespace model
 {
 
-class Cone : public ParametricSurface 
+class Cone : public ParametricSurface
 {
 public:
 	Cone(float height, float radius);
@@ -25,7 +25,7 @@ private:
 
 }; // Cone
 
-class Sphere : public ParametricSurface 
+class Sphere : public ParametricSurface
 {
 public:
 	Sphere(float radius);
@@ -41,7 +41,7 @@ private:
 
 }; // Sphere
 
-class Torus : public ParametricSurface 
+class Torus : public ParametricSurface
 {
 public:
 	Torus(float majorRadius, float minorRadius);
@@ -58,7 +58,7 @@ private:
 
 }; // Torus
 
-class TrefoilKnot : public ParametricSurface 
+class TrefoilKnot : public ParametricSurface
 {
 public:
 	TrefoilKnot(float scale);
@@ -74,7 +74,7 @@ private:
 
 }; // TrefoilKnot
 
-class MobiusStrip : public ParametricSurface 
+class MobiusStrip : public ParametricSurface
 {
 public:
 	MobiusStrip(float scale);
@@ -90,7 +90,7 @@ private:
 
 }; // MobiusStrip
 
-class KleinBottle : public ParametricSurface 
+class KleinBottle : public ParametricSurface
 {
 public:
 	KleinBottle(float scale);

@@ -4,36 +4,30 @@
 
 #include <painting3/AABB.h>
 
-#include <rapidjson/document.h>
-
 #include <boost/noncopyable.hpp>
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace model
 {
 
-class Mesh;
-
 class Model : boost::noncopyable
 {
 public:
-	virtual const char* Type() const = 0;
+	auto& GetAllMeshes() const { return m_meshes; }
 
-	virtual bool StoreToJson(rapidjson::Value& val,
-		rapidjson::MemoryPoolAllocator<>& alloc) const = 0;
-	virtual void LoadFromJson(const rapidjson::Value& val) = 0;
-
-	const std::vector<MeshPtr>& GetAllMeshes() const { return m_meshes; }
-
-	void AddMesh(const MeshPtr& mesh) { m_meshes.push_back(mesh); }
+	void AddMesh(std::unique_ptr<Mesh>& mesh) { m_meshes.push_back(std::move(mesh)); }
 
 	auto& GetAABB() const { return m_aabb; }
+	void SetAABB(const pt3::AABB& aabb) { m_aabb = aabb; }
 
-protected:
-	std::vector<MeshPtr> m_meshes;
-	
+	// for ResPool
+	bool LoadFromFile(const std::string& filepath);
+
+private:
+	std::vector<std::unique_ptr<Mesh>> m_meshes;
+
 	pt3::AABB m_aabb;
 
 }; // Model

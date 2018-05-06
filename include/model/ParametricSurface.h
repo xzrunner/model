@@ -4,17 +4,17 @@
 
 #include <SM_Vector.h>
 
-namespace model 
+namespace model
 {
 
-struct ParametricInterval 
+struct ParametricInterval
 {
 	sm::ivec2 divisions;
 	sm::vec2  upperBound;
 	sm::vec2  texture_count;
 };
 
-class ParametricSurface : public Surface 
+class ParametricSurface : public Surface
 {
 public:
 	virtual int  GetVertexCount() const override;

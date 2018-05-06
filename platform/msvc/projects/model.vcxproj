@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -11,27 +11,36 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\source\AssimpHelper.cpp" />
+    <ClCompile Include="..\..\..\source\M3DLoader.cpp" />
     <ClCompile Include="..\..\..\source\Material.cpp" />
     <ClCompile Include="..\..\..\source\Mesh.cpp" />
+    <ClCompile Include="..\..\..\source\MeshGeometry.cpp" />
     <ClCompile Include="..\..\..\source\Model.cpp" />
-    <ClCompile Include="..\..\..\source\ModelFactory.cpp" />
-    <ClCompile Include="..\..\..\source\ModelObj.cpp" />
-    <ClCompile Include="..\..\..\source\ModelParametric.cpp" />
+    <ClCompile Include="..\..\..\source\ObjLoader.cpp" />
     <ClCompile Include="..\..\..\source\ParametricEquations.cpp" />
     <ClCompile Include="..\..\..\source\ParametricSurface.cpp" />
+    <ClCompile Include="..\..\..\source\Callback.cpp" />
+    <ClCompile Include="..\..\..\source\SkinnedData.cpp" />
     <ClCompile Include="..\..\..\source\SurfaceFactory.cpp" />
+    <ClCompile Include="..\..\..\source\SurfaceLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\include\model\AssimpHelper.h" />
+    <ClInclude Include="..\..\..\include\model\M3DLoader.h" />
     <ClInclude Include="..\..\..\include\model\Material.h" />
     <ClInclude Include="..\..\..\include\model\Mesh.h" />
+    <ClInclude Include="..\..\..\include\model\MeshGeometry.h" />
     <ClInclude Include="..\..\..\include\model\Model.h" />
-    <ClInclude Include="..\..\..\include\model\ModelFactory.h" />
-    <ClInclude Include="..\..\..\include\model\ModelObj.h" />
-    <ClInclude Include="..\..\..\include\model\ModelParametric.h" />
+    <ClInclude Include="..\..\..\include\model\Callback.h" />
+    <ClInclude Include="..\..\..\include\model\SkinnedModel.h" />
+    <ClInclude Include="..\..\..\include\model\ObjLoader.h" />
     <ClInclude Include="..\..\..\include\model\ParametricEquations.h" />
     <ClInclude Include="..\..\..\include\model\ParametricSurface.h" />
+    <ClInclude Include="..\..\..\include\model\SkinnedData.h" />
     <ClInclude Include="..\..\..\include\model\Surface.h" />
     <ClInclude Include="..\..\..\include\model\SurfaceFactory.h" />
+    <ClInclude Include="..\..\..\include\model\SurfaceLoader.h" />
     <ClInclude Include="..\..\..\include\model\typedef.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -77,7 +86,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\sm\src\sm;..\..\..\..\painting3\include;..\..\..\..\external\boost\include;..\..\..\..\external\rapidjson\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\painting3\include;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -91,7 +100,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\sm\src\sm;..\..\..\..\painting3\include;..\..\..\..\external\boost\include;..\..\..\..\external\rapidjson\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\painting3\include;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>

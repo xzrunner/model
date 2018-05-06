@@ -7,7 +7,7 @@ namespace model
 
 const char* const Cone::TYPE_NAME = "Cone";
 
-Cone::Cone(float height, float radius) 
+Cone::Cone(float height, float radius)
 	: m_height(height)
 	, m_radius(radius)
 {
@@ -28,7 +28,7 @@ sm::vec3 Cone::Evaluate(const sm::vec2& domain) const
 
 const char* const Sphere::TYPE_NAME = "Sphere";
 
-Sphere::Sphere(float radius) 
+Sphere::Sphere(float radius)
 	: m_radius(radius)
 {
 	ParametricInterval interval = { sm::ivec2(20, 20), sm::vec2(SM_PI, SM_TWO_PI), sm::vec2(20, 35) };
@@ -48,7 +48,7 @@ sm::vec3 Sphere::Evaluate(const sm::vec2& domain) const
 
 const char* const Torus::TYPE_NAME = "Torus";
 
-Torus::Torus(float majorRadius, float minorRadius) 
+Torus::Torus(float majorRadius, float minorRadius)
 	: m_majorRadius(majorRadius)
 	, m_minorRadius(minorRadius)
 {
@@ -71,7 +71,7 @@ sm::vec3 Torus::Evaluate(const sm::vec2& domain) const
 
 const char* const TrefoilKnot::TYPE_NAME = "TrefoilKnot";
 
-TrefoilKnot::TrefoilKnot(float scale) 
+TrefoilKnot::TrefoilKnot(float scale)
 	: m_scale(scale)
 {
 	ParametricInterval interval = { sm::ivec2(60, 15), sm::vec2(SM_TWO_PI, SM_TWO_PI), sm::vec2(100, 8) };
@@ -114,7 +114,7 @@ sm::vec3 TrefoilKnot::Evaluate(const sm::vec2& domain) const
 
 const char* const MobiusStrip::TYPE_NAME = "MobiusStrip";
 
-MobiusStrip::MobiusStrip(float scale) 
+MobiusStrip::MobiusStrip(float scale)
 	: m_scale(scale)
 {
 	ParametricInterval interval = { sm::ivec2(40, 20), sm::vec2(SM_TWO_PI, SM_TWO_PI), sm::vec2(40, 15) };
@@ -146,7 +146,7 @@ sm::vec3 MobiusStrip::Evaluate(const sm::vec2& domain) const
 
 const char* const KleinBottle::TYPE_NAME = "KleinBottle";
 
-KleinBottle::KleinBottle(float scale) 
+KleinBottle::KleinBottle(float scale)
 	: m_scale(scale)
 {
 	ParametricInterval interval = { sm::ivec2(20, 20), sm::vec2(SM_TWO_PI, SM_TWO_PI), sm::vec2(15, 50) };

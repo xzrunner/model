@@ -2,10 +2,10 @@
 
 #include <vector>
 
-namespace model 
+namespace model
 {
 
-class Surface 
+class Surface
 {
 public:
 	virtual const char* Type() const = 0;

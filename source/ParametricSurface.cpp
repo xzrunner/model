@@ -1,7 +1,7 @@
 #include "model/ParametricSurface.h"
 #include "model/typedef.h"
 
-namespace model 
+namespace model
 {
 
 int ParametricSurface::GetVertexCount() const
@@ -27,9 +27,9 @@ void ParametricSurface::GenerateVertices(int vertex_type, std::vector<float>& ve
 	vertices.resize(GetVertexCount() * stride);
 	float* ptr = &vertices[0];
 
-	for (int j = 0; j < m_divisions.y; j++) 
+	for (int j = 0; j < m_divisions.y; j++)
 	{
-		for (int i = 0; i < m_divisions.x; i++) 
+		for (int i = 0; i < m_divisions.x; i++)
 		{
 
 			// Compute Position
@@ -39,7 +39,7 @@ void ParametricSurface::GenerateVertices(int vertex_type, std::vector<float>& ve
 			ptr += 3;
 
 			// Compute Normal
-			if (vertex_type & VERTEX_FLAG_NORMALS) 
+			if (vertex_type & VERTEX_FLAG_NORMALS)
 			{
 				float s = static_cast<float>(i), t = static_cast<float>(j);
 
@@ -62,7 +62,7 @@ void ParametricSurface::GenerateVertices(int vertex_type, std::vector<float>& ve
 			}
 
 			// Compute Texture Coordinates
-			if (vertex_type & VERTEX_FLAG_TEXCOORDS) 
+			if (vertex_type & VERTEX_FLAG_TEXCOORDS)
 			{
 				float s = m_texture_count.x * i / m_slices.x;
 				float t = m_texture_count.y * j / m_slices.y;
