@@ -7,7 +7,7 @@
 namespace model
 {
 
-struct MaterialOld : boost::noncopyable
+struct MaterialOld
 {
 	sm::vec3 ambient = { 0.04f, 0.04f, 0.04f };
 	sm::vec3 diffuse = { 1, 1, 1 };
@@ -21,9 +21,12 @@ struct MaterialOld : boost::noncopyable
 
 struct Material
 {
+
 	sm::vec4 DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
 	sm::vec3 FresnelR0     = { 0.01f, 0.01f, 0.01f };
 	float Roughness        = .25f;
-};
+	void* texture = nullptr;
+
+}; // Material
 
 }

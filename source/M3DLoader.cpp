@@ -5,17 +5,29 @@
 #include "model/Mesh.h"
 #include "model/Model.h"
 #include "model/typedef.h"
+#include "model/Callback.h"
 
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
 
+#include <boost/filesystem.hpp>
+
 #include <fstream>
+
+namespace
+{
+
+const float MODEL_SCALE = 0.1f;
+
+}
 
 namespace model
 {
 
 bool M3DLoader::Load(Model& model, const std::string& filepath)
 {
+	auto dir = boost::filesystem::path(filepath).parent_path().string();
+
 	std::vector<M3DLoader::SkinnedVertex> vertices;
 	std::vector<uint16_t> indices;
 	std::vector<M3DLoader::Subset> subsets;
@@ -48,12 +60,30 @@ bool M3DLoader::Load(Model& model, const std::string& filepath)
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
 	int idx = 0;
+	GD_ASSERT(subsets.size() == mats.size(), "err material");
 	for (auto& sub : subsets)
 	{
-		mesh->geometry.sub_geometries.insert({
-			"sm_" + std::to_string(idx++),
+		//mesh->geometry.sub_geometries.insert({
+		//	"sm_" + std::to_string(idx++),
+		//	SubmeshGeometry(sub.FaceCount * 3, sub.FaceStart * 3)
+		//});
+		mesh->geometry.sub_geometries.push_back(
 			SubmeshGeometry(sub.FaceCount * 3, sub.FaceStart * 3)
-		});
+		);
+
+		auto& mat_src = mats[idx];
+
+		Material mat_dst;
+		mat_dst.DiffuseAlbedo = mat_src.DiffuseAlbedo;
+		mat_dst.FresnelR0 = mat_src.FresnelR0;
+		mat_dst.Roughness = mat_src.Roughness;
+		auto img_path = boost::filesystem::absolute(mat_src.DiffuseMapName, dir);
+		mat_dst.texture = Callback::CreateImg(img_path.string());
+		mesh->materials.push_back(mat_dst);
+
+		mesh->geometry.sub_geometry_materials.push_back(idx);
+
+		idx++;
 	}
 	model.AddMesh(mesh);
 
@@ -193,6 +223,8 @@ void M3DLoader::ReadVertices(std::ifstream& fin, uint32_t numVertices, std::vect
 		fin >> ignore >> vertices[i].TangentU.x >> vertices[i].TangentU.y >> vertices[i].TangentU.z >> vertices[i].TangentU.w;
 	    fin >> ignore >> vertices[i].Normal.x   >> vertices[i].Normal.y   >> vertices[i].Normal.z;
 	    fin >> ignore >> vertices[i].TexC.x     >> vertices[i].TexC.y;
+
+		vertices[i].Pos *= MODEL_SCALE;
     }
 }
 
@@ -222,6 +254,8 @@ void M3DLoader::ReadSkinnedVertices(std::ifstream& fin, uint32_t numVertices, st
 		vertices[i].BoneIndices[1] = (uint8_t)boneIndices[1];
 		vertices[i].BoneIndices[2] = (uint8_t)boneIndices[2];
 		vertices[i].BoneIndices[3] = (uint8_t)boneIndices[3];
+
+		vertices[i].Pos *= MODEL_SCALE;
     }
 }
 

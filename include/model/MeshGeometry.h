@@ -25,7 +25,9 @@ struct MeshGeometry : boost::noncopyable
 	unsigned int vbo = 0;
 	unsigned int ebo = 0;
 
-	std::unordered_map<std::string, SubmeshGeometry> sub_geometries;
+//	std::unordered_map<std::string, SubmeshGeometry> sub_geometries;
+	std::vector<SubmeshGeometry> sub_geometries;
+	std::vector<unsigned int>    sub_geometry_materials;
 
 	unsigned int vertex_type = 0;
 

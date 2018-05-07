@@ -42,7 +42,8 @@ bool SurfaceLoader::Load(Model& model, const std::string& filepath)
 	auto mesh = std::make_unique<Mesh>();
 	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
 		vi, mesh->geometry.vao, mesh->geometry.vbo, mesh->geometry.ebo);
-	mesh->geometry.sub_geometries.insert({ "default", SubmeshGeometry(vi.in, 0) });
+//	mesh->geometry.sub_geometries.insert({ "default", SubmeshGeometry(vi.in, 0) });
+	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(vi.in, 0));
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	model.AddMesh(mesh);
 

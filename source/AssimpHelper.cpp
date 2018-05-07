@@ -208,14 +208,16 @@ std::unique_ptr<Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, const aiMate
 
 	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
 		vi, mesh->geometry.vao, mesh->geometry.vbo, mesh->geometry.ebo);
-	mesh->geometry.sub_geometries.insert({ "default", SubmeshGeometry(vi.in, 0) });
+//	mesh->geometry.sub_geometries.insert({ "default", SubmeshGeometry(vi.in, 0) });
+	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(vi.in, 0));
+	mesh->geometry.sub_geometry_materials.push_back(0);
 
 	return mesh;
 }
 
 void AssimpHelper::LoadMaterial(const aiMesh* ai_mesh, const aiMaterial* ai_material, Mesh& mesh, const std::string& dir)
 {
-	auto& material = mesh.material_old;
+	model::MaterialOld material;
 
 	aiColor4D col;
 
@@ -254,6 +256,8 @@ void AssimpHelper::LoadMaterial(const aiMesh* ai_mesh, const aiMaterial* ai_mate
 			material.texture = Callback::CreateImg(img_path.string());
 		}
 	}
+
+	mesh.old_materials.push_back(material);
 }
 
 }
