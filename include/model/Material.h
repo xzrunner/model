@@ -15,8 +15,6 @@ struct MaterialOld
 	float    shininess = 50;
 	void*    texture = nullptr;
 
-	~MaterialOld();
-
 }; // MaterialOld
 
 struct Material

@@ -15,6 +15,8 @@ struct Mesh : boost::noncopyable
 	std::vector<Material>    materials;
 	std::vector<MaterialOld> old_materials;
 
+	~Mesh();
+
 }; // Mesh
 
 }
