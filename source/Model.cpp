@@ -21,6 +21,8 @@ bool Model::LoadFromFile(const std::string& filepath)
 		return AssimpHelper::Load(*this, filepath);
 	} else if (ext == ".m3d") {
 		return M3DLoader::Load(*this, filepath);
+	} else if (ext == ".X") {
+		return AssimpHelper::Load(*this, filepath);
 	} else {
 		GD_REPORT_ASSERT("unknown type.");
 		return false;
