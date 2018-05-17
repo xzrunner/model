@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Scene.h"
+
 #include <SM_Matrix.h>
 
 #include <map>
@@ -15,24 +17,23 @@ namespace pt3 { class AABB; }
 namespace model
 {
 
-class Model;
 struct Mesh;
 struct Material;
 
 class AssimpHelper
 {
 public:
-	static bool Load(Model& model, const std::string& filepath);
+	static bool Load(Scene& scene, const std::string& filepath);
 
 private:
-	static void LoadNode(const aiScene* scene, const aiNode* node, Model& model,
-		const std::string& dir, pt3::AABB& aabb);
+	static int LoadNode(const aiScene* ai_scene, const aiNode* node, Scene& scene);
 
-	static std::unique_ptr<Mesh> LoadMesh(const aiMesh* ai_mesh, const aiMaterial* ai_material,
-		const std::string& dir, const sm::mat4& trans, pt3::AABB& aabb);
+	static std::unique_ptr<Scene::Mesh> LoadMesh(const aiMesh* ai_mesh/*, const sm::mat4& trans, pt3::AABB& aabb*/);
 
-	static void LoadMaterial(const aiMesh* ai_mesh, const aiMaterial* ai_material,
-		Mesh& mesh, const std::string& dir);
+	static std::unique_ptr<Scene::Material> LoadMaterial(const aiMaterial* ai_material,
+		Scene& scene, const std::string& dir);
+
+	static int LoadTexture(Scene& scene, const std::string& filepath);
 
 }; // AssimpHelper
 

@@ -2,10 +2,10 @@
 
 #include "model/M3DLoader.h"
 #include "model/SkinnedData.h"
-#include "model/Mesh.h"
-#include "model/Model.h"
+#include "model/Scene.h"
 #include "model/typedef.h"
 #include "model/Callback.h"
+#include "model/EffectType.h"
 
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
@@ -24,7 +24,7 @@ const float MODEL_SCALE = 0.1f;
 namespace model
 {
 
-bool M3DLoader::Load(Model& model, const std::string& filepath)
+bool M3DLoader::Load(Scene& scene, const std::string& filepath)
 {
 	auto dir = boost::filesystem::path(filepath).parent_path().string();
 
@@ -54,11 +54,17 @@ bool M3DLoader::Load(Model& model, const std::string& filepath)
 	vi.va_list.push_back(ur::RenderContext::VertexAttribute(4, 3, stride, 11)); // bone_weights
 	vi.va_list.push_back(ur::RenderContext::VertexAttribute(5, 4, stride, 14)); // bone_indices
 
-	auto mesh = std::make_unique<Mesh>();
+	//// material
+	//scene.materials.emplace_back(std::make_unique<Scene::Material>());
+
+	// mesh
+	auto mesh = std::make_unique<Scene::Mesh>();
 	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
 		vi, mesh->geometry.vao, mesh->geometry.vbo, mesh->geometry.ebo);
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
+	mesh->material = 0;
+	mesh->effect = EFFECT_DEFAULT;
 	int idx = 0;
 	GD_ASSERT(subsets.size() == mats.size(), "err material");
 	for (auto& sub : subsets)
@@ -67,25 +73,37 @@ bool M3DLoader::Load(Model& model, const std::string& filepath)
 		//	"sm_" + std::to_string(idx++),
 		//	SubmeshGeometry(sub.FaceCount * 3, sub.FaceStart * 3)
 		//});
-		mesh->geometry.sub_geometries.push_back(
-			SubmeshGeometry(sub.FaceCount * 3, sub.FaceStart * 3)
+		mesh->geometry.sub_geometries.emplace_back(
+			sub.FaceCount * 3, sub.FaceStart * 3
 		);
 
 		auto& mat_src = mats[idx];
 
-		Material mat_dst;
-		mat_dst.DiffuseAlbedo = mat_src.DiffuseAlbedo;
-		mat_dst.FresnelR0 = mat_src.FresnelR0;
-		mat_dst.Roughness = mat_src.Roughness;
+		// todo
+		//Material mat_dst;
+		//mat_dst.DiffuseAlbedo = mat_src.DiffuseAlbedo;
+		//mat_dst.FresnelR0 = mat_src.FresnelR0;
+		//mat_dst.Roughness = mat_src.Roughness;
+		//auto img_path = boost::filesystem::absolute(mat_src.DiffuseMapName, dir);
+		//mat_dst.texture = Callback::CreateImg(img_path.string());
+		//mesh->materials.push_back(mat_dst);
+
+		auto material = std::make_unique<Scene::Material>();
+		material->diffuse_tex = scene.textures.size();
 		auto img_path = boost::filesystem::absolute(mat_src.DiffuseMapName, dir);
-		mat_dst.texture = Callback::CreateImg(img_path.string());
-		mesh->materials.push_back(mat_dst);
+		scene.textures.push_back({ filepath, Callback::CreateImg(img_path.string()) });
+		scene.materials.push_back(std::move(material));
 
 		mesh->geometry.sub_geometry_materials.push_back(idx);
 
 		idx++;
 	}
-	model.AddMesh(mesh);
+	scene.meshes.push_back(std::move(mesh));
+
+	// node
+	auto node = std::make_unique<Scene::Node>();
+	node->meshes.emplace_back(0);
+	scene.nodes.push_back(std::move(node));
 
 	return true;
 }
