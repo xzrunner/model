@@ -26,9 +26,10 @@ public:
 	static bool Load(Scene& scene, const std::string& filepath);
 
 private:
-	static int LoadNode(const aiScene* ai_scene, const aiNode* node, Scene& scene);
+	static int LoadNode(const aiScene* ai_scene, const aiNode* node, Scene& scene,
+		const std::vector<pt3::AABB>& meshes_aabb, const sm::mat4& mat);
 
-	static std::unique_ptr<Scene::Mesh> LoadMesh(const aiMesh* ai_mesh/*, const sm::mat4& trans, pt3::AABB& aabb*/);
+	static std::unique_ptr<Scene::Mesh> LoadMesh(const aiMesh* ai_mesh, pt3::AABB& aabb);
 
 	static std::unique_ptr<Scene::Material> LoadMaterial(const aiMaterial* ai_material,
 		Scene& scene, const std::string& dir);

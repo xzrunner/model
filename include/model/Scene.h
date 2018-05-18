@@ -59,8 +59,7 @@ struct Scene : boost::noncopyable
 
 	std::vector<std::unique_ptr<Node>> nodes;
 
-	//// todo
-	//pt3::AABB aabb;
+	pt3::AABB aabb;
 
 	// for ResPool
 	bool LoadFromFile(const std::string& filepath);

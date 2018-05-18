@@ -59,6 +59,7 @@ bool SurfaceLoader::Load(Scene& scene, const std::string& filepath)
 	node->meshes.emplace_back(0);
 	scene.nodes.push_back(std::move(node));
 
+	// aabb
 	pt3::AABB aabb;
 	for (int i = 0, n = vertices.size(); i < n; )
 	{
@@ -69,7 +70,7 @@ bool SurfaceLoader::Load(Scene& scene, const std::string& filepath)
 		aabb.Combine(pos);
 		i += stride;
 	}
-//	model.SetAABB(aabb);
+	scene.aabb = aabb;
 
 	return true;
 }

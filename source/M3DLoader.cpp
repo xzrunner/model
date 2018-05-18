@@ -37,6 +37,11 @@ bool M3DLoader::Load(Scene& scene, const std::string& filepath)
 		return false;
 	}
 
+	// aabb
+	for (auto& v : vertices) {
+		scene.aabb.Combine(v.Pos);
+	}
+
 	const int stride = sizeof(M3DLoader::SkinnedVertex) / sizeof(float);
 
 	ur::RenderContext::VertexInfo vi;
