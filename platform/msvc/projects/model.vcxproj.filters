@@ -38,7 +38,9 @@
     <ClCompile Include="..\..\..\source\Callback.cpp">
       <Filter>utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\Scene.cpp" />
+    <ClCompile Include="..\..\..\source\Model.cpp" />
+    <ClCompile Include="..\..\..\source\ModelInstance.cpp" />
+    <ClCompile Include="..\..\..\source\GlobalClock.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\model\ParametricEquations.h">
@@ -72,7 +74,9 @@
     <ClInclude Include="..\..\..\include\model\Callback.h">
       <Filter>utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\model\Scene.h" />
     <ClInclude Include="..\..\..\include\model\EffectType.h" />
+    <ClInclude Include="..\..\..\include\model\Model.h" />
+    <ClInclude Include="..\..\..\include\model\ModelInstance.h" />
+    <ClInclude Include="..\..\..\include\model\GlobalClock.h" />
   </ItemGroup>
 </Project>

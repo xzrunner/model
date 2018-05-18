@@ -7,7 +7,7 @@
 namespace model
 {
 
-class Model;
+struct Model;
 
 class ObjLoader
 {

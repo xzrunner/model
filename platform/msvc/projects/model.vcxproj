@@ -12,9 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\AssimpHelper.cpp" />
+    <ClCompile Include="..\..\..\source\GlobalClock.cpp" />
     <ClCompile Include="..\..\..\source\M3DLoader.cpp" />
     <ClCompile Include="..\..\..\source\MeshGeometry.cpp" />
-    <ClCompile Include="..\..\..\source\Scene.cpp" />
+    <ClCompile Include="..\..\..\source\Model.cpp" />
+    <ClCompile Include="..\..\..\source\ModelInstance.cpp" />
     <ClCompile Include="..\..\..\source\ObjLoader.cpp" />
     <ClCompile Include="..\..\..\source\ParametricEquations.cpp" />
     <ClCompile Include="..\..\..\source\ParametricSurface.cpp" />
@@ -26,10 +28,12 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\include\model\AssimpHelper.h" />
     <ClInclude Include="..\..\..\include\model\EffectType.h" />
+    <ClInclude Include="..\..\..\include\model\GlobalClock.h" />
     <ClInclude Include="..\..\..\include\model\M3DLoader.h" />
     <ClInclude Include="..\..\..\include\model\MeshGeometry.h" />
     <ClInclude Include="..\..\..\include\model\Callback.h" />
-    <ClInclude Include="..\..\..\include\model\Scene.h" />
+    <ClInclude Include="..\..\..\include\model\Model.h" />
+    <ClInclude Include="..\..\..\include\model\ModelInstance.h" />
     <ClInclude Include="..\..\..\include\model\SkinnedModel.h" />
     <ClInclude Include="..\..\..\include\model\ObjLoader.h" />
     <ClInclude Include="..\..\..\include\model\ParametricEquations.h" />

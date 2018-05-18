@@ -5,12 +5,12 @@
 namespace model
 {
 
-struct Scene;
+struct Model;
 
 class SurfaceLoader
 {
 public:
-	static bool Load(Scene& scene, const std::string& filepath);
+	static bool Load(Model& model, const std::string& filepath);
 
 }; // SurfaceLoader
 

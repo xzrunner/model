@@ -12,7 +12,7 @@
 namespace model
 {
 
-struct Scene;
+struct Model;
 class SkinnedData;
 struct BoneAnimation;
 struct AnimationClip;
@@ -20,7 +20,7 @@ struct AnimationClip;
 class M3DLoader
 {
 public:
-	static bool Load(Scene& scene, const std::string& filepath);
+	static bool Load(Model& model, const std::string& filepath);
 
 private:
 	struct Vertex

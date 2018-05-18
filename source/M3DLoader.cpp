@@ -2,7 +2,7 @@
 
 #include "model/M3DLoader.h"
 #include "model/SkinnedData.h"
-#include "model/Scene.h"
+#include "model/Model.h"
 #include "model/typedef.h"
 #include "model/Callback.h"
 #include "model/EffectType.h"
@@ -24,7 +24,7 @@ const float MODEL_SCALE = 0.1f;
 namespace model
 {
 
-bool M3DLoader::Load(Scene& scene, const std::string& filepath)
+bool M3DLoader::Load(Model& model, const std::string& filepath)
 {
 	auto dir = boost::filesystem::path(filepath).parent_path().string();
 
@@ -39,7 +39,7 @@ bool M3DLoader::Load(Scene& scene, const std::string& filepath)
 
 	// aabb
 	for (auto& v : vertices) {
-		scene.aabb.Combine(v.Pos);
+		model.aabb.Combine(v.Pos);
 	}
 
 	const int stride = sizeof(M3DLoader::SkinnedVertex) / sizeof(float);
@@ -60,10 +60,10 @@ bool M3DLoader::Load(Scene& scene, const std::string& filepath)
 	vi.va_list.push_back(ur::RenderContext::VertexAttribute(5, 4, stride, 14)); // bone_indices
 
 	//// material
-	//scene.materials.emplace_back(std::make_unique<Scene::Material>());
+	//model.materials.emplace_back(std::make_unique<Model::Material>());
 
 	// mesh
-	auto mesh = std::make_unique<Scene::Mesh>();
+	auto mesh = std::make_unique<Model::Mesh>();
 	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
 		vi, mesh->geometry.vao, mesh->geometry.vbo, mesh->geometry.ebo);
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
@@ -93,22 +93,22 @@ bool M3DLoader::Load(Scene& scene, const std::string& filepath)
 		//mat_dst.texture = Callback::CreateImg(img_path.string());
 		//mesh->materials.push_back(mat_dst);
 
-		auto material = std::make_unique<Scene::Material>();
-		material->diffuse_tex = scene.textures.size();
+		auto material = std::make_unique<Model::Material>();
+		material->diffuse_tex = model.textures.size();
 		auto img_path = boost::filesystem::absolute(mat_src.DiffuseMapName, dir);
-		scene.textures.push_back({ filepath, Callback::CreateImg(img_path.string()) });
-		scene.materials.push_back(std::move(material));
+		model.textures.push_back({ filepath, Callback::CreateImg(img_path.string()) });
+		model.materials.push_back(std::move(material));
 
 		mesh->geometry.sub_geometry_materials.push_back(idx);
 
 		idx++;
 	}
-	scene.meshes.push_back(std::move(mesh));
+	model.meshes.push_back(std::move(mesh));
 
 	// node
-	auto node = std::make_unique<Scene::Node>();
+	auto node = std::make_unique<Model::Node>();
 	node->meshes.emplace_back(0);
-	scene.nodes.push_back(std::move(node));
+	model.nodes.push_back(std::move(node));
 
 	return true;
 }

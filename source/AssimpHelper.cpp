@@ -1,7 +1,7 @@
 #include "model/AssimpHelper.h"
 #include "model/typedef.h"
 #include "model/Callback.h"
-#include "model/Scene.h"
+#include "model/Model.h"
 #include "model/EffectType.h"
 
 #include <unirender/RenderContext.h>
@@ -15,6 +15,52 @@
 #include <assimp/postprocess.h>     // Post processing flags
 
 #include <boost/filesystem.hpp>
+
+namespace
+{
+
+sm::mat4 trans_ai_mat(const C_STRUCT aiMatrix4x4& ai_mat)
+{
+	sm::mat4 mat;
+	mat.x[0]  = ai_mat.a1;
+	mat.x[1]  = ai_mat.b1;
+	mat.x[2]  = ai_mat.c1;
+	mat.x[3]  = ai_mat.d1;
+	mat.x[4]  = ai_mat.a2;
+	mat.x[5]  = ai_mat.b2;
+	mat.x[6]  = ai_mat.c2;
+	mat.x[7]  = ai_mat.d2;
+	mat.x[8]  = ai_mat.a3;
+	mat.x[9]  = ai_mat.b3;
+	mat.x[10] = ai_mat.c3;
+	mat.x[11] = ai_mat.d3;
+	mat.x[12] = ai_mat.a4;
+	mat.x[13] = ai_mat.b4;
+	mat.x[14] = ai_mat.c4;
+	mat.x[15] = ai_mat.d4;
+	return mat;
+}
+
+sm::vec3 trans_ai_vector3d(const C_STRUCT aiVector3D& ai_vec3)
+{
+	sm::vec3 vec3;
+	vec3.x = ai_vec3.x;
+	vec3.y = ai_vec3.y;
+	vec3.z = ai_vec3.z;
+	return vec3;
+}
+
+sm::Quaternion trans_ai_quaternion(const C_STRUCT aiQuaternion& ai_quat)
+{
+	sm::Quaternion quat;
+	quat.x = ai_quat.x;
+	quat.y = ai_quat.y;
+	quat.z = ai_quat.z;
+	quat.w = ai_quat.w;
+	return quat;
+}
+
+}
 
 namespace model
 {
@@ -35,7 +81,7 @@ unsigned int ppsteps = aiProcess_CalcTangentSpace | // calculate tangents and bi
 	aiProcess_SplitByBoneCount         | // split meshes with too many bones. Necessary for our (limited) hardware skinning shader
 	0;
 
-bool AssimpHelper::Load(Scene& scene, const std::string& filepath)
+bool AssimpHelper::Load(Model& model, const std::string& filepath)
 {
 	Assimp::Importer importer;
 	const aiScene* ai_scene = importer.ReadFile(filepath.c_str(),
@@ -53,74 +99,64 @@ bool AssimpHelper::Load(Scene& scene, const std::string& filepath)
 
 	// material
 	auto dir = boost::filesystem::path(filepath).parent_path().string();
-	scene.materials.reserve(ai_scene->mNumMaterials);
+	model.materials.reserve(ai_scene->mNumMaterials);
 	for (size_t i = 0; i < ai_scene->mNumMaterials; ++i)
 	{
 		auto src = ai_scene->mMaterials[i];
-		scene.materials.push_back(LoadMaterial(src, scene, dir));
+		model.materials.push_back(LoadMaterial(src, model, dir));
 	}
 
 	// mesh
 	std::vector<pt3::AABB> meshes_aabb;
 	meshes_aabb.reserve(ai_scene->mNumMeshes);
-	scene.meshes.reserve(ai_scene->mNumMeshes);
+	model.meshes.reserve(ai_scene->mNumMeshes);
 	for (size_t i = 0; i < ai_scene->mNumMeshes; ++i)
 	{
 		auto src = ai_scene->mMeshes[i];
 		pt3::AABB aabb;
-		scene.meshes.push_back(LoadMesh(src, aabb));
+		model.meshes.push_back(LoadMesh(src, aabb));
 		meshes_aabb.push_back(aabb);
 	}
 
 	// node
-	LoadNode(ai_scene, ai_scene->mRootNode, scene, meshes_aabb, sm::mat4());
+	LoadNode(ai_scene, ai_scene->mRootNode, model, meshes_aabb, sm::mat4());
 
 	// todo: load lights and cameras
+
+	// animation
+	model.anims.reserve(ai_scene->mNumAnimations);
+	for (size_t i = 0; i < ai_scene->mNumAnimations; ++i) {
+		auto src = ai_scene->mAnimations[i];
+		model.anims.push_back(LoadAnimation(src));
+	}
 
 	return true;
 }
 
-int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Scene& scene,
+int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model,
 	                       const std::vector<pt3::AABB>& meshes_aabb, const sm::mat4& mat)
 {
-	auto node = std::make_unique<Scene::Node>();
+	auto node = std::make_unique<Model::Node>();
 	auto node_raw = node.get();
 
 	node_raw->name = ai_node->mName.C_Str();
 
-	int node_id = scene.nodes.size();
-	scene.nodes.push_back(std::move(node));
+	int node_id = model.nodes.size();
+	model.nodes.push_back(std::move(node));
 
-	sm::mat4 node_mat;
-	node_mat.x[0] = ai_node->mTransformation.a1;
-	node_mat.x[1] = ai_node->mTransformation.b1;
-	node_mat.x[2] = ai_node->mTransformation.c1;
-	node_mat.x[3] = ai_node->mTransformation.d1;
-	node_mat.x[4] = ai_node->mTransformation.a2;
-	node_mat.x[5] = ai_node->mTransformation.b2;
-	node_mat.x[6] = ai_node->mTransformation.c2;
-	node_mat.x[7] = ai_node->mTransformation.d2;
-	node_mat.x[8] = ai_node->mTransformation.a3;
-	node_mat.x[9] = ai_node->mTransformation.b3;
-	node_mat.x[10] = ai_node->mTransformation.c3;
-	node_mat.x[11] = ai_node->mTransformation.d3;
-	node_mat.x[12] = ai_node->mTransformation.a4;
-	node_mat.x[13] = ai_node->mTransformation.b4;
-	node_mat.x[14] = ai_node->mTransformation.c4;
-	node_mat.x[15] = ai_node->mTransformation.d4;
-	node_raw->local_mat = node_mat;
+	node_raw->local_trans = trans_ai_mat(ai_node->mTransformation);
 
-	auto child_mat = mat * node_mat;
+	auto child_mat = mat * node_raw->local_trans;
 
 	if (ai_node->mNumChildren)
 	{
 		for (size_t i = 0; i < ai_node->mNumChildren; ++i)
 		{
-			int child = LoadNode(ai_scene, ai_node->mChildren[i], scene, meshes_aabb, child_mat);
+			int child = LoadNode(ai_scene, ai_node->mChildren[i], model, meshes_aabb, child_mat);
 			node_raw->children.push_back(child);
 
-			assert(scene.nodes[child]->parent == -1);
-			scene.nodes[child]->parent = node_id;
+			assert(model.nodes[child]->parent == -1);
+			model.nodes[child]->parent = node_id;
 		}
 	}
 	else
@@ -130,25 +166,25 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Scene
 			//sm::mat4 trans_mat;
 			//const aiNode* node = ai_node;
 			//while (node) {
-			//	sm::mat4 node_mat;
-			//	node_mat.x[0] = ai_node->mTransformation.a1;
-			//	node_mat.x[1] = ai_node->mTransformation.b1;
-			//	node_mat.x[2] = ai_node->mTransformation.c1;
-			//	node_mat.x[3] = ai_node->mTransformation.d1;
-			//	node_mat.x[4] = ai_node->mTransformation.a2;
-			//	node_mat.x[5] = ai_node->mTransformation.b2;
-			//	node_mat.x[6] = ai_node->mTransformation.c2;
-			//	node_mat.x[7] = ai_node->mTransformation.d2;
-			//	node_mat.x[8] = ai_node->mTransformation.a3;
-			//	node_mat.x[9] = ai_node->mTransformation.b3;
-			//	node_mat.x[10] = ai_node->mTransformation.c3;
-			//	node_mat.x[11] = ai_node->mTransformation.d3;
-			//	node_mat.x[12] = ai_node->mTransformation.a4;
-			//	node_mat.x[13] = ai_node->mTransformation.b4;
-			//	node_mat.x[14] = ai_node->mTransformation.c4;
-			//	node_mat.x[15] = ai_node->mTransformation.d4;
+			//	sm::mat4 node_trans;
+			//	node_trans.x[0] = ai_node->mTransformation.a1;
+			//	node_trans.x[1] = ai_node->mTransformation.b1;
+			//	node_trans.x[2] = ai_node->mTransformation.c1;
+			//	node_trans.x[3] = ai_node->mTransformation.d1;
+			//	node_trans.x[4] = ai_node->mTransformation.a2;
+			//	node_trans.x[5] = ai_node->mTransformation.b2;
+			//	node_trans.x[6] = ai_node->mTransformation.c2;
+			//	node_trans.x[7] = ai_node->mTransformation.d2;
+			//	node_trans.x[8] = ai_node->mTransformation.a3;
+			//	node_trans.x[9] = ai_node->mTransformation.b3;
+			//	node_trans.x[10] = ai_node->mTransformation.c3;
+			//	node_trans.x[11] = ai_node->mTransformation.d3;
+			//	node_trans.x[12] = ai_node->mTransformation.a4;
+			//	node_trans.x[13] = ai_node->mTransformation.b4;
+			//	node_trans.x[14] = ai_node->mTransformation.c4;
+			//	node_trans.x[15] = ai_node->mTransformation.d4;
 
-			//	trans_mat = node_mat * trans_mat;
+			//	trans_mat = node_trans * trans_mat;
 
 			//	node = node_raw->mParent;
 			//}
@@ -161,7 +197,7 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Scene
 			//	const aiMaterial* ai_material = ai_scene->mMaterials[ai_mesh->mMaterialIndex];
 
 			//	auto mesh = LoadMesh(ai_mesh, trans_mat, aabb);
-			//	scene.meshes.push_back(std::move(mesh));
+			//	model.meshes.push_back(std::move(mesh));
 			//}
 
 			node_raw->meshes.reserve(ai_node->mNumMeshes);
@@ -169,7 +205,7 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Scene
 			{
 				auto mesh = ai_node->mMeshes[i];
 				node_raw->meshes.push_back(mesh);
-				scene.aabb.Combine(meshes_aabb[mesh].Cube(), child_mat);
+				model.aabb.Combine(meshes_aabb[mesh].Cube(), child_mat);
 			}
 		}
 	}
@@ -177,9 +213,9 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Scene
 	return node_id;
 }
 
-std::unique_ptr<Scene::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, pt3::AABB& aabb)
+std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, pt3::AABB& aabb)
 {
-	auto mesh = std::make_unique<Scene::Mesh>();
+	auto mesh = std::make_unique<Model::Mesh>();
 
 	mesh->material = ai_mesh->mMaterialIndex;
 
@@ -286,10 +322,10 @@ std::unique_ptr<Scene::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, pt3::
 	return mesh;
 }
 
-std::unique_ptr<Scene::Material> AssimpHelper::LoadMaterial(const aiMaterial* ai_material,
-	                                                        Scene& scene, const std::string& dir)
+std::unique_ptr<Model::Material> AssimpHelper::LoadMaterial(const aiMaterial* ai_material,
+	                                                        Model& model, const std::string& dir)
 {
-	auto material = std::make_unique<Scene::Material>();
+	auto material = std::make_unique<Model::Material>();
 
 	aiColor4D col;
 
@@ -325,17 +361,17 @@ std::unique_ptr<Scene::Material> AssimpHelper::LoadMaterial(const aiMaterial* ai
 		if (aiGetMaterialString(ai_material, AI_MATKEY_TEXTURE_DIFFUSE(0), &path) == AI_SUCCESS)
 		{
 			auto img_path = boost::filesystem::absolute(path.data, dir);
-			material->diffuse_tex = LoadTexture(scene, img_path.string());
+			material->diffuse_tex = LoadTexture(model, img_path.string());
 		}
 	}
 
 	return material;
 }
 
-int AssimpHelper::LoadTexture(Scene& scene, const std::string& filepath)
+int AssimpHelper::LoadTexture(Model& model, const std::string& filepath)
 {
 	int idx = 0;
-	for (auto& tex : scene.textures)
+	for (auto& tex : model.textures)
 	{
 		if (tex.first == filepath) {
 			return idx;
@@ -343,9 +379,51 @@ int AssimpHelper::LoadTexture(Scene& scene, const std::string& filepath)
 		++idx;
 	}
 
-	int ret = scene.textures.size();
-	scene.textures.push_back({ filepath, Callback::CreateImg(filepath) });
+	int ret = model.textures.size();
+	model.textures.push_back({ filepath, Callback::CreateImg(filepath) });
 	return ret;
+}
+
+std::unique_ptr<Model::Animation> AssimpHelper::LoadAnimation(const aiAnimation* ai_anim)
+{
+	auto anim = std::make_unique<Model::Animation>();
+	anim->name = ai_anim->mName.C_Str();
+	anim->duration = ai_anim->mDuration;
+	anim->ticks_per_second = ai_anim->mTicksPerSecond;
+	for (int i = 0, n = ai_anim->mNumChannels; i < n; ++i) {
+		auto& src = ai_anim->mChannels[i];
+		anim->channels.push_back(LoadNodeAnim(src));
+	}
+	return anim;
+}
+
+std::unique_ptr<Model::NodeAnim> AssimpHelper::LoadNodeAnim(const aiNodeAnim* ai_node)
+{
+	auto node_anim = std::make_unique<Model::NodeAnim>();
+	node_anim->name = ai_node->mNodeName.C_Str();
+
+	node_anim->position_keys.reserve(ai_node->mNumPositionKeys);
+	for (int i = 0; i < ai_node->mNumPositionKeys; ++i)
+	{
+		auto& src = ai_node->mPositionKeys[i];
+		node_anim->position_keys.push_back({ src.mTime, trans_ai_vector3d(src.mValue) });
+	}
+
+	node_anim->rotation_keys.reserve(ai_node->mNumRotationKeys);
+	for (int i = 0; i < ai_node->mNumRotationKeys; ++i)
+	{
+		auto& src = ai_node->mRotationKeys[i];
+		node_anim->rotation_keys.push_back({ src.mTime, trans_ai_quaternion(src.mValue) });
+	}
+
+	node_anim->scaling_keys.reserve(ai_node->mNumScalingKeys);
+	for (int i = 0; i < ai_node->mNumScalingKeys; ++i)
+	{
+		auto& src = ai_node->mScalingKeys[i];
+		node_anim->scaling_keys.push_back({ src.mTime, trans_ai_vector3d(src.mValue) });
+	}
+
+	return node_anim;
 }
 
 }

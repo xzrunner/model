@@ -16,8 +16,11 @@ namespace model
 struct Mesh;
 struct Node;
 
-struct Scene : boost::noncopyable
+struct Model : boost::noncopyable
 {
+	// for ResPool
+	bool LoadFromFile(const std::string& filepath);
+
 	struct Material
 	{
 		sm::vec3 ambient = { 0.04f, 0.04f, 0.04f };
@@ -47,9 +50,33 @@ struct Scene : boost::noncopyable
 
 		std::vector<int> meshes;
 
-		sm::mat4 local_mat;
+		sm::mat4 local_trans;
+
+		int channel_idx = -1;
 
 	}; // Node
+
+	struct NodeAnim
+	{
+		std::string name;
+
+		std::vector<std::pair<float, sm::vec3>>       position_keys;
+		std::vector<std::pair<float, sm::Quaternion>> rotation_keys;
+		std::vector<std::pair<float, sm::vec3>>       scaling_keys;
+
+	}; // NodeAnim
+
+	struct Animation
+	{
+		std::string name;
+
+		float duration = 0;
+
+		float ticks_per_second = 0;
+
+		std::vector<std::unique_ptr<NodeAnim>> channels;
+
+	}; // Animation
 
 	std::vector<std::pair<std::string, void*>> textures;
 
@@ -59,11 +86,10 @@ struct Scene : boost::noncopyable
 
 	std::vector<std::unique_ptr<Node>> nodes;
 
+	std::vector<std::unique_ptr<Animation>> anims;
+
 	pt3::AABB aabb;
 
-	// for ResPool
-	bool LoadFromFile(const std::string& filepath);
-
-}; // Scene
+}; // Model
 
 }

@@ -1,4 +1,4 @@
-#include "model/Scene.h"
+#include "model/Model.h"
 #include "model/SurfaceLoader.h"
 #include "model/ObjLoader.h"
 #include "model/M3DLoader.h"
@@ -11,7 +11,7 @@
 namespace model
 {
 
-bool Scene::LoadFromFile(const std::string& filepath)
+bool Model::LoadFromFile(const std::string& filepath)
 {
 	auto ext = boost::filesystem::extension(filepath);
 	if (ext == ".param") {

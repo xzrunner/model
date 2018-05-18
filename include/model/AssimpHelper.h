@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Scene.h"
+#include "Model.h"
 
 #include <SM_Matrix.h>
 
@@ -11,6 +11,8 @@ struct aiScene;
 struct aiNode;
 struct aiMesh;
 struct aiMaterial;
+struct aiAnimation;
+struct aiNodeAnim;
 
 namespace pt3 { class AABB; }
 
@@ -23,18 +25,21 @@ struct Material;
 class AssimpHelper
 {
 public:
-	static bool Load(Scene& scene, const std::string& filepath);
+	static bool Load(Model& model, const std::string& filepath);
 
 private:
-	static int LoadNode(const aiScene* ai_scene, const aiNode* node, Scene& scene,
+	static int LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model,
 		const std::vector<pt3::AABB>& meshes_aabb, const sm::mat4& mat);
 
-	static std::unique_ptr<Scene::Mesh> LoadMesh(const aiMesh* ai_mesh, pt3::AABB& aabb);
+	static std::unique_ptr<Model::Mesh> LoadMesh(const aiMesh* ai_mesh, pt3::AABB& aabb);
 
-	static std::unique_ptr<Scene::Material> LoadMaterial(const aiMaterial* ai_material,
-		Scene& scene, const std::string& dir);
+	static std::unique_ptr<Model::Material> LoadMaterial(const aiMaterial* ai_material,
+		Model& model, const std::string& dir);
 
-	static int LoadTexture(Scene& scene, const std::string& filepath);
+	static int LoadTexture(Model& model, const std::string& filepath);
+
+	static std::unique_ptr<Model::Animation> LoadAnimation(const aiAnimation* ai_anim);
+	static std::unique_ptr<Model::NodeAnim> LoadNodeAnim(const aiNodeAnim* ai_node);
 
 }; // AssimpHelper
 

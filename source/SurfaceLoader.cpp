@@ -2,7 +2,7 @@
 #include "model/SurfaceFactory.h"
 #include "model/Surface.h"
 #include "model/typedef.h"
-#include "model/Scene.h"
+#include "model/Model.h"
 #include "model/EffectType.h"
 
 #include <unirender/RenderContext.h>
@@ -13,7 +13,7 @@
 namespace model
 {
 
-bool SurfaceLoader::Load(Scene& scene, const std::string& filepath)
+bool SurfaceLoader::Load(Model& model, const std::string& filepath)
 {
 	auto name = boost::filesystem::path(filepath).stem().string();
 	auto surface = SurfaceFactory::Create(name);
@@ -40,10 +40,10 @@ bool SurfaceLoader::Load(Scene& scene, const std::string& filepath)
 	vi.va_list.push_back(ur::RenderContext::VertexAttribute(1, 3, stride, 3));
 
 	// material
-	scene.materials.emplace_back(std::make_unique<Scene::Material>());
+	model.materials.emplace_back(std::make_unique<Model::Material>());
 
 	// mesh
-	auto mesh = std::make_unique<Scene::Mesh>();
+	auto mesh = std::make_unique<Model::Mesh>();
 	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
 		vi, mesh->geometry.vao, mesh->geometry.vbo, mesh->geometry.ebo);
 //	mesh->geometry.sub_geometries.insert({ "default", SubmeshGeometry(vi.in, 0) });
@@ -52,12 +52,12 @@ bool SurfaceLoader::Load(Scene& scene, const std::string& filepath)
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	mesh->material = 0;
 	mesh->effect = EFFECT_DEFAULT_NO_TEX;
-	scene.meshes.push_back(std::move(mesh));
+	model.meshes.push_back(std::move(mesh));
 
 	// node
-	auto node = std::make_unique<Scene::Node>();
+	auto node = std::make_unique<Model::Node>();
 	node->meshes.emplace_back(0);
-	scene.nodes.push_back(std::move(node));
+	model.nodes.push_back(std::move(node));
 
 	// aabb
 	pt3::AABB aabb;
@@ -70,7 +70,7 @@ bool SurfaceLoader::Load(Scene& scene, const std::string& filepath)
 		aabb.Combine(pos);
 		i += stride;
 	}
-	scene.aabb = aabb;
+	model.aabb = aabb;
 
 	return true;
 }
