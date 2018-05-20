@@ -31,4 +31,14 @@ bool Model::LoadFromFile(const std::string& filepath)
 	return false;
 }
 
+int Model::QueryNodeByName(const std::string& name) const
+{
+	for (int i = 0, n = nodes.size(); i < n; ++i) {
+		if (nodes[i]->name == name) {
+			return i;
+		}
+	}
+	return -1;
+}
+
 }

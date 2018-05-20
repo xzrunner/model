@@ -123,11 +123,23 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath)
 
 	// todo: load lights and cameras
 
+	// bone
+	for (auto& mesh : model.meshes) {
+		for (auto& bone : mesh->geometry.bones) {
+			bone.node = model.QueryNodeByName(bone.name);
+		}
+	}
+
 	// animation
 	model.anims.reserve(ai_scene->mNumAnimations);
 	for (size_t i = 0; i < ai_scene->mNumAnimations; ++i) {
 		auto src = ai_scene->mAnimations[i];
 		model.anims.push_back(LoadAnimation(src));
+	}
+
+	// todo
+	if (boost::filesystem::extension(filepath) == ".X") {
+		model.anim_speed = 100;
 	}
 
 	return true;
@@ -221,11 +233,13 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, pt3::
 
 	int vertex_type = 0;
 	int floats_per_vertex = 3;
+
 	bool has_normal = ai_mesh->HasNormals();
 	if (has_normal) {
 		floats_per_vertex += 3;
 		vertex_type |= VERTEX_FLAG_NORMALS;
 	}
+
 	bool has_texcoord = ai_mesh->HasTextureCoords(0);
 	if (has_texcoord)
 	{
@@ -238,29 +252,66 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, pt3::
 		mesh->effect = EFFECT_DEFAULT_NO_TEX;
 	}
 
-	std::vector<float> vertices;
-	vertices.reserve(floats_per_vertex * ai_mesh->mNumVertices);
+	bool has_skinned = ai_mesh->HasBones();
+	if (has_skinned)
+	{
+		floats_per_vertex += 2;
+		vertex_type |= VERTEX_FLAG_SKINNED;
+		mesh->effect = EFFECT_SKINNED;
+	}
+
+	std::vector<std::vector<std::pair<int, float>>> weights_per_vertex(ai_mesh->mNumVertices);
+	for (unsigned int i = 0; i < ai_mesh->mNumBones; ++i)
+	{
+		auto bone = ai_mesh->mBones[i];
+		for (unsigned int j = 0; j < bone->mNumWeights; ++j) {
+			weights_per_vertex[bone->mWeights[j].mVertexId].push_back({ i, bone->mWeights[j].mWeight });
+		}
+	}
+
+	size_t vb_sz = ai_mesh->mNumVertices * floats_per_vertex * sizeof(float);
+	uint8_t* buf = new uint8_t[vb_sz];
+	uint8_t* ptr = buf;
 	for (size_t i = 0; i < ai_mesh->mNumVertices; ++i)
 	{
 		const aiVector3D& p = ai_mesh->mVertices[i];
 
 		sm::vec3 p_trans(p.x, p.y, p.z);
-
-		vertices.push_back(p_trans.x);
-		vertices.push_back(p_trans.y);
-		vertices.push_back(p_trans.z);
+		memcpy(ptr, &p_trans.x, sizeof(float) * 3);
+		ptr += sizeof(float) * 3;
 		aabb.Combine(p_trans);
 
-		if (has_normal) {
+		if (has_normal)
+		{
 			const aiVector3D& n = ai_mesh->mNormals[i];
-			vertices.push_back(n.x);
-			vertices.push_back(n.y);
-			vertices.push_back(n.z);
+			memcpy(ptr, &n.x, sizeof(float) * 3);
+			ptr += sizeof(float) * 3;
 		}
-		if (has_texcoord) {
+		if (has_texcoord)
+		{
 			const aiVector3D& t = ai_mesh->mTextureCoords[0][i];
-			vertices.push_back(t.x);
-			vertices.push_back(1 - t.y);
+			memcpy(ptr, &t.x, sizeof(float));
+			ptr += sizeof(float);
+			float y = 1 - t.y;
+			memcpy(ptr, &y, sizeof(float));
+			ptr += sizeof(float);
+		}
+		if (has_skinned)
+		{
+			assert(weights_per_vertex[i].size() <= 4);
+			unsigned char indices[4] = { 0, 0, 0, 0 };
+			unsigned char weights[4] = { 0, 0, 0, 0 };
+			for (int j = 0, m = weights_per_vertex[i].size(); j < m; ++j)
+			{
+				indices[j] = weights_per_vertex[i][j].first;
+				weights[j] = static_cast<unsigned char>(weights_per_vertex[i][j].second * 255.0f);
+			}
+			uint32_t indices_pack = (indices[3] << 24) | (indices[2] << 16) | (indices[1] << 8) | indices[0];
+			uint32_t weights_pack = (weights[3] << 24) | (weights[2] << 16) | (weights[1] << 8) | weights[0];
+			memcpy(ptr, &indices_pack, sizeof(float));
+			ptr += sizeof(uint32_t);
+			memcpy(ptr, &weights_pack, sizeof(float));
+			ptr += sizeof(uint32_t);
 		}
 	}
 
@@ -281,36 +332,31 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, pt3::
 
 	ur::RenderContext::VertexInfo vi;
 
-	vi.vn = vertices.size();
-	vi.vertices = &vertices[0];
+	vi.vn = vb_sz;
+	vi.vertices = buf;
 	vi.in = indices.size();
 	vi.indices = &indices[0];
 
-	size_t stride = 3;
-	if (has_normal) {
-		stride += 3;
-	}
-	if (has_texcoord) {
-		stride += 2;
-	}
-	size_t index = 0;
-	size_t offset = 0;
 	// pos
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(index++, 3, stride, offset));
-	offset += 3;
+	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));
 	// normal
 	if (has_normal)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
-		vi.va_list.push_back(ur::RenderContext::VertexAttribute(index++, 3, stride, offset));
-		offset += 3;
+		vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));
 	}
 	// texcoord
 	if (has_texcoord)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
-		vi.va_list.push_back(ur::RenderContext::VertexAttribute(index++, 2, stride, offset));
-		offset += 2;
+		vi.va_list.push_back(ur::RenderContext::VertexAttribute(2, 4));
+	}
+	// skinned
+	if (has_skinned)
+	{
+		mesh->geometry.vertex_type |= VERTEX_FLAG_SKINNED;
+		vi.va_list.push_back(ur::RenderContext::VertexAttribute(4, 1));
+		vi.va_list.push_back(ur::RenderContext::VertexAttribute(4, 1));
 	}
 
 	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
@@ -318,6 +364,19 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, pt3::
 //	mesh->geometry.sub_geometries.insert({ "default", SubmeshGeometry(vi.in, 0) });
 	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(vi.in, 0));
 	mesh->geometry.sub_geometry_materials.push_back(0);
+
+	mesh->geometry.bones.reserve(ai_mesh->mNumBones);
+	for (size_t i = 0; i < ai_mesh->mNumBones; ++i)
+	{
+		auto src = ai_mesh->mBones[i];
+		model::Bone dst;
+		dst.node = -1;
+		dst.name = src->mName.C_Str();
+		dst.offset_trans = trans_ai_mat(src->mOffsetMatrix);
+		mesh->geometry.bones.push_back(dst);
+	}
+
+	delete[] buf;
 
 	return mesh;
 }
@@ -388,8 +447,8 @@ std::unique_ptr<Model::Animation> AssimpHelper::LoadAnimation(const aiAnimation*
 {
 	auto anim = std::make_unique<Model::Animation>();
 	anim->name = ai_anim->mName.C_Str();
-	anim->duration = ai_anim->mDuration;
-	anim->ticks_per_second = ai_anim->mTicksPerSecond;
+	anim->duration = static_cast<float>(ai_anim->mDuration);
+	anim->ticks_per_second = static_cast<float>(ai_anim->mTicksPerSecond);
 	for (int i = 0, n = ai_anim->mNumChannels; i < n; ++i) {
 		auto& src = ai_anim->mChannels[i];
 		anim->channels.push_back(LoadNodeAnim(src));
@@ -403,24 +462,30 @@ std::unique_ptr<Model::NodeAnim> AssimpHelper::LoadNodeAnim(const aiNodeAnim* ai
 	node_anim->name = ai_node->mNodeName.C_Str();
 
 	node_anim->position_keys.reserve(ai_node->mNumPositionKeys);
-	for (int i = 0; i < ai_node->mNumPositionKeys; ++i)
+	for (size_t i = 0; i < ai_node->mNumPositionKeys; ++i)
 	{
 		auto& src = ai_node->mPositionKeys[i];
-		node_anim->position_keys.push_back({ src.mTime, trans_ai_vector3d(src.mValue) });
+		node_anim->position_keys.push_back({
+			static_cast<float>(src.mTime), trans_ai_vector3d(src.mValue)
+		});
 	}
 
 	node_anim->rotation_keys.reserve(ai_node->mNumRotationKeys);
-	for (int i = 0; i < ai_node->mNumRotationKeys; ++i)
+	for (size_t i = 0; i < ai_node->mNumRotationKeys; ++i)
 	{
 		auto& src = ai_node->mRotationKeys[i];
-		node_anim->rotation_keys.push_back({ src.mTime, trans_ai_quaternion(src.mValue) });
+		node_anim->rotation_keys.push_back({
+			static_cast<float>(src.mTime), trans_ai_quaternion(src.mValue)
+		});
 	}
 
 	node_anim->scaling_keys.reserve(ai_node->mNumScalingKeys);
-	for (int i = 0; i < ai_node->mNumScalingKeys; ++i)
+	for (size_t i = 0; i < ai_node->mNumScalingKeys; ++i)
 	{
 		auto& src = ai_node->mScalingKeys[i];
-		node_anim->scaling_keys.push_back({ src.mTime, trans_ai_vector3d(src.mValue) });
+		node_anim->scaling_keys.push_back({
+			static_cast<float>(src.mTime), trans_ai_vector3d(src.mValue)
+		});
 	}
 
 	return node_anim;

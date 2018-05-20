@@ -20,7 +20,7 @@ ModelInstance::ModelInstance(const std::shared_ptr<Model>& model, int anim_idx)
 	// global trans
 	CalcGlobalTrans();
 
-	if (curr_anim_index >= 0 && curr_anim_index < model->anims.size())
+	if (curr_anim_index >= 0 && curr_anim_index < static_cast<int>(model->anims.size()))
 	{
 		channel_idx.reserve(sz);
 		auto& channels = model->anims[curr_anim_index]->channels;
@@ -35,38 +35,34 @@ ModelInstance::ModelInstance(const std::shared_ptr<Model>& model, int anim_idx)
 			channel_idx.push_back(idx);
 		}
 
-		last_pos.assign(channels.size(), std::make_tuple(0, 0, 0));
+		m_last_pos.assign(channels.size(), std::make_tuple(0, 0, 0));
 	}
 }
 
 bool ModelInstance::Update()
 {
-	float curr_time = GlobalClock::Instance()->GetTime();
-	if (last_time >= curr_time || last_time == 0) {
-		last_time = curr_time;
+	if (curr_anim_index < 0 || curr_anim_index >= static_cast<int>(model->anims.size())) {
 		return false;
 	}
 
-	float dt = curr_time - last_time;
-	last_time = curr_time;
-
-	if (curr_anim_index < 0 || curr_anim_index >= model->anims.size()) {
+	float curr_time = GlobalClock::Instance()->GetTime() * model->anim_speed;
+	if (m_start_time == 0)
+	{
+		m_start_time = curr_time;
+		m_last_time = 0;
 		return false;
 	}
 
 	auto& anim = model->anims[curr_anim_index];
 
-	float ticks_per_second = anim->ticks_per_second != 0.0 ? anim->ticks_per_second : 25.0;
-	dt *= ticks_per_second;
-
-	float time = 0.0f;
-	if (anim->duration > 0.0) {
-		time = fmod(dt, anim->duration);
+	float curr_frame = 0.0f;
+	float ticks_per_second = anim->ticks_per_second != 0 ? anim->ticks_per_second : 25.0f;
+	if (anim->duration > 0) {
+		curr_time = fmod(curr_time - m_start_time, anim->duration / ticks_per_second);
+		curr_frame = curr_time * ticks_per_second;
 	}
 
-	if (anim_trans.size() != anim->channels.size()) {
-		anim_trans.resize(anim->channels.size());
-	}
+	std::vector<sm::mat4> channels_trans(anim->channels.size());
 
 	// calc anim trans
 	for (int i = 0, n = anim->channels.size(); i < n; ++i)
@@ -77,10 +73,10 @@ bool ModelInstance::Update()
 		sm::vec3 position(0, 0, 0);
 		if (!channel->position_keys.empty())
 		{
-			unsigned int frame = (time >= last_time) ? std::get<0>(last_pos[i]) : 0;
+			unsigned int frame = (curr_time >= m_last_time) ? std::get<0>(m_last_pos[i]) : 0;
 			while (frame < channel->position_keys.size() - 1)
 			{
-				if (time < channel->position_keys[frame + 1].first) {
+				if (curr_frame < channel->position_keys[frame + 1].first) {
 					break;
 				}
 				frame++;
@@ -95,7 +91,7 @@ bool ModelInstance::Update()
 			}
 			if (diff_time > 0)
 			{
-				float factor = float((time - key.first) / diff_time);
+				float factor = float((curr_frame - key.first) / diff_time);
 				position = key.second + (next_key.second - key.second) * factor;
 			}
 			else
@@ -103,17 +99,17 @@ bool ModelInstance::Update()
 				position = key.second;
 			}
 
-			std::get<0>(last_pos[i]) = frame;
+			std::get<0>(m_last_pos[i]) = frame;
 		}
 
 		// rotation
 		sm::Quaternion rotation(1, 0, 0, 0);
 		if (!channel->rotation_keys.empty())
 		{
-			unsigned int frame = (time >= last_time) ? std::get<1>(last_pos[i]) : 0;
+			unsigned int frame = (curr_time >= m_last_time) ? std::get<1>(m_last_pos[i]) : 0;
 			while (frame < channel->rotation_keys.size() - 1)
 			{
-				if (time < channel->rotation_keys[frame + 1].first) {
+				if (curr_frame < channel->rotation_keys[frame + 1].first) {
 					break;
 				}
 				frame++;
@@ -128,7 +124,7 @@ bool ModelInstance::Update()
 			}
 			if (diff_time > 0)
 			{
-				float factor = float((time - key.first) / diff_time);
+				float factor = float((curr_frame - key.first) / diff_time);
 				rotation.Slerp(key.second, next_key.second, factor);
 			}
 			else
@@ -136,17 +132,17 @@ bool ModelInstance::Update()
 				rotation = key.second;
 			}
 
-			std::get<1>(last_pos[i]) = frame;
+			std::get<1>(m_last_pos[i]) = frame;
 		}
 
 		// scaling
 		sm::vec3 scaling(0, 0, 0);
 		if (!channel->scaling_keys.empty())
 		{
-			unsigned int frame = (time >= last_time) ? std::get<2>(last_pos[i]) : 0;
+			unsigned int frame = (curr_time >= m_last_time) ? std::get<2>(m_last_pos[i]) : 0;
 			while (frame < channel->scaling_keys.size() - 1)
 			{
-				if (time < channel->scaling_keys[frame + 1].first) {
+				if (curr_frame < channel->scaling_keys[frame + 1].first) {
 					break;
 				}
 				frame++;
@@ -161,7 +157,7 @@ bool ModelInstance::Update()
 			}
 			if (diff_time > 0)
 			{
-				float factor = float((time - key.first) / diff_time);
+				float factor = float((curr_frame - key.first) / diff_time);
 				scaling = key.second + (next_key.second - key.second) * factor;
 			}
 			else
@@ -169,7 +165,7 @@ bool ModelInstance::Update()
 				scaling = key.second;
 			}
 
-			std::get<2>(last_pos[i]) = frame;
+			std::get<2>(m_last_pos[i]) = frame;
 		}
 
 		sm::mat4 m(rotation);
@@ -177,21 +173,43 @@ bool ModelInstance::Update()
 		m.c[1][0] *= scaling.y; m.c[1][1] *= scaling.y; m.c[1][2] *= scaling.y; m.c[1][3] = 0;
 		m.c[2][0] *= scaling.z; m.c[2][1] *= scaling.z; m.c[2][2] *= scaling.z; m.c[2][3] = 0;
 		m.c[3][0] = position.x; m.c[3][1] = position.y; m.c[3][2] = position.z; m.c[3][3] = 1;
-		anim_trans[i] = m;
+		channels_trans[i] = m;
 	}
 
 	// update local trans
 	assert(channel_idx.size() == local_trans.size());
-	for (int i = 0, n = channel_idx.size(); i < n; ++i) {
+	for (int i = 0, n = channel_idx.size(); i < n; ++i)
+	{
 		if (channel_idx[i] >= 0) {
-			local_trans[i] = anim_trans[channel_idx[i]];
+			local_trans[i] = channels_trans[channel_idx[i]];
+		} else {
+			local_trans[i].Identity();
 		}
 	}
 
 	// update global trans
 	CalcGlobalTrans();
 
-	last_time = time;
+	m_last_time = curr_time;
+
+	return true;
+}
+
+const std::vector<sm::mat4>& ModelInstance::CalcBoneMatrices(int node_idx, int mesh_idx) const
+{
+	auto& mesh = model->meshes[mesh_idx];
+
+	sm::mat4 global_inv_mesh_trans = global_trans[node_idx].Inverted();
+
+	m_bone_trans.resize(mesh->geometry.bones.size());
+	for (size_t i = 0, n = mesh->geometry.bones.size(); i < n; ++i)
+	{
+		auto& bone = mesh->geometry.bones[i];
+		assert(bone.node >= 0);
+		m_bone_trans[i] = bone.offset_trans * global_trans[bone.node] * global_inv_mesh_trans;
+	}
+
+	return m_bone_trans;
 }
 
 void ModelInstance::CalcGlobalTrans()

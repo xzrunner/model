@@ -21,6 +21,8 @@ struct Model : boost::noncopyable
 	// for ResPool
 	bool LoadFromFile(const std::string& filepath);
 
+	int QueryNodeByName(const std::string& name) const;
+
 	struct Material
 	{
 		sm::vec3 ambient = { 0.04f, 0.04f, 0.04f };
@@ -89,6 +91,8 @@ struct Model : boost::noncopyable
 	std::vector<std::unique_ptr<Animation>> anims;
 
 	pt3::AABB aabb;
+
+	float anim_speed = 1;
 
 }; // Model
 

@@ -36,8 +36,8 @@ bool SurfaceLoader::Load(Model& model, const std::string& filepath)
 	vi.in = indices.size();
 	vi.indices = &indices[0];
 
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(0, 3, stride, 0));
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(1, 3, stride, 3));
+	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));
+	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));
 
 	// material
 	model.materials.emplace_back(std::make_unique<Model::Material>());

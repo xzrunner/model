@@ -52,12 +52,12 @@ bool M3DLoader::Load(Model& model, const std::string& filepath)
 	vi.in = indices.size();
 	vi.indices = &indices[0];
 
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(0, 3, stride, 0));  // pos
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(1, 3, stride, 3));  // normal
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(2, 2, stride, 6));  // texcoord
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 3, stride, 8));  // tangent
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(4, 3, stride, 11)); // bone_weights
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(5, 4, stride, 14)); // bone_indices
+	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));  // pos
+	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));  // normal
+	vi.va_list.push_back(ur::RenderContext::VertexAttribute(2, 4));  // texcoord
+	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));  // tangent
+	vi.va_list.push_back(ur::RenderContext::VertexAttribute(4, 1)); // bone_weights
+	vi.va_list.push_back(ur::RenderContext::VertexAttribute(4, 1)); // bone_indices
 
 	//// material
 	//model.materials.emplace_back(std::make_unique<Model::Material>());
