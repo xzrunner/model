@@ -18,6 +18,8 @@ struct Node;
 
 struct Model : boost::noncopyable
 {
+	~Model();
+
 	// for ResPool
 	bool LoadFromFile(const std::string& filepath);
 

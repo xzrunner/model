@@ -97,7 +97,7 @@ bool M3DLoader::Load(Model& model, const std::string& filepath)
 		auto material = std::make_unique<Model::Material>();
 		material->diffuse_tex = model.textures.size();
 		auto img_path = boost::filesystem::absolute(mat_src.DiffuseMapName, dir);
-		model.textures.push_back({ filepath, Callback::CreateImg(img_path.string()) });
+		model.textures.push_back({ img_path.string(), Callback::CreateImg(img_path.string()) });
 		model.materials.push_back(std::move(material));
 
 		mesh->geometry.sub_geometry_materials.push_back(idx);

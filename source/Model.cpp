@@ -2,7 +2,9 @@
 #include "model/SurfaceLoader.h"
 #include "model/ObjLoader.h"
 #include "model/M3DLoader.h"
+#include "model/MaxLoader.h"
 #include "model/AssimpHelper.h"
+#include "model/Callback.h"
 
 #include <guard/check.h>
 
@@ -10,6 +12,13 @@
 
 namespace model
 {
+
+Model::~Model()
+{
+	for (auto& tex : textures) {
+		Callback::ReleaseImg(tex.second);
+	}
+}
 
 bool Model::LoadFromFile(const std::string& filepath)
 {
