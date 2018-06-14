@@ -46,8 +46,9 @@ bool M3DLoader::Load(Model& model, const std::string& filepath)
 
 	ur::RenderContext::VertexInfo vi;
 
-	vi.vn = vertices.size() * stride;
+	vi.vn = vertices.size();
 	vi.vertices = &vertices[0].Pos.xyz[0];
+	vi.stride = sizeof(M3DLoader::SkinnedVertex);
 
 	vi.in = indices.size();
 	vi.indices = &indices[0];
@@ -79,7 +80,7 @@ bool M3DLoader::Load(Model& model, const std::string& filepath)
 		//	SubmeshGeometry(sub.FaceCount * 3, sub.FaceStart * 3)
 		//});
 		mesh->geometry.sub_geometries.emplace_back(
-			sub.FaceCount * 3, sub.FaceStart * 3
+			true, sub.FaceCount * 3, sub.FaceStart * 3
 		);
 
 		auto& mat_src = mats[idx];

@@ -269,8 +269,7 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, pt3::
 		}
 	}
 
-	size_t vb_sz = ai_mesh->mNumVertices * floats_per_vertex * sizeof(float);
-	uint8_t* buf = new uint8_t[vb_sz];
+	uint8_t* buf = new uint8_t[ai_mesh->mNumVertices * floats_per_vertex * sizeof(float)];
 	uint8_t* ptr = buf;
 	for (size_t i = 0; i < ai_mesh->mNumVertices; ++i)
 	{
@@ -332,8 +331,9 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, pt3::
 
 	ur::RenderContext::VertexInfo vi;
 
-	vi.vn = vb_sz;
+	vi.vn = ai_mesh->mNumVertices;
 	vi.vertices = buf;
+	vi.stride = floats_per_vertex * sizeof(float);
 	vi.in = indices.size();
 	vi.indices = &indices[0];
 
@@ -362,7 +362,7 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, pt3::
 	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
 		vi, mesh->geometry.vao, mesh->geometry.vbo, mesh->geometry.ebo);
 //	mesh->geometry.sub_geometries.insert({ "default", SubmeshGeometry(vi.in, 0) });
-	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(vi.in, 0));
+	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(true, vi.in, 0));
 	mesh->geometry.sub_geometry_materials.push_back(0);
 
 	mesh->geometry.bones.reserve(ai_mesh->mNumBones);

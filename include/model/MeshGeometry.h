@@ -12,11 +12,12 @@ namespace model
 struct SubmeshGeometry
 {
 	SubmeshGeometry() {}
-	SubmeshGeometry(size_t index_count, size_t index_offset)
-		: index_count(index_count), index_offset(index_offset) {}
+	SubmeshGeometry(bool index, size_t count, size_t offset)
+		: index(index), count(count), offset(offset) {}
 
-	size_t index_count = 0;
-	size_t index_offset = 0;
+	bool index = true;
+	size_t count = 0;
+	size_t offset = 0;
 };
 
 struct Bone

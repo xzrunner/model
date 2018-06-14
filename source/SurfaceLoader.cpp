@@ -30,6 +30,7 @@ bool SurfaceLoader::Load(Model& model, const std::string& filepath)
 	surface->GenerateVertices(vertex_type, vertices);
 	vi.vn = vertices.size();
 	vi.vertices = &vertices[0];
+	vi.stride = stride * sizeof(float);
 
 	std::vector<unsigned short> indices;
 	surface->GenerateTriangleIndices(indices);
@@ -47,7 +48,7 @@ bool SurfaceLoader::Load(Model& model, const std::string& filepath)
 	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
 		vi, mesh->geometry.vao, mesh->geometry.vbo, mesh->geometry.ebo);
 //	mesh->geometry.sub_geometries.insert({ "default", SubmeshGeometry(vi.in, 0) });
-	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(vi.in, 0));
+	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(true, vi.in, 0));
 	mesh->geometry.sub_geometry_materials.push_back(0);
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	mesh->material = 0;
