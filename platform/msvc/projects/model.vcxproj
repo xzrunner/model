@@ -14,6 +14,7 @@
     <ClCompile Include="..\..\..\source\AssimpHelper.cpp" />
     <ClCompile Include="..\..\..\source\GlobalClock.cpp" />
     <ClCompile Include="..\..\..\source\M3DLoader.cpp" />
+    <ClCompile Include="..\..\..\source\MaxLoader.cpp" />
     <ClCompile Include="..\..\..\source\MeshGeometry.cpp" />
     <ClCompile Include="..\..\..\source\Model.cpp" />
     <ClCompile Include="..\..\..\source\ModelInstance.cpp" />
@@ -30,6 +31,7 @@
     <ClInclude Include="..\..\..\include\model\EffectType.h" />
     <ClInclude Include="..\..\..\include\model\GlobalClock.h" />
     <ClInclude Include="..\..\..\include\model\M3DLoader.h" />
+    <ClInclude Include="..\..\..\include\model\MaxLoader.h" />
     <ClInclude Include="..\..\..\include\model\MeshGeometry.h" />
     <ClInclude Include="..\..\..\include\model\Callback.h" />
     <ClInclude Include="..\..\..\include\model\Model.h" />
@@ -43,6 +45,9 @@
     <ClInclude Include="..\..\..\include\model\SurfaceFactory.h" />
     <ClInclude Include="..\..\..\include\model\SurfaceLoader.h" />
     <ClInclude Include="..\..\..\include\model\typedef.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\include\model\MaxLoader.inl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>3.model</ProjectName>
@@ -87,7 +92,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\painting3\include;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\painting3\include;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;..\..\..\..\external\rapidxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -101,7 +106,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\painting3\include;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\painting3\include;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;..\..\..\..\external\rapidxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>

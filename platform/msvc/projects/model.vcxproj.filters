@@ -41,6 +41,9 @@
     <ClCompile Include="..\..\..\source\Model.cpp" />
     <ClCompile Include="..\..\..\source\ModelInstance.cpp" />
     <ClCompile Include="..\..\..\source\GlobalClock.cpp" />
+    <ClCompile Include="..\..\..\source\MaxLoader.cpp">
+      <Filter>loader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\model\ParametricEquations.h">
@@ -78,5 +81,13 @@
     <ClInclude Include="..\..\..\include\model\Model.h" />
     <ClInclude Include="..\..\..\include\model\ModelInstance.h" />
     <ClInclude Include="..\..\..\include\model\GlobalClock.h" />
+    <ClInclude Include="..\..\..\include\model\MaxLoader.h">
+      <Filter>loader</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\include\model\MaxLoader.inl">
+      <Filter>loader</Filter>
+    </None>
   </ItemGroup>
 </Project>
