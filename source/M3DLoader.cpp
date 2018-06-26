@@ -9,6 +9,7 @@
 
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
+#include <guard/check.h>
 
 #include <boost/filesystem.hpp>
 
