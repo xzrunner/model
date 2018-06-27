@@ -38,8 +38,8 @@ private:
 
 	static int LoadTexture(Model& model, const std::string& filepath);
 
-	static std::unique_ptr<Model::Animation> LoadAnimation(const aiAnimation* ai_anim);
-	static std::unique_ptr<Model::NodeAnim> LoadNodeAnim(const aiNodeAnim* ai_node);
+	static std::unique_ptr<SkeletalAnim::Animation> LoadAnimation(const aiAnimation* ai_anim);
+	static std::unique_ptr<SkeletalAnim::NodeAnim> LoadNodeAnim(const aiNodeAnim* ai_node);
 
 }; // AssimpHelper
 

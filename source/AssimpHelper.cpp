@@ -126,15 +126,14 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath)
 	// bone
 	for (auto& mesh : model.meshes) {
 		for (auto& bone : mesh->geometry.bones) {
-			bone.node = model.QueryNodeByName(bone.name);
+			bone.node = model.sk_anim.QueryNodeByName(bone.name);
 		}
 	}
 
 	// animation
-	model.anims.reserve(ai_scene->mNumAnimations);
 	for (size_t i = 0; i < ai_scene->mNumAnimations; ++i) {
 		auto src = ai_scene->mAnimations[i];
-		model.anims.push_back(LoadAnimation(src));
+		model.sk_anim.AddAnim(LoadAnimation(src));
 	}
 
 	// todo
@@ -148,13 +147,13 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath)
 int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model,
 	                       const std::vector<pt3::AABB>& meshes_aabb, const sm::mat4& mat)
 {
-	auto node = std::make_unique<Model::Node>();
+	auto node = std::make_unique<SkeletalAnim::Node>();
 	auto node_raw = node.get();
 
 	node_raw->name = ai_node->mName.C_Str();
 
-	int node_id = model.nodes.size();
-	model.nodes.push_back(std::move(node));
+	int node_id = model.sk_anim.GetNodeSize();
+	model.sk_anim.AddNode(node);
 
 	node_raw->local_trans = trans_ai_mat(ai_node->mTransformation);
 
@@ -167,8 +166,9 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 			int child = LoadNode(ai_scene, ai_node->mChildren[i], model, meshes_aabb, child_mat);
 			node_raw->children.push_back(child);
 
-			assert(model.nodes[child]->parent == -1);
-			model.nodes[child]->parent = node_id;
+			auto node = model.sk_anim.GetNode(child);
+			assert(node->parent == -1);
+			node->parent = node_id;
 		}
 	}
 	else
@@ -443,9 +443,9 @@ int AssimpHelper::LoadTexture(Model& model, const std::string& filepath)
 	return ret;
 }
 
-std::unique_ptr<Model::Animation> AssimpHelper::LoadAnimation(const aiAnimation* ai_anim)
+std::unique_ptr<SkeletalAnim::Animation> AssimpHelper::LoadAnimation(const aiAnimation* ai_anim)
 {
-	auto anim = std::make_unique<Model::Animation>();
+	auto anim = std::make_unique<SkeletalAnim::Animation>();
 	anim->name = ai_anim->mName.C_Str();
 	anim->duration = static_cast<float>(ai_anim->mDuration);
 	anim->ticks_per_second = static_cast<float>(ai_anim->mTicksPerSecond);
@@ -456,9 +456,9 @@ std::unique_ptr<Model::Animation> AssimpHelper::LoadAnimation(const aiAnimation*
 	return anim;
 }
 
-std::unique_ptr<Model::NodeAnim> AssimpHelper::LoadNodeAnim(const aiNodeAnim* ai_node)
+std::unique_ptr<SkeletalAnim::NodeAnim> AssimpHelper::LoadNodeAnim(const aiNodeAnim* ai_node)
 {
-	auto node_anim = std::make_unique<Model::NodeAnim>();
+	auto node_anim = std::make_unique<SkeletalAnim::NodeAnim>();
 	node_anim->name = ai_node->mNodeName.C_Str();
 
 	node_anim->position_keys.reserve(ai_node->mNumPositionKeys);

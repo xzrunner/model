@@ -9,26 +9,28 @@ ModelInstance::ModelInstance(const std::shared_ptr<Model>& model, int anim_idx)
 	: model(model)
 	, curr_anim_index(anim_idx)
 {
-	int sz = model->nodes.size();
+	auto& nodes = model->sk_anim.GetAllNodes();
+	int sz = nodes.size();
 
 	// local trans
 	local_trans.reserve(sz);
 	for (int i = 0; i < sz; ++i) {
-		local_trans.push_back(model->nodes[i]->local_trans);
+		local_trans.push_back(nodes[i]->local_trans);
 	}
 
 	// global trans
 	CalcGlobalTrans();
 
-	if (curr_anim_index >= 0 && curr_anim_index < static_cast<int>(model->anims.size()))
+	auto& anims = model->sk_anim.GetAllAnims();
+	if (curr_anim_index >= 0 && curr_anim_index < static_cast<int>(anims.size()))
 	{
 		channel_idx.reserve(sz);
-		auto& channels = model->anims[curr_anim_index]->channels;
+		auto& channels = anims[curr_anim_index]->channels;
 		for (int i = 0; i < sz; ++i)
 		{
 			int idx = -1;
 			for (int j = 0, m = channels.size(); j < m; ++j) {
-				if (model->nodes[i]->name == channels[j]->name) {
+				if (nodes[i]->name == channels[j]->name) {
 					idx = j;
 				}
 			}
@@ -41,7 +43,8 @@ ModelInstance::ModelInstance(const std::shared_ptr<Model>& model, int anim_idx)
 
 bool ModelInstance::Update()
 {
-	if (curr_anim_index < 0 || curr_anim_index >= static_cast<int>(model->anims.size())) {
+	auto& anims = model->sk_anim.GetAllAnims();
+	if (curr_anim_index < 0 || curr_anim_index >= static_cast<int>(anims.size())) {
 		return false;
 	}
 
@@ -53,7 +56,7 @@ bool ModelInstance::Update()
 		return false;
 	}
 
-	auto& anim = model->anims[curr_anim_index];
+	auto& anim = anims[curr_anim_index];
 
 	float curr_frame = 0.0f;
 	float ticks_per_second = anim->ticks_per_second != 0 ? anim->ticks_per_second : 25.0f;
@@ -214,6 +217,7 @@ const std::vector<sm::mat4>& ModelInstance::CalcBoneMatrices(int node_idx, int m
 
 void ModelInstance::CalcGlobalTrans()
 {
+	auto& nodes = model->sk_anim.GetAllNodes();
 	size_t sz = local_trans.size();
 	if (global_trans.size() != sz) {
 		global_trans.resize(sz);
@@ -221,10 +225,10 @@ void ModelInstance::CalcGlobalTrans()
 	for (size_t i = 0; i < sz; ++i)
 	{
 		auto g_trans = local_trans[i];
-		int parent = model->nodes[i]->parent;
+		int parent = nodes[i]->parent;
 		while (parent != -1) {
 			g_trans = g_trans * local_trans[parent];
-			parent = model->nodes[parent]->parent;
+			parent = nodes[parent]->parent;
 		}
 		global_trans[i] = g_trans;
 	}
