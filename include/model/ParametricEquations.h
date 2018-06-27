@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ParametricSurface.h"
+#include "model/ParametricSurface.h"
 
 #include <SM_Vector.h>
 #include <sm_const.h>

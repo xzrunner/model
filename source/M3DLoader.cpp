@@ -1,6 +1,6 @@
 // This code from d3d12book https://github.com/d3dcoder/d3d12book
 
-#include "model/M3DLoader.h"
+#include "model/M3dLoader.h"
 #include "model/SkinnedData.h"
 #include "model/Model.h"
 #include "model/typedef.h"

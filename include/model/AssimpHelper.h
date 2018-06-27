@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Model.h"
+#include "model/Model.h"
 
 #include <SM_Matrix.h>
 

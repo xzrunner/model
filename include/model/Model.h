@@ -1,6 +1,7 @@
 #pragma once
 
-#include "MeshGeometry.h"
+#include "model/MeshGeometry.h"
+#include "model/SkeletalAnim.h"
 
 #include <painting3/AABB.h>
 #include <SM_Matrix.h>
