@@ -10,6 +10,15 @@
     <Filter Include="utility">
       <UniqueIdentifier>{d8d7fe43-e8c8-41dc-ac73-1a6ddff627df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="anim">
+      <UniqueIdentifier>{a8690aed-4075-42d7-b6d7-bb76aeb259ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="model">
+      <UniqueIdentifier>{67ae6668-1304-4c4e-8dee-87fab2796438}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="loader\todo">
+      <UniqueIdentifier>{de38f94e-63e1-47b2-b0a7-cab446a3266b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\ParametricEquations.cpp">
@@ -21,28 +30,47 @@
     <ClCompile Include="..\..\..\source\SurfaceFactory.cpp">
       <Filter>surface</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\M3DLoader.cpp">
-      <Filter>loader</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\SurfaceLoader.cpp">
       <Filter>loader</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\AssimpHelper.cpp">
       <Filter>loader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\SkinnedData.cpp" />
-    <ClCompile Include="..\..\..\source\MeshGeometry.cpp" />
     <ClCompile Include="..\..\..\source\ObjLoader.cpp">
       <Filter>loader</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\Callback.cpp">
       <Filter>utility</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\Model.cpp" />
-    <ClCompile Include="..\..\..\source\ModelInstance.cpp" />
-    <ClCompile Include="..\..\..\source\GlobalClock.cpp" />
     <ClCompile Include="..\..\..\source\MaxLoader.cpp">
       <Filter>loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\MdlLoader.cpp">
+      <Filter>loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\M3dLoader.cpp">
+      <Filter>loader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\SkeletalAnim.cpp">
+      <Filter>anim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\MorphTargetAnim.cpp">
+      <Filter>anim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\GlobalClock.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\Model.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\ModelInstance.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\MeshGeometry.cpp">
+      <Filter>model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\SkinnedData.cpp">
+      <Filter>loader\todo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -58,31 +86,59 @@
     <ClInclude Include="..\..\..\include\model\SurfaceFactory.h">
       <Filter>surface</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\model\M3DLoader.h">
-      <Filter>loader</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\model\SurfaceLoader.h">
       <Filter>loader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\model\typedef.h" />
     <ClInclude Include="..\..\..\include\model\AssimpHelper.h">
       <Filter>loader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\model\SkinnedData.h" />
-    <ClInclude Include="..\..\..\include\model\SkinnedModel.h" />
-    <ClInclude Include="..\..\..\include\model\MeshGeometry.h" />
     <ClInclude Include="..\..\..\include\model\ObjLoader.h">
       <Filter>loader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\Callback.h">
       <Filter>utility</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\model\EffectType.h" />
-    <ClInclude Include="..\..\..\include\model\Model.h" />
-    <ClInclude Include="..\..\..\include\model\ModelInstance.h" />
-    <ClInclude Include="..\..\..\include\model\GlobalClock.h" />
     <ClInclude Include="..\..\..\include\model\MaxLoader.h">
       <Filter>loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\MdlLoader.h">
+      <Filter>loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\M3dLoader.h">
+      <Filter>loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\NormalMap.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\SkeletalAnim.h">
+      <Filter>anim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\MorphTargetAnim.h">
+      <Filter>anim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\EffectType.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\GlobalClock.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\Model.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\ModelInstance.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\typedef.h">
+      <Filter>utility</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\MeshGeometry.h">
+      <Filter>model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\SkinnedData.h">
+      <Filter>loader\todo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\SkinnedModel.h">
+      <Filter>loader\todo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
