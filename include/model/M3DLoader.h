@@ -17,7 +17,7 @@ class SkinnedData;
 struct BoneAnimation;
 struct AnimationClip;
 
-class M3DLoader
+class M3dLoader
 {
 public:
 	static bool Load(Model& model, const std::string& filepath);
@@ -87,6 +87,6 @@ private:
 	static void ReadAnimationClips(std::ifstream& fin, uint32_t numBones, uint32_t numAnimationClips, std::unordered_map<std::string, AnimationClip>& animations);
 	static void ReadBoneKeyframes(std::ifstream& fin, uint32_t numBones, BoneAnimation& boneAnimation);
 
-}; // M3DLoader
+}; // M3dLoader
 
 }

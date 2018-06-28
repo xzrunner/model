@@ -25,31 +25,31 @@ const float MODEL_SCALE = 0.1f;
 namespace model
 {
 
-bool M3DLoader::Load(Model& model, const std::string& filepath)
+bool M3dLoader::Load(Model& model, const std::string& filepath)
 {
 	auto dir = boost::filesystem::path(filepath).parent_path().string();
 
-	std::vector<M3DLoader::SkinnedVertex> vertices;
+	std::vector<M3dLoader::SkinnedVertex> vertices;
 	std::vector<uint16_t> indices;
-	std::vector<M3DLoader::Subset> subsets;
-	std::vector<M3DLoader::M3dMaterial> mats;
-	SkinnedData skin_info;
-	if (!M3DLoader::Load(filepath, vertices, indices, subsets, mats, skin_info)) {
-		return false;
-	}
+	std::vector<M3dLoader::Subset> subsets;
+	std::vector<M3dLoader::M3dMaterial> mats;
+	//SkinnedData skin_info;
+	//if (!M3dLoader::Load(filepath, vertices, indices, subsets, mats, skin_info)) {
+	//	return false;
+	//}
 
 	// aabb
 	for (auto& v : vertices) {
 		model.aabb.Combine(v.Pos);
 	}
 
-	const int stride = sizeof(M3DLoader::SkinnedVertex) / sizeof(float);
+	const int stride = sizeof(M3dLoader::SkinnedVertex) / sizeof(float);
 
 	ur::RenderContext::VertexInfo vi;
 
 	vi.vn = vertices.size();
 	vi.vertices = &vertices[0].Pos.xyz[0];
-	vi.stride = sizeof(M3DLoader::SkinnedVertex);
+	vi.stride = sizeof(M3dLoader::SkinnedVertex);
 
 	vi.in = indices.size();
 	vi.indices = &indices[0];
@@ -107,15 +107,10 @@ bool M3DLoader::Load(Model& model, const std::string& filepath)
 	}
 	model.meshes.push_back(std::move(mesh));
 
-	// node
-	auto node = std::make_unique<Model::Node>();
-	node->meshes.emplace_back(0);
-	model.nodes.push_back(std::move(node));
-
 	return true;
 }
 
-bool M3DLoader::Load(const std::string& filename,
+bool M3dLoader::Load(const std::string& filename,
 					 std::vector<Vertex>& vertices,
 					 std::vector<uint16_t>& indices,
 					 std::vector<Subset>& subsets,
@@ -150,7 +145,7 @@ bool M3DLoader::Load(const std::string& filename,
     return false;
 }
 
-bool M3DLoader::Load(const std::string& filename,
+bool M3dLoader::Load(const std::string& filename,
 					 std::vector<SkinnedVertex>& vertices,
 					 std::vector<uint16_t>& indices,
 					 std::vector<Subset>& subsets,
@@ -198,7 +193,7 @@ bool M3DLoader::Load(const std::string& filename,
     return false;
 }
 
-void M3DLoader::ReadMaterials(std::ifstream& fin, uint32_t numMaterials, std::vector<M3dMaterial>& mats)
+void M3dLoader::ReadMaterials(std::ifstream& fin, uint32_t numMaterials, std::vector<M3dMaterial>& mats)
 {
 	 std::string ignore;
      mats.resize(numMaterials);
@@ -220,7 +215,7 @@ void M3DLoader::ReadMaterials(std::ifstream& fin, uint32_t numMaterials, std::ve
 		}
 }
 
-void M3DLoader::ReadSubsetTable(std::ifstream& fin, uint32_t numSubsets, std::vector<Subset>& subsets)
+void M3dLoader::ReadSubsetTable(std::ifstream& fin, uint32_t numSubsets, std::vector<Subset>& subsets)
 {
     std::string ignore;
 	subsets.resize(numSubsets);
@@ -236,7 +231,7 @@ void M3DLoader::ReadSubsetTable(std::ifstream& fin, uint32_t numSubsets, std::ve
     }
 }
 
-void M3DLoader::ReadVertices(std::ifstream& fin, uint32_t numVertices, std::vector<Vertex>& vertices)
+void M3dLoader::ReadVertices(std::ifstream& fin, uint32_t numVertices, std::vector<Vertex>& vertices)
 {
 	std::string ignore;
     vertices.resize(numVertices);
@@ -253,7 +248,7 @@ void M3DLoader::ReadVertices(std::ifstream& fin, uint32_t numVertices, std::vect
     }
 }
 
-void M3DLoader::ReadSkinnedVertices(std::ifstream& fin, uint32_t numVertices, std::vector<SkinnedVertex>& vertices)
+void M3dLoader::ReadSkinnedVertices(std::ifstream& fin, uint32_t numVertices, std::vector<SkinnedVertex>& vertices)
 {
 	std::string ignore;
     vertices.resize(numVertices);
@@ -286,7 +281,7 @@ void M3DLoader::ReadSkinnedVertices(std::ifstream& fin, uint32_t numVertices, st
     }
 }
 
-void M3DLoader::ReadTriangles(std::ifstream& fin, uint32_t numTriangles, std::vector<uint16_t>& indices)
+void M3dLoader::ReadTriangles(std::ifstream& fin, uint32_t numTriangles, std::vector<uint16_t>& indices)
 {
 	std::string ignore;
     indices.resize(numTriangles*3);
@@ -298,7 +293,7 @@ void M3DLoader::ReadTriangles(std::ifstream& fin, uint32_t numTriangles, std::ve
     }
 }
 
-void M3DLoader::ReadBoneOffsets(std::ifstream& fin, uint32_t numBones, std::vector<sm::mat4>& boneOffsets)
+void M3dLoader::ReadBoneOffsets(std::ifstream& fin, uint32_t numBones, std::vector<sm::mat4>& boneOffsets)
 {
 	std::string ignore;
     boneOffsets.resize(numBones);
@@ -314,7 +309,7 @@ void M3DLoader::ReadBoneOffsets(std::ifstream& fin, uint32_t numBones, std::vect
     }
 }
 
-void M3DLoader::ReadBoneHierarchy(std::ifstream& fin, uint32_t numBones, std::vector<int>& boneIndexToParentIndex)
+void M3dLoader::ReadBoneHierarchy(std::ifstream& fin, uint32_t numBones, std::vector<int>& boneIndexToParentIndex)
 {
 	std::string ignore;
     boneIndexToParentIndex.resize(numBones);
@@ -326,7 +321,7 @@ void M3DLoader::ReadBoneHierarchy(std::ifstream& fin, uint32_t numBones, std::ve
 	}
 }
 
-void M3DLoader::ReadAnimationClips(std::ifstream& fin, uint32_t numBones, uint32_t numAnimationClips,
+void M3dLoader::ReadAnimationClips(std::ifstream& fin, uint32_t numBones, uint32_t numAnimationClips,
 								   std::unordered_map<std::string, AnimationClip>& animations)
 {
 	std::string ignore;
@@ -350,7 +345,7 @@ void M3DLoader::ReadAnimationClips(std::ifstream& fin, uint32_t numBones, uint32
     }
 }
 
-void M3DLoader::ReadBoneKeyframes(std::ifstream& fin, uint32_t numBones, BoneAnimation& boneAnimation)
+void M3dLoader::ReadBoneKeyframes(std::ifstream& fin, uint32_t numBones, BoneAnimation& boneAnimation)
 {
 	std::string ignore;
     uint32_t numKeyframes = 0;
