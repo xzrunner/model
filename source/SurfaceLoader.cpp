@@ -55,11 +55,6 @@ bool SurfaceLoader::Load(Model& model, const std::string& filepath)
 	mesh->effect = EFFECT_DEFAULT_NO_TEX;
 	model.meshes.push_back(std::move(mesh));
 
-	// node
-	auto node = std::make_unique<Model::Node>();
-	node->meshes.emplace_back(0);
-	model.nodes.push_back(std::move(node));
-
 	// aabb
 	pt3::AABB aabb;
 	for (int i = 0, n = vertices.size(); i < n; )

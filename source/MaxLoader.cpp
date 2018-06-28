@@ -117,11 +117,6 @@ void MaxLoader::LoadMesh(Model& model, const rapidxml::xml_node<>* mesh_node)
 	mesh->material = 0;
 	mesh->effect = EFFECT_USER;
 	model.meshes.push_back(std::move(mesh));
-
-	// node
-	auto node = std::make_unique<Model::Node>();
-	node->meshes.emplace_back(0);
-	model.nodes.push_back(std::move(node));
 }
 
 void MaxLoader::LoadMeshData(MeshData& dst, const rapidxml::xml_node<>* src)
