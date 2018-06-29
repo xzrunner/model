@@ -6,12 +6,11 @@
 #include "model/EffectType.h"
 #include "model/NormalMap.h"
 #include "model/typedef.h"
+#include "model/MorphTargetAnim.h"
 
 #include <quake/Palette.h>
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
-#include <gimg_import.h>
-#include <gimg_typedef.h>
 
 #include <fstream>
 #include <memory>
@@ -71,14 +70,15 @@ void MdlLoader::LoadMaterial(const MdlHeader& header, std::ifstream& fin,
 		palette.IndexedToRgb((unsigned char*)skin.data, skin_sz, rgb);
 		delete[] skin.data;
 
-		gimg_revert_y(rgb, header.skinwidth, header.skinheight, GPF_RGB);
-
 		auto material = std::make_unique<Model::Material>();
 		material->diffuse_tex = model.textures.size();
 		model.textures.push_back({ filepath + std::to_string(i),
 			Callback::CreateImg(rgb, header.skinwidth, header.skinheight, 3) });
 		model.materials.push_back(std::move(material));
+
+		delete[] rgb;
 	}
+	delete[] skins;
 }
 
 void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& model)
@@ -128,11 +128,12 @@ void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& mod
 				auto& texcoord = texcoords[vert_idx];
 				float s = static_cast<float>(texcoord.s);
 				float t = static_cast<float>(texcoord.t);
-				if (!tri.facesfront && texcoords->onseam) {
+				if (!tri.facesfront && texcoord.onseam) {
 					s += header.skinwidth * 0.5f;
 				}
 				s = (s + 0.5f) / header.skinwidth;
 				t = (t + 0.5f) / header.skinheight;
+
 				vertices[v_ptr].texcoord.Set(s, t);
 
 				vertices[v_ptr].normal = NORMAL_MAP[frame.frame.verts[j].normal_idx];
@@ -140,7 +141,14 @@ void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& mod
 				++v_ptr;
 			}
 		}
+
+		delete[] frame.frame.verts;
+		frame.frame.verts = nullptr;
 	}
+
+	delete[] frames;
+	delete[] tris;
+	delete[] texcoords;
 
 	const int stride = sizeof(Vertex) / sizeof(float);
 
@@ -164,13 +172,19 @@ void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& mod
 	auto mesh = std::make_unique<Model::Mesh>();
 	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
 		vi, mesh->geometry.vao, mesh->geometry.vbo, mesh->geometry.ebo);
-	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(false, vi.vn, 0));
-	mesh->geometry.sub_geometry_materials.push_back(0);
+	int vertices_n = header.num_tris * 3;
+	int offset = 0;
+	for (int i = 0; i < header.num_frames; ++i) {
+		mesh->geometry.sub_geometries.push_back(SubmeshGeometry(false, vertices_n, offset));
+		offset += vertices_n;
+	}
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
 	mesh->material = 0;
 	mesh->effect = EFFECT_MORPH_TARGET;
 	model.meshes.push_back(std::move(mesh));
+
+	model.anim = std::make_unique<MorphTargetAnim>(3, header.num_frames);
 
 	model.aabb = aabb;
 }

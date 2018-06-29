@@ -140,6 +140,12 @@
     <ClInclude Include="..\..\..\include\model\SkinnedModel.h">
       <Filter>loader\todo</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\model\Animation.h">
+      <Filter>anim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\AnimType.h">
+      <Filter>anim</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\include\model\MaxLoader.inl">

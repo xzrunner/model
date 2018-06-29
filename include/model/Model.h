@@ -50,7 +50,7 @@ struct Model : boost::noncopyable
 
 	std::vector<std::unique_ptr<Mesh>> meshes;
 
-	SkeletalAnim sk_anim;
+	std::unique_ptr<Animation> anim = nullptr;
 
 	pt3::AABB aabb;
 

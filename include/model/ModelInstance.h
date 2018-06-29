@@ -31,6 +31,9 @@ struct ModelInstance : boost::noncopyable
 	std::vector<int> channel_idx;
 
 private:
+	bool UpdateMorphTargetAnim();
+	bool UpdateSkeletalAnim();
+
 	void CalcGlobalTrans();
 
 private:

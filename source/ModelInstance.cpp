@@ -1,6 +1,8 @@
 ﻿#include "model/ModelInstance.h"
 #include "model/Model.h"
 #include "model/GlobalClock.h"
+#include "model/MorphTargetAnim.h"
+#include "model/SkeletalAnim.h"
 
 namespace model
 {
@@ -9,41 +11,79 @@ ModelInstance::ModelInstance(const std::shared_ptr<Model>& model, int anim_idx)
 	: model(model)
 	, curr_anim_index(anim_idx)
 {
-	auto& nodes = model->sk_anim.GetAllNodes();
-	int sz = nodes.size();
-
-	// local trans
-	local_trans.reserve(sz);
-	for (int i = 0; i < sz; ++i) {
-		local_trans.push_back(nodes[i]->local_trans);
-	}
-
-	// global trans
-	CalcGlobalTrans();
-
-	auto& anims = model->sk_anim.GetAllAnims();
-	if (curr_anim_index >= 0 && curr_anim_index < static_cast<int>(anims.size()))
+	auto& anim = model->anim;
+	if (anim && anim->Type() == ANIM_SKELETAL)
 	{
-		channel_idx.reserve(sz);
-		auto& channels = anims[curr_anim_index]->channels;
-		for (int i = 0; i < sz; ++i)
-		{
-			int idx = -1;
-			for (int j = 0, m = channels.size(); j < m; ++j) {
-				if (nodes[i]->name == channels[j]->name) {
-					idx = j;
-				}
-			}
-			channel_idx.push_back(idx);
+		auto sk_anim = static_cast<SkeletalAnim*>(anim.get());
+		auto& nodes = sk_anim->GetAllNodes();
+		int sz = nodes.size();
+
+		// local trans
+		local_trans.reserve(sz);
+		for (int i = 0; i < sz; ++i) {
+			local_trans.push_back(nodes[i]->local_trans);
 		}
 
-		m_last_pos.assign(channels.size(), std::make_tuple(0, 0, 0));
+		// global trans
+		CalcGlobalTrans();
+
+		auto& anims = sk_anim->GetAllAnims();
+		if (curr_anim_index >= 0 && curr_anim_index < static_cast<int>(anims.size()))
+		{
+			channel_idx.reserve(sz);
+			auto& channels = anims[curr_anim_index]->channels;
+			for (int i = 0; i < sz; ++i)
+			{
+				int idx = -1;
+				for (int j = 0, m = channels.size(); j < m; ++j) {
+					if (nodes[i]->name == channels[j]->name) {
+						idx = j;
+					}
+				}
+				channel_idx.push_back(idx);
+			}
+
+			m_last_pos.assign(channels.size(), std::make_tuple(0, 0, 0));
+		}
 	}
 }
 
 bool ModelInstance::Update()
 {
-	auto& anims = model->sk_anim.GetAllAnims();
+	if (!model->anim) {
+		return false;
+	}
+
+	switch (model->anim->Type())
+	{
+	case ANIM_MORPH_TARGET:
+		return UpdateMorphTargetAnim();
+	case ANIM_SKELETAL:
+		return UpdateSkeletalAnim();
+	}
+	return false;
+}
+
+bool ModelInstance::UpdateMorphTargetAnim()
+{
+	float curr_time = GlobalClock::Instance()->GetTime() * model->anim_speed;
+	if (m_start_time == 0)
+	{
+		m_start_time = curr_time;
+		m_last_time = 0;
+		return false;
+	}
+
+	auto anim = static_cast<MorphTargetAnim*>(model->anim.get());
+	int frame = static_cast<int>((curr_time - m_start_time) * anim->GetFps()) % anim->GetNumFrames();
+	anim->SetFrame(frame);
+}
+
+bool ModelInstance::UpdateSkeletalAnim()
+{
+	auto sk_anim = static_cast<SkeletalAnim*>(model->anim.get());
+
+	auto& anims = sk_anim->GetAllAnims();
 	if (curr_anim_index < 0 || curr_anim_index >= static_cast<int>(anims.size())) {
 		return false;
 	}
@@ -200,6 +240,10 @@ bool ModelInstance::Update()
 
 const std::vector<sm::mat4>& ModelInstance::CalcBoneMatrices(int node_idx, int mesh_idx) const
 {
+	if (!model->anim || model->anim->Type() != ANIM_SKELETAL) {
+		return m_bone_trans;
+	}
+
 	auto& mesh = model->meshes[mesh_idx];
 
 	sm::mat4 global_inv_mesh_trans = global_trans[node_idx].Inverted();
@@ -217,7 +261,12 @@ const std::vector<sm::mat4>& ModelInstance::CalcBoneMatrices(int node_idx, int m
 
 void ModelInstance::CalcGlobalTrans()
 {
-	auto& nodes = model->sk_anim.GetAllNodes();
+	if (!model->anim || model->anim->Type() != ANIM_SKELETAL) {
+		return;
+	}
+
+	auto sk_anim = static_cast<SkeletalAnim*>(model->anim.get());
+	auto& nodes = sk_anim->GetAllNodes();
 	size_t sz = local_trans.size();
 	if (global_trans.size() != sz) {
 		global_trans.resize(sz);

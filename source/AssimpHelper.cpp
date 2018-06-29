@@ -97,6 +97,8 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath)
 		return NULL;
 	}
 
+	auto anim = std::make_unique<SkeletalAnim>();
+
 	// material
 	auto dir = boost::filesystem::path(filepath).parent_path().string();
 	model.materials.reserve(ai_scene->mNumMaterials);
@@ -119,21 +121,21 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath)
 	}
 
 	// node
-	LoadNode(ai_scene, ai_scene->mRootNode, model, meshes_aabb, sm::mat4());
+	LoadNode(ai_scene, ai_scene->mRootNode, model, *anim, meshes_aabb, sm::mat4());
 
 	// todo: load lights and cameras
 
 	// bone
 	for (auto& mesh : model.meshes) {
 		for (auto& bone : mesh->geometry.bones) {
-			bone.node = model.sk_anim.QueryNodeByName(bone.name);
+			bone.node = anim->QueryNodeByName(bone.name);
 		}
 	}
 
 	// animation
 	for (size_t i = 0; i < ai_scene->mNumAnimations; ++i) {
 		auto src = ai_scene->mAnimations[i];
-		model.sk_anim.AddAnim(LoadAnimation(src));
+		anim->AddAnim(LoadAnimation(src));
 	}
 
 	// todo
@@ -141,10 +143,12 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath)
 		model.anim_speed = 100;
 	}
 
+	model.anim = std::move(anim);
+
 	return true;
 }
 
-int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model,
+int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model, SkeletalAnim& anim,
 	                       const std::vector<pt3::AABB>& meshes_aabb, const sm::mat4& mat)
 {
 	auto node = std::make_unique<SkeletalAnim::Node>();
@@ -152,8 +156,8 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 
 	node_raw->name = ai_node->mName.C_Str();
 
-	int node_id = model.sk_anim.GetNodeSize();
-	model.sk_anim.AddNode(node);
+	int node_id = anim.GetNodeSize();
+	anim.AddNode(node);
 
 	node_raw->local_trans = trans_ai_mat(ai_node->mTransformation);
 
@@ -163,10 +167,10 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 	{
 		for (size_t i = 0; i < ai_node->mNumChildren; ++i)
 		{
-			int child = LoadNode(ai_scene, ai_node->mChildren[i], model, meshes_aabb, child_mat);
+			int child = LoadNode(ai_scene, ai_node->mChildren[i], model, anim, meshes_aabb, child_mat);
 			node_raw->children.push_back(child);
 
-			auto node = model.sk_anim.GetNode(child);
+			auto node = anim.GetNode(child);
 			assert(node->parent == -1);
 			node->parent = node_id;
 		}

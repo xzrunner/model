@@ -1,6 +1,7 @@
 #pragma once
 
 #include "model/Model.h"
+#include "model/SkeletalAnim.h"
 
 #include <SM_Matrix.h>
 
@@ -28,7 +29,7 @@ public:
 	static bool Load(Model& model, const std::string& filepath);
 
 private:
-	static int LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model,
+	static int LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model, SkeletalAnim& anim,
 		const std::vector<pt3::AABB>& meshes_aabb, const sm::mat4& mat);
 
 	static std::unique_ptr<Model::Mesh> LoadMesh(const aiMesh* ai_mesh, pt3::AABB& aabb);

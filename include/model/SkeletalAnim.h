@@ -1,8 +1,8 @@
 #pragma once
 
-#include <SM_Matrix.h>
+#include "model/Animation.h"
 
-#include <boost/noncopyable.hpp>
+#include <SM_Matrix.h>
 
 #include <string>
 #include <vector>
@@ -11,7 +11,7 @@
 namespace model
 {
 
-class SkeletalAnim : boost::noncopyable
+class SkeletalAnim : public Animation
 {
 public:
 	struct Node : boost::noncopyable
@@ -52,6 +52,7 @@ public:
 	}; // Animation
 
 public:
+	virtual AnimType Type() const override { return ANIM_SKELETAL; }
 
 	int QueryNodeByName(const std::string& name) const;
 

@@ -30,6 +30,8 @@
     <ClCompile Include="..\..\..\source\SurfaceLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\include\model\Animation.h" />
+    <ClInclude Include="..\..\..\include\model\AnimType.h" />
     <ClInclude Include="..\..\..\include\model\AssimpHelper.h" />
     <ClInclude Include="..\..\..\include\model\EffectType.h" />
     <ClInclude Include="..\..\..\include\model\GlobalClock.h" />
@@ -99,7 +101,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\gimg\src\gimg;..\..\..\..\painting3\include;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\quake\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;..\..\..\..\external\rapidxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\painting3\include;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\quake\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;..\..\..\..\external\rapidxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -113,7 +115,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\gimg\src\gimg;..\..\..\..\painting3\include;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\quake\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;..\..\..\..\external\rapidxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\painting3\include;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\quake\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;..\..\..\..\external\rapidxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
