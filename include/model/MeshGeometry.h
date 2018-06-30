@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SM_Matrix.h>
+#include <unirender/VertexAttrib.h>
 
 #include <unordered_map>
 
@@ -39,7 +40,11 @@ struct MeshGeometry : boost::noncopyable
 	std::vector<SubmeshGeometry> sub_geometries;
 	std::vector<unsigned int>    sub_geometry_materials;
 
+	// skeletal anim
 	std::vector<Bone> bones;
+
+	// morph anim
+	std::vector<ur::VertexAttrib> vertex_layout;
 
 	unsigned int vertex_type = 0;
 

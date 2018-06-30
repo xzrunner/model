@@ -75,8 +75,13 @@ bool ModelInstance::UpdateMorphTargetAnim()
 	}
 
 	auto anim = static_cast<MorphTargetAnim*>(model->anim.get());
-	int frame = static_cast<int>((curr_time - m_start_time) * anim->GetFps()) % anim->GetNumFrames();
+	float f_frame = (curr_time - m_start_time) * anim->GetFps();
+	int frame = static_cast<int>(f_frame) % anim->GetNumFrames();
 	anim->SetFrame(frame);
+	float blend = f_frame - std::floor(f_frame);
+	anim->SetBlend(blend);
+
+	return true;
 }
 
 bool ModelInstance::UpdateSkeletalAnim()

@@ -175,9 +175,11 @@ void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& mod
 	mesh->geometry.vbo = rc.CreateBuffer(ur::VERTEXBUFFER, buf, vt_sz + tc_sz);
 	delete[] buf;
 
-	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("position", 3, 4, 24, 0));
-	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("normal",   3, 4, 24, 12));
-	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("texcoord", 2, 4, 0, vt_sz));
+	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("pose1_vert",   3, 4, 24, 0));
+	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("pose1_normal", 3, 4, 24, 12));
+	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("pose2_vert",   3, 4, 24, 0));
+	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("pose2_normal", 3, 4, 24, 12));
+	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("texcoord",     2, 4, 0, vt_sz));
 
 	int vertices_n = header.num_tris * 3;
 	int offset = 0;
@@ -188,7 +190,7 @@ void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& mod
 	mesh->effect = EFFECT_MORPH_TARGET;
 	model.meshes.push_back(std::move(mesh));
 
-	model.anim = std::make_unique<MorphTargetAnim>(3, header.num_frames);
+	model.anim = std::make_unique<MorphTargetAnim>(3, header.num_frames, header.num_tris * 3);
 
 	model.aabb = aabb;
 }
