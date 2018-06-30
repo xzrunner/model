@@ -29,7 +29,7 @@ bool SurfaceLoader::Load(Model& model, const std::string& filepath)
 
 	std::vector<float> vertices;
 	surface->GenerateVertices(vertex_type, vertices);
-	vi.vn = vertices.size();
+	vi.vn = vertices.size() / stride;
 	vi.vertices = &vertices[0];
 	vi.stride = stride * sizeof(float);
 
