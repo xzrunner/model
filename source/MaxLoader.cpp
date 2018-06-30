@@ -99,9 +99,9 @@ void MaxLoader::LoadMesh(Model& model, const rapidxml::xml_node<>* mesh_node)
 	vi.in = 0;
 	vi.indices = nullptr;
 
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));  // pos
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));  // normal
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(2, 4));  // texcoord
+	vi.va_list.push_back(ur::VertexAttrib("pos",          3, 4, 32, 0));  // pos
+	vi.va_list.push_back(ur::VertexAttrib("normal",       3, 4, 32, 12));  // normal
+	vi.va_list.push_back(ur::VertexAttrib("texcoord",     2, 4, 32, 24));  // texcoord
 
 	// material
 	model.materials.emplace_back(std::make_unique<Model::Material>());

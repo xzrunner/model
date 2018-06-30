@@ -22,7 +22,6 @@ struct Vertex
 {
 	sm::vec3 pos;
 	sm::vec3 normal;
-	sm::vec2 texcoord;
 };
 
 const float SCALE = 0.1f;
@@ -83,11 +82,11 @@ void MdlLoader::LoadMaterial(const MdlHeader& header, std::ifstream& fin,
 
 void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& model)
 {
-	MdlTexcoord* texcoords = new MdlTexcoord[header.num_verts];
-	fin.read(reinterpret_cast<char*>(texcoords), sizeof(MdlTexcoord) * header.num_verts);
+	MdlTexcoord* mdl_texcoords = new MdlTexcoord[header.num_verts];
+	fin.read(reinterpret_cast<char*>(mdl_texcoords), sizeof(MdlTexcoord) * header.num_verts);
 
-	MdlTriangle* tris = new MdlTriangle[header.num_tris];
-	fin.read(reinterpret_cast<char*>(tris), sizeof(MdlTriangle) * header.num_tris);
+	MdlTriangle* mdl_tris = new MdlTriangle[header.num_tris];
+	fin.read(reinterpret_cast<char*>(mdl_tris), sizeof(MdlTriangle) * header.num_tris);
 
 	pt3::AABB aabb;
 
@@ -98,10 +97,10 @@ void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& mod
 	vertices.resize(header.num_frames * header.num_tris * 3);
 	int v_ptr = 0;
 
-	MdlFrame* frames = new MdlFrame[header.num_frames];
+	MdlFrame* mdl_frames = new MdlFrame[header.num_frames];
 	for (int i = 0; i < header.num_frames; ++i)
 	{
-		auto& frame = frames[i];
+		auto& frame = mdl_frames[i];
 		frame.frame.verts = new MdlVertex[header.num_verts];
 		fin.read(reinterpret_cast<char*>(&frame.type), sizeof(int));
 		assert(frame.type == 0);
@@ -118,26 +117,12 @@ void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& mod
 		}
 		for (int j = 0; j < header.num_tris; ++j)
 		{
-			auto& tri = tris[j];
+			auto& tri = mdl_tris[j];
 			for (int k = 0; k < 3; ++k)
 			{
 				int vert_idx = tri.vertex[k];
-
 				vertices[v_ptr].pos = positions[vert_idx];
-
-				auto& texcoord = texcoords[vert_idx];
-				float s = static_cast<float>(texcoord.s);
-				float t = static_cast<float>(texcoord.t);
-				if (!tri.facesfront && texcoord.onseam) {
-					s += header.skinwidth * 0.5f;
-				}
-				s = (s + 0.5f) / header.skinwidth;
-				t = (t + 0.5f) / header.skinheight;
-
-				vertices[v_ptr].texcoord.Set(s, t);
-
 				vertices[v_ptr].normal = NORMAL_MAP[frame.frame.verts[j].normal_idx];
-
 				++v_ptr;
 			}
 		}
@@ -146,38 +131,57 @@ void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& mod
 		frame.frame.verts = nullptr;
 	}
 
-	delete[] frames;
-	delete[] tris;
-	delete[] texcoords;
+	std::vector<sm::vec2> texcoords;
+	texcoords.resize(header.num_tris * 3);
+	v_ptr = 0;
+	for (int i = 0; i < header.num_tris; ++i)
+	{
+		auto& tri = mdl_tris[i];
+		for (int j = 0; j < 3; ++j)
+		{
+			int vert_idx = tri.vertex[j];
 
-	const int stride = sizeof(Vertex) / sizeof(float);
+			auto& texcoord = mdl_texcoords[vert_idx];
+			float s = static_cast<float>(texcoord.s);
+			float t = static_cast<float>(texcoord.t);
+			if (!tri.facesfront && texcoord.onseam) {
+				s += header.skinwidth * 0.5f;
+			}
+			s = (s + 0.5f) / header.skinwidth;
+			t = (t + 0.5f) / header.skinheight;
 
-	ur::RenderContext::VertexInfo vi;
+			texcoords[v_ptr].Set(s, t);
 
-	vi.vn = vertices.size();
-	vi.vertices = &vertices[0].pos.x;
-	vi.stride = sizeof(Vertex);
+			++v_ptr;
+		}
+	}
 
-	vi.in = 0;
-	vi.indices = nullptr;
-
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));  // pos
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));  // normal
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(2, 4));  // texcoord
+	delete[] mdl_frames;
+	delete[] mdl_tris;
+	delete[] mdl_texcoords;
 
 	// material
 	model.materials.emplace_back(std::make_unique<Model::Material>());
 
 	// mesh
 	auto mesh = std::make_unique<Model::Mesh>();
-	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
-		vi, mesh->geometry.vao, mesh->geometry.vbo, mesh->geometry.ebo);
+
+	int vt_sz = sizeof(Vertex) * vertices.size();
+	int tc_sz = sizeof(sm::vec2) * texcoords.size();
+	uint8_t* buf = new uint8_t[vt_sz + tc_sz];
+	memcpy(buf, vertices.data(), vt_sz);
+	memcpy(buf + vt_sz, texcoords.data(), tc_sz);
+	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
+	mesh->geometry.vbo = rc.CreateBuffer(ur::VERTEXBUFFER, buf, vt_sz + tc_sz);
+	delete[] buf;
+
+	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("position", 3, 4, 24, 0));
+	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("normal",   3, 4, 24, 12));
+	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("texcoord", 2, 4, 0, vt_sz));
+
 	int vertices_n = header.num_tris * 3;
 	int offset = 0;
-	for (int i = 0; i < header.num_frames; ++i) {
-		mesh->geometry.sub_geometries.push_back(SubmeshGeometry(false, vertices_n, offset));
-		offset += vertices_n;
-	}
+	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(false, vertices_n, 0));
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
 	mesh->material = 0;

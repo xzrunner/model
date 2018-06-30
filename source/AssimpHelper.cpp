@@ -6,6 +6,7 @@
 
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
+#include <unirender/VertexAttrib.h>
 
 #include <SM_Matrix.h>
 #include <painting3/AABB.h>
@@ -341,26 +342,48 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, pt3::
 	vi.in = indices.size();
 	vi.indices = &indices[0];
 
+	int stride = 0;
 	// pos
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));
+	stride += 4 * 3;
+	// normal
+	if (has_normal) {
+		stride += 4 * 3;
+	}
+	// texcoord
+	if (has_texcoord) {
+		stride += 4 * 2;
+	}
+	// skinned
+	if (has_skinned) {
+		stride += 4 + 4;
+	}
+
+	int offset = 0;
+	// pos
+	vi.va_list.push_back(ur::VertexAttrib("pos", 3, 4, stride, offset));
+	offset += 4 * 3;
 	// normal
 	if (has_normal)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
-		vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));
+		vi.va_list.push_back(ur::VertexAttrib("normal", 3, 4, stride, offset));
+		offset += 4 * 3;
 	}
 	// texcoord
 	if (has_texcoord)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
-		vi.va_list.push_back(ur::RenderContext::VertexAttribute(2, 4));
+		vi.va_list.push_back(ur::VertexAttrib("texcoord", 2, 4, stride, offset));
+		offset += 4 * 2;
 	}
 	// skinned
 	if (has_skinned)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_SKINNED;
-		vi.va_list.push_back(ur::RenderContext::VertexAttribute(4, 1));
-		vi.va_list.push_back(ur::RenderContext::VertexAttribute(4, 1));
+		vi.va_list.push_back(ur::VertexAttrib("blend_indices", 4, 1, stride, offset));
+		offset += 4;
+		vi.va_list.push_back(ur::VertexAttrib("blend_weights", 4, 1, stride, offset));
+		offset += 4;
 	}
 
 	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(

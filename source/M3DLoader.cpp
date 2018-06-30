@@ -9,6 +9,7 @@
 
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
+#include <unirender/VertexAttrib.h>
 #include <guard/check.h>
 
 #include <boost/filesystem.hpp>
@@ -54,12 +55,12 @@ bool M3dLoader::Load(Model& model, const std::string& filepath)
 	vi.in = indices.size();
 	vi.indices = &indices[0];
 
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));  // pos
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));  // normal
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(2, 4));  // texcoord
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));  // tangent
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(4, 1)); // bone_weights
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(4, 1)); // bone_indices
+	vi.va_list.push_back(ur::VertexAttrib("pos",          3, 4, 52, 0));  // pos
+	vi.va_list.push_back(ur::VertexAttrib("normal",       3, 4, 52, 12));  // normal
+	vi.va_list.push_back(ur::VertexAttrib("texcoord",     2, 4, 52, 24));  // texcoord
+	vi.va_list.push_back(ur::VertexAttrib("tangent",      3, 4, 52, 32));  // tangent
+	vi.va_list.push_back(ur::VertexAttrib("bone_weights", 4, 1, 52, 44)); // bone_weights
+	vi.va_list.push_back(ur::VertexAttrib("bone_indices", 4, 1, 52, 48)); // bone_indices
 
 	//// material
 	//model.materials.emplace_back(std::make_unique<Model::Material>());

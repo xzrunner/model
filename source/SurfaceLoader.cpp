@@ -7,6 +7,7 @@
 
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
+#include <unirender/VertexAttrib.h>
 
 #include <boost/filesystem.hpp>
 
@@ -37,8 +38,8 @@ bool SurfaceLoader::Load(Model& model, const std::string& filepath)
 	vi.in = indices.size();
 	vi.indices = &indices[0];
 
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));
-	vi.va_list.push_back(ur::RenderContext::VertexAttribute(3, 4));
+	vi.va_list.push_back(ur::VertexAttrib("pos",    3, 4, 24, 0));
+	vi.va_list.push_back(ur::VertexAttrib("normal", 3, 4, 24, 12));
 
 	// material
 	model.materials.emplace_back(std::make_unique<Model::Material>());
