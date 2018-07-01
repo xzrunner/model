@@ -7,9 +7,8 @@
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
 #include <unirender/VertexAttrib.h>
-
 #include <SM_Matrix.h>
-#include <painting3/AABB.h>
+#include <SM_Cube.h>
 
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
@@ -110,13 +109,13 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath)
 	}
 
 	// mesh
-	std::vector<pt3::AABB> meshes_aabb;
+	std::vector<sm::cube> meshes_aabb;
 	meshes_aabb.reserve(ai_scene->mNumMeshes);
 	model.meshes.reserve(ai_scene->mNumMeshes);
 	for (size_t i = 0; i < ai_scene->mNumMeshes; ++i)
 	{
 		auto src = ai_scene->mMeshes[i];
-		pt3::AABB aabb;
+		sm::cube aabb;
 		model.meshes.push_back(LoadMesh(src, aabb));
 		meshes_aabb.push_back(aabb);
 	}
@@ -150,7 +149,7 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath)
 }
 
 int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model, SkeletalAnim& anim,
-	                       const std::vector<pt3::AABB>& meshes_aabb, const sm::mat4& mat)
+	                       const std::vector<sm::cube>& meshes_aabb, const sm::mat4& mat)
 {
 	auto node = std::make_unique<SkeletalAnim::Node>();
 	auto node_raw = node.get();
@@ -222,7 +221,7 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 			{
 				auto mesh = ai_node->mMeshes[i];
 				node_raw->meshes.push_back(mesh);
-				model.aabb.Combine(meshes_aabb[mesh].Cube(), child_mat);
+				CombineAABB(model.aabb, meshes_aabb[mesh], child_mat);
 			}
 		}
 	}
@@ -230,7 +229,7 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 	return node_id;
 }
 
-std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, pt3::AABB& aabb)
+std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, sm::cube& aabb)
 {
 	auto mesh = std::make_unique<Model::Mesh>();
 
@@ -516,6 +515,18 @@ std::unique_ptr<SkeletalAnim::NodeAnim> AssimpHelper::LoadNodeAnim(const aiNodeA
 	}
 
 	return node_anim;
+}
+
+void AssimpHelper::CombineAABB(sm::cube& dst, const sm::cube& src, const sm::mat4& mat)
+{
+	dst.Combine(mat * sm::vec3(src.xmin, src.ymin, src.zmin));
+	dst.Combine(mat * sm::vec3(src.xmin, src.ymax, src.zmin));
+	dst.Combine(mat * sm::vec3(src.xmax, src.ymax, src.zmin));
+	dst.Combine(mat * sm::vec3(src.xmax, src.ymin, src.zmin));
+	dst.Combine(mat * sm::vec3(src.xmin, src.ymin, src.zmax));
+	dst.Combine(mat * sm::vec3(src.xmin, src.ymax, src.zmax));
+	dst.Combine(mat * sm::vec3(src.xmax, src.ymax, src.zmax));
+	dst.Combine(mat * sm::vec3(src.xmax, src.ymin, src.zmax));
 }
 
 }

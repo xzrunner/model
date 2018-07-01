@@ -11,6 +11,7 @@
 #include <quake/Palette.h>
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
+#include <SM_Cube.h>
 
 #include <fstream>
 #include <memory>
@@ -88,7 +89,7 @@ void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& mod
 	MdlTriangle* mdl_tris = new MdlTriangle[header.num_tris];
 	fin.read(reinterpret_cast<char*>(mdl_tris), sizeof(MdlTriangle) * header.num_tris);
 
-	pt3::AABB aabb;
+	sm::cube aabb;
 
 	std::vector<sm::vec3> positions;
 	positions.resize(header.num_verts);

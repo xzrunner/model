@@ -15,8 +15,6 @@ struct aiMaterial;
 struct aiAnimation;
 struct aiNodeAnim;
 
-namespace pt3 { class AABB; }
-
 namespace model
 {
 
@@ -30,9 +28,9 @@ public:
 
 private:
 	static int LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model, SkeletalAnim& anim,
-		const std::vector<pt3::AABB>& meshes_aabb, const sm::mat4& mat);
+		const std::vector<sm::cube>& meshes_aabb, const sm::mat4& mat);
 
-	static std::unique_ptr<Model::Mesh> LoadMesh(const aiMesh* ai_mesh, pt3::AABB& aabb);
+	static std::unique_ptr<Model::Mesh> LoadMesh(const aiMesh* ai_mesh, sm::cube& aabb);
 
 	static std::unique_ptr<Model::Material> LoadMaterial(const aiMaterial* ai_material,
 		Model& model, const std::string& dir);
@@ -41,6 +39,8 @@ private:
 
 	static std::unique_ptr<SkeletalAnim::Animation> LoadAnimation(const aiAnimation* ai_anim);
 	static std::unique_ptr<SkeletalAnim::NodeAnim> LoadNodeAnim(const aiNodeAnim* ai_node);
+
+	static void CombineAABB(sm::cube& dst, const sm::cube& src, const sm::mat4& mat);
 
 }; // AssimpHelper
 

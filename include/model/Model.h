@@ -3,8 +3,8 @@
 #include "model/MeshGeometry.h"
 #include "model/SkeletalAnim.h"
 
-#include <painting3/AABB.h>
 #include <SM_Matrix.h>
+#include <SM_Cube.h>
 
 #include <boost/noncopyable.hpp>
 
@@ -52,7 +52,7 @@ struct Model : boost::noncopyable
 
 	std::unique_ptr<Animation> anim = nullptr;
 
-	pt3::AABB aabb;
+	sm::cube aabb;
 
 	float anim_speed = 1;
 

@@ -57,7 +57,7 @@ bool SurfaceLoader::Load(Model& model, const std::string& filepath)
 	model.meshes.push_back(std::move(mesh));
 
 	// aabb
-	pt3::AABB aabb;
+	sm::cube aabb;
 	for (int i = 0, n = vertices.size(); i < n; )
 	{
 		sm::vec3 pos;
