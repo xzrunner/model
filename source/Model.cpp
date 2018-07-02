@@ -31,6 +31,8 @@ bool Model::LoadFromFile(const std::string& filepath)
 		return MaxLoader::Load(*this, filepath);
 	} else if (ext == ".mdl") {
 		return MdlLoader::Load(*this, filepath);
+	} else if (ext == ".bsp") {
+		return BspLoader::Load(*this, filepath);
 	} else {
 		GD_REPORT_ASSERT("unknown type.");
 		return false;
