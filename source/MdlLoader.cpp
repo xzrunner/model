@@ -1,12 +1,12 @@
 // code from http://tfc.duke.free.fr/coding/mdl-specs-en.html
 
 #include "model/MdlLoader.h"
-#include "model/Callback.h"
 #include "model/Model.h"
 #include "model/EffectType.h"
 #include "model/NormalMap.h"
 #include "model/typedef.h"
 #include "model/MorphTargetAnim.h"
+#include "model/TextureLoader.h"
 
 #include <quake/Palette.h>
 #include <unirender/RenderContext.h>
@@ -72,8 +72,8 @@ void MdlLoader::LoadMaterial(const MdlHeader& header, std::ifstream& fin,
 
 		auto material = std::make_unique<Model::Material>();
 		material->diffuse_tex = model.textures.size();
-		model.textures.push_back({ filepath + std::to_string(i),
-			Callback::CreateImg(rgb, header.skinwidth, header.skinheight, 3) });
+		auto tex = TextureLoader::LoadFromMemory(rgb, header.skinwidth, header.skinheight, 3);
+		model.textures.push_back({ filepath + std::to_string(i), std::move(tex) });
 		model.materials.push_back(std::move(material));
 
 		delete[] rgb;

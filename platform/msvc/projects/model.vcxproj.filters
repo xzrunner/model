@@ -1,34 +1,37 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="surface">
-      <UniqueIdentifier>{9f2d748d-19cc-44f5-a52d-1d638d5f844c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="loader">
       <UniqueIdentifier>{203546df-6b18-4ccf-84c7-1c16649b0cd3}</UniqueIdentifier>
     </Filter>
     <Filter Include="utility">
       <UniqueIdentifier>{d8d7fe43-e8c8-41dc-ac73-1a6ddff627df}</UniqueIdentifier>
     </Filter>
-    <Filter Include="anim">
-      <UniqueIdentifier>{a8690aed-4075-42d7-b6d7-bb76aeb259ca}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="model">
-      <UniqueIdentifier>{67ae6668-1304-4c4e-8dee-87fab2796438}</UniqueIdentifier>
-    </Filter>
     <Filter Include="loader\todo">
       <UniqueIdentifier>{de38f94e-63e1-47b2-b0a7-cab446a3266b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="loader\quake">
+      <UniqueIdentifier>{180464c8-c33d-4f9a-a20e-6b398e40cc77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dataset">
+      <UniqueIdentifier>{67ae6668-1304-4c4e-8dee-87fab2796438}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dataset\anim">
+      <UniqueIdentifier>{a8690aed-4075-42d7-b6d7-bb76aeb259ca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dataset\surface">
+      <UniqueIdentifier>{9f2d748d-19cc-44f5-a52d-1d638d5f844c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\ParametricEquations.cpp">
-      <Filter>surface</Filter>
+      <Filter>dataset\surface</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\ParametricSurface.cpp">
-      <Filter>surface</Filter>
+      <Filter>dataset\surface</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\SurfaceFactory.cpp">
-      <Filter>surface</Filter>
+      <Filter>dataset\surface</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\SurfaceLoader.cpp">
       <Filter>loader</Filter>
@@ -39,52 +42,55 @@
     <ClCompile Include="..\..\..\source\ObjLoader.cpp">
       <Filter>loader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\Callback.cpp">
-      <Filter>utility</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\MaxLoader.cpp">
-      <Filter>loader</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\source\MdlLoader.cpp">
       <Filter>loader</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\M3dLoader.cpp">
       <Filter>loader</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\SkeletalAnim.cpp">
-      <Filter>anim</Filter>
+      <Filter>dataset\anim</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\MorphTargetAnim.cpp">
-      <Filter>anim</Filter>
+      <Filter>dataset\anim</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\GlobalClock.cpp">
       <Filter>utility</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\Model.cpp">
-      <Filter>model</Filter>
+      <Filter>dataset</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\ModelInstance.cpp">
-      <Filter>model</Filter>
+      <Filter>dataset</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\MeshGeometry.cpp">
-      <Filter>model</Filter>
+      <Filter>dataset</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\SkinnedData.cpp">
       <Filter>loader\todo</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\MdlLoader.cpp">
+      <Filter>loader\quake</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\BspLoader.cpp">
+      <Filter>loader\quake</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\TextureLoader.cpp">
+      <Filter>loader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\model\ParametricEquations.h">
-      <Filter>surface</Filter>
+      <Filter>dataset\surface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\ParametricSurface.h">
-      <Filter>surface</Filter>
+      <Filter>dataset\surface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\Surface.h">
-      <Filter>surface</Filter>
+      <Filter>dataset\surface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\SurfaceFactory.h">
-      <Filter>surface</Filter>
+      <Filter>dataset\surface</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\SurfaceLoader.h">
       <Filter>loader</Filter>
@@ -95,13 +101,7 @@
     <ClInclude Include="..\..\..\include\model\ObjLoader.h">
       <Filter>loader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\model\Callback.h">
-      <Filter>utility</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\model\MaxLoader.h">
-      <Filter>loader</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\model\MdlLoader.h">
       <Filter>loader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\M3dLoader.h">
@@ -111,10 +111,10 @@
       <Filter>utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\SkeletalAnim.h">
-      <Filter>anim</Filter>
+      <Filter>dataset\anim</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\MorphTargetAnim.h">
-      <Filter>anim</Filter>
+      <Filter>dataset\anim</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\EffectType.h">
       <Filter>utility</Filter>
@@ -123,16 +123,16 @@
       <Filter>utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\Model.h">
-      <Filter>model</Filter>
+      <Filter>dataset</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\ModelInstance.h">
-      <Filter>model</Filter>
+      <Filter>dataset</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\typedef.h">
       <Filter>utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\MeshGeometry.h">
-      <Filter>model</Filter>
+      <Filter>dataset</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\SkinnedData.h">
       <Filter>loader\todo</Filter>
@@ -141,10 +141,25 @@
       <Filter>loader\todo</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\Animation.h">
-      <Filter>anim</Filter>
+      <Filter>dataset\anim</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\AnimType.h">
-      <Filter>anim</Filter>
+      <Filter>dataset\anim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\MdlLoader.h">
+      <Filter>loader\quake</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\BspLoader.h">
+      <Filter>loader\quake</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\BspFile.h">
+      <Filter>loader\quake</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\QuakeModel.h">
+      <Filter>loader\quake</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\TextureLoader.h">
+      <Filter>loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

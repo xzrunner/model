@@ -5,7 +5,7 @@
 #include "model/MaxLoader.h"
 #include "model/AssimpHelper.h"
 #include "model/MdlLoader.h"
-#include "model/Callback.h"
+#include "model/BspLoader.h"
 
 #include <guard/check.h>
 
@@ -13,13 +13,6 @@
 
 namespace model
 {
-
-Model::~Model()
-{
-	for (auto& tex : textures) {
-		Callback::ReleaseImg(tex.second);
-	}
-}
 
 bool Model::LoadFromFile(const std::string& filepath)
 {

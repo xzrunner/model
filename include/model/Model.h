@@ -5,6 +5,7 @@
 
 #include <SM_Matrix.h>
 #include <SM_Cube.h>
+#include <unirender/Texture.h>
 
 #include <boost/noncopyable.hpp>
 
@@ -19,8 +20,6 @@ struct Node;
 
 struct Model : boost::noncopyable
 {
-	~Model();
-
 	// for ResPool
 	bool LoadFromFile(const std::string& filepath);
 
@@ -44,7 +43,7 @@ struct Model : boost::noncopyable
 
 	}; // Mesh
 
-	std::vector<std::pair<std::string, void*>> textures;
+	std::vector<std::pair<std::string, ur::TexturePtr>> textures;
 
 	std::vector<std::unique_ptr<Material>> materials;
 

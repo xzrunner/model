@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\AssimpHelper.cpp" />
+    <ClCompile Include="..\..\..\source\BspLoader.cpp" />
     <ClCompile Include="..\..\..\source\GlobalClock.cpp" />
     <ClCompile Include="..\..\..\source\M3dLoader.cpp" />
     <ClCompile Include="..\..\..\source\MaxLoader.cpp" />
@@ -23,27 +24,29 @@
     <ClCompile Include="..\..\..\source\ObjLoader.cpp" />
     <ClCompile Include="..\..\..\source\ParametricEquations.cpp" />
     <ClCompile Include="..\..\..\source\ParametricSurface.cpp" />
-    <ClCompile Include="..\..\..\source\Callback.cpp" />
     <ClCompile Include="..\..\..\source\SkeletalAnim.cpp" />
     <ClCompile Include="..\..\..\source\SkinnedData.cpp" />
     <ClCompile Include="..\..\..\source\SurfaceFactory.cpp" />
     <ClCompile Include="..\..\..\source\SurfaceLoader.cpp" />
+    <ClCompile Include="..\..\..\source\TextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\model\Animation.h" />
     <ClInclude Include="..\..\..\include\model\AnimType.h" />
     <ClInclude Include="..\..\..\include\model\AssimpHelper.h" />
+    <ClInclude Include="..\..\..\include\model\BspFile.h" />
+    <ClInclude Include="..\..\..\include\model\BspLoader.h" />
     <ClInclude Include="..\..\..\include\model\EffectType.h" />
     <ClInclude Include="..\..\..\include\model\GlobalClock.h" />
     <ClInclude Include="..\..\..\include\model\M3dLoader.h" />
     <ClInclude Include="..\..\..\include\model\MaxLoader.h" />
     <ClInclude Include="..\..\..\include\model\MdlLoader.h" />
     <ClInclude Include="..\..\..\include\model\MeshGeometry.h" />
-    <ClInclude Include="..\..\..\include\model\Callback.h" />
     <ClInclude Include="..\..\..\include\model\Model.h" />
     <ClInclude Include="..\..\..\include\model\ModelInstance.h" />
     <ClInclude Include="..\..\..\include\model\MorphTargetAnim.h" />
     <ClInclude Include="..\..\..\include\model\NormalMap.h" />
+    <ClInclude Include="..\..\..\include\model\QuakeModel.h" />
     <ClInclude Include="..\..\..\include\model\SkeletalAnim.h" />
     <ClInclude Include="..\..\..\include\model\SkinnedModel.h" />
     <ClInclude Include="..\..\..\include\model\ObjLoader.h" />
@@ -53,6 +56,7 @@
     <ClInclude Include="..\..\..\include\model\Surface.h" />
     <ClInclude Include="..\..\..\include\model\SurfaceFactory.h" />
     <ClInclude Include="..\..\..\include\model\SurfaceLoader.h" />
+    <ClInclude Include="..\..\..\include\model\TextureLoader.h" />
     <ClInclude Include="..\..\..\include\model\typedef.h" />
   </ItemGroup>
   <ItemGroup>
@@ -101,7 +105,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\painting3\include;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\quake\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;..\..\..\..\external\rapidxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\gimg\src\gimg;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\quake\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;..\..\..\..\external\rapidxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -115,7 +119,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\painting3\include;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\quake\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;..\..\..\..\external\rapidxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\gimg\src\gimg;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\quake\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;..\..\..\..\external\rapidxml\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>

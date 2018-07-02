@@ -4,8 +4,8 @@
 #include "model/SkinnedData.h"
 #include "model/Model.h"
 #include "model/typedef.h"
-#include "model/Callback.h"
 #include "model/EffectType.h"
+#include "model/TextureLoader.h"
 
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
@@ -99,7 +99,8 @@ bool M3dLoader::Load(Model& model, const std::string& filepath)
 		auto material = std::make_unique<Model::Material>();
 		material->diffuse_tex = model.textures.size();
 		auto img_path = boost::filesystem::absolute(mat_src.DiffuseMapName, dir);
-		model.textures.push_back({ img_path.string(), Callback::CreateImg(img_path.string()) });
+		auto tex = TextureLoader::LoadFromFile(img_path.string().c_str());
+		model.textures.push_back({ img_path.string(), std::move(tex) });
 		model.materials.push_back(std::move(material));
 
 		mesh->geometry.sub_geometry_materials.push_back(idx);

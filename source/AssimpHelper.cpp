@@ -1,8 +1,8 @@
 #include "model/AssimpHelper.h"
 #include "model/typedef.h"
-#include "model/Callback.h"
 #include "model/Model.h"
 #include "model/EffectType.h"
+#include "model/TextureLoader.h"
 
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
@@ -465,7 +465,7 @@ int AssimpHelper::LoadTexture(Model& model, const std::string& filepath)
 	}
 
 	int ret = model.textures.size();
-	model.textures.push_back({ filepath, Callback::CreateImg(filepath) });
+	model.textures.push_back({ filepath, TextureLoader::LoadFromFile(filepath.c_str()) });
 	return ret;
 }
 
