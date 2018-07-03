@@ -78,6 +78,9 @@
     <ClCompile Include="..\..\..\source\TextureLoader.cpp">
       <Filter>loader</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\BspModel.cpp">
+      <Filter>loader\quake</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\model\ParametricEquations.h">
@@ -160,6 +163,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\TextureLoader.h">
       <Filter>loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\BspModel.h">
+      <Filter>loader\quake</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
