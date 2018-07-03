@@ -32,8 +32,8 @@
     <ClCompile Include="..\..\..\source\TextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\include\model\Animation.h" />
-    <ClInclude Include="..\..\..\include\model\AnimType.h" />
+    <ClInclude Include="..\..\..\include\model\ModelExtend.h" />
+    <ClInclude Include="..\..\..\include\model\ModelExtendType.h" />
     <ClInclude Include="..\..\..\include\model\AssimpHelper.h" />
     <ClInclude Include="..\..\..\include\model\BspFile.h" />
     <ClInclude Include="..\..\..\include\model\BspLoader.h" />
@@ -48,7 +48,6 @@
     <ClInclude Include="..\..\..\include\model\ModelInstance.h" />
     <ClInclude Include="..\..\..\include\model\MorphTargetAnim.h" />
     <ClInclude Include="..\..\..\include\model\NormalMap.h" />
-    <ClInclude Include="..\..\..\include\model\QuakeModel.h" />
     <ClInclude Include="..\..\..\include\model\SkeletalAnim.h" />
     <ClInclude Include="..\..\..\include\model\SkinnedModel.h" />
     <ClInclude Include="..\..\..\include\model\ObjLoader.h" />

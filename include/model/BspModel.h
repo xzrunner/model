@@ -1,6 +1,6 @@
 #pragma once
 
-#include "model/Animation.h"
+#include "model/ModelExtend.h"
 #include "model/BspFile.h"
 
 #include <SM_Vector.h>
@@ -25,7 +25,7 @@ namespace model
 #define SURF_DRAWTELE		0x1000
 #define SURF_DRAWWATER		0x2000
 
-struct BspModel : public Animation
+struct BspModel : public ModelExtend
 {
 	struct Plane
 	{
@@ -179,7 +179,7 @@ struct BspModel : public Animation
 		}
 	}
 
-	virtual AnimType Type() const override { return ANIM_BSP; }
+	virtual ModelExtendType Type() const override { return EXT_BSP; }
 
 	void BuildSurfaceDisplayList();
 

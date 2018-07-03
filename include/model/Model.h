@@ -49,7 +49,7 @@ struct Model : boost::noncopyable
 
 	std::vector<std::unique_ptr<Mesh>> meshes;
 
-	std::unique_ptr<Animation> anim = nullptr;
+	std::unique_ptr<ModelExtend> ext = nullptr;
 
 	sm::cube aabb;
 

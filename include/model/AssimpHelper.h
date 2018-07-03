@@ -27,7 +27,7 @@ public:
 	static bool Load(Model& model, const std::string& filepath);
 
 private:
-	static int LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model, SkeletalAnim& anim,
+	static int LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model, SkeletalAnim& ext,
 		const std::vector<sm::cube>& meshes_aabb, const sm::mat4& mat);
 
 	static std::unique_ptr<Model::Mesh> LoadMesh(const aiMesh* ai_mesh, sm::cube& aabb);
@@ -37,7 +37,7 @@ private:
 
 	static int LoadTexture(Model& model, const std::string& filepath);
 
-	static std::unique_ptr<SkeletalAnim::Animation> LoadAnimation(const aiAnimation* ai_anim);
+	static std::unique_ptr<SkeletalAnim::ModelExtend> LoadAnimation(const aiAnimation* ai_anim);
 	static std::unique_ptr<SkeletalAnim::NodeAnim> LoadNodeAnim(const aiNodeAnim* ai_node);
 
 	static void CombineAABB(sm::cube& dst, const sm::cube& src, const sm::mat4& mat);

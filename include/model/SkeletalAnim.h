@@ -1,6 +1,6 @@
 #pragma once
 
-#include "model/Animation.h"
+#include "model/ModelExtend.h"
 
 #include <SM_Matrix.h>
 
@@ -11,7 +11,7 @@
 namespace model
 {
 
-class SkeletalAnim : public Animation
+class SkeletalAnim : public ModelExtend
 {
 public:
 	struct Node : boost::noncopyable
@@ -39,7 +39,7 @@ public:
 
 	}; // NodeAnim
 
-	struct Animation
+	struct ModelExtend
 	{
 		std::string name;
 
@@ -49,15 +49,15 @@ public:
 
 		std::vector<std::unique_ptr<NodeAnim>> channels;
 
-	}; // Animation
+	}; // ModelExtend
 
 public:
-	virtual AnimType Type() const override { return ANIM_SKELETAL; }
+	virtual ModelExtendType Type() const override { return EXT_SKELETAL; }
 
 	int QueryNodeByName(const std::string& name) const;
 
-	void AddAnim(std::unique_ptr<Animation>& anim) {
-		m_anims.push_back(std::move(anim));
+	void AddAnim(std::unique_ptr<ModelExtend>& ext) {
+		m_anims.push_back(std::move(ext));
 	}
 	auto& GetAllAnims() const { return m_anims; }
 
@@ -78,7 +78,7 @@ public:
 private:
 	std::vector<std::unique_ptr<Node>> m_nodes;
 
-	std::vector<std::unique_ptr<Animation>> m_anims;
+	std::vector<std::unique_ptr<ModelExtend>> m_anims;
 
 }; // SkeletalAnim
 

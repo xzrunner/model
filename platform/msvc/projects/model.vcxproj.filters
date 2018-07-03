@@ -16,11 +16,11 @@
     <Filter Include="dataset">
       <UniqueIdentifier>{67ae6668-1304-4c4e-8dee-87fab2796438}</UniqueIdentifier>
     </Filter>
-    <Filter Include="dataset\anim">
-      <UniqueIdentifier>{a8690aed-4075-42d7-b6d7-bb76aeb259ca}</UniqueIdentifier>
-    </Filter>
     <Filter Include="dataset\surface">
       <UniqueIdentifier>{9f2d748d-19cc-44f5-a52d-1d638d5f844c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dataset\extend">
+      <UniqueIdentifier>{a8690aed-4075-42d7-b6d7-bb76aeb259ca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -49,10 +49,10 @@
       <Filter>loader</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\SkeletalAnim.cpp">
-      <Filter>dataset\anim</Filter>
+      <Filter>dataset\extend</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\MorphTargetAnim.cpp">
-      <Filter>dataset\anim</Filter>
+      <Filter>dataset\extend</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\GlobalClock.cpp">
       <Filter>utility</Filter>
@@ -114,10 +114,10 @@
       <Filter>utility</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\SkeletalAnim.h">
-      <Filter>dataset\anim</Filter>
+      <Filter>dataset\extend</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\MorphTargetAnim.h">
-      <Filter>dataset\anim</Filter>
+      <Filter>dataset\extend</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\EffectType.h">
       <Filter>utility</Filter>
@@ -143,12 +143,6 @@
     <ClInclude Include="..\..\..\include\model\SkinnedModel.h">
       <Filter>loader\todo</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\model\Animation.h">
-      <Filter>dataset\anim</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\model\AnimType.h">
-      <Filter>dataset\anim</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\model\MdlLoader.h">
       <Filter>loader\quake</Filter>
     </ClInclude>
@@ -158,14 +152,17 @@
     <ClInclude Include="..\..\..\include\model\BspFile.h">
       <Filter>loader\quake</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\model\QuakeModel.h">
-      <Filter>loader\quake</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\model\TextureLoader.h">
       <Filter>loader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\BspModel.h">
       <Filter>loader\quake</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\ModelExtend.h">
+      <Filter>dataset\extend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\ModelExtendType.h">
+      <Filter>dataset\extend</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -191,7 +191,7 @@ void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& mod
 	mesh->effect = EFFECT_MORPH_TARGET;
 	model.meshes.push_back(std::move(mesh));
 
-	model.anim = std::make_unique<MorphTargetAnim>(3, header.num_frames, header.num_tris * 3);
+	model.ext = std::make_unique<MorphTargetAnim>(3, header.num_frames, header.num_tris * 3);
 
 	model.aabb = aabb;
 }

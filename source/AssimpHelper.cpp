@@ -97,7 +97,7 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath)
 		return NULL;
 	}
 
-	auto anim = std::make_unique<SkeletalAnim>();
+	auto ext = std::make_unique<SkeletalAnim>();
 
 	// material
 	auto dir = boost::filesystem::path(filepath).parent_path().string();
@@ -121,21 +121,21 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath)
 	}
 
 	// node
-	LoadNode(ai_scene, ai_scene->mRootNode, model, *anim, meshes_aabb, sm::mat4());
+	LoadNode(ai_scene, ai_scene->mRootNode, model, *ext, meshes_aabb, sm::mat4());
 
 	// todo: load lights and cameras
 
 	// bone
 	for (auto& mesh : model.meshes) {
 		for (auto& bone : mesh->geometry.bones) {
-			bone.node = anim->QueryNodeByName(bone.name);
+			bone.node = ext->QueryNodeByName(bone.name);
 		}
 	}
 
 	// animation
 	for (size_t i = 0; i < ai_scene->mNumAnimations; ++i) {
 		auto src = ai_scene->mAnimations[i];
-		anim->AddAnim(LoadAnimation(src));
+		ext->AddAnim(LoadAnimation(src));
 	}
 
 	// todo
@@ -143,12 +143,12 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath)
 		model.anim_speed = 100;
 	}
 
-	model.anim = std::move(anim);
+	model.ext = std::move(ext);
 
 	return true;
 }
 
-int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model, SkeletalAnim& anim,
+int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model, SkeletalAnim& ext,
 	                       const std::vector<sm::cube>& meshes_aabb, const sm::mat4& mat)
 {
 	auto node = std::make_unique<SkeletalAnim::Node>();
@@ -156,8 +156,8 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 
 	node_raw->name = ai_node->mName.C_Str();
 
-	int node_id = anim.GetNodeSize();
-	anim.AddNode(node);
+	int node_id = ext.GetNodeSize();
+	ext.AddNode(node);
 
 	node_raw->local_trans = trans_ai_mat(ai_node->mTransformation);
 
@@ -167,10 +167,10 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 	{
 		for (size_t i = 0; i < ai_node->mNumChildren; ++i)
 		{
-			int child = LoadNode(ai_scene, ai_node->mChildren[i], model, anim, meshes_aabb, child_mat);
+			int child = LoadNode(ai_scene, ai_node->mChildren[i], model, ext, meshes_aabb, child_mat);
 			node_raw->children.push_back(child);
 
-			auto node = anim.GetNode(child);
+			auto node = ext.GetNode(child);
 			assert(node->parent == -1);
 			node->parent = node_id;
 		}
@@ -469,17 +469,17 @@ int AssimpHelper::LoadTexture(Model& model, const std::string& filepath)
 	return ret;
 }
 
-std::unique_ptr<SkeletalAnim::Animation> AssimpHelper::LoadAnimation(const aiAnimation* ai_anim)
+std::unique_ptr<SkeletalAnim::ModelExtend> AssimpHelper::LoadAnimation(const aiAnimation* ai_anim)
 {
-	auto anim = std::make_unique<SkeletalAnim::Animation>();
-	anim->name = ai_anim->mName.C_Str();
-	anim->duration = static_cast<float>(ai_anim->mDuration);
-	anim->ticks_per_second = static_cast<float>(ai_anim->mTicksPerSecond);
+	auto ext = std::make_unique<SkeletalAnim::ModelExtend>();
+	ext->name = ai_anim->mName.C_Str();
+	ext->duration = static_cast<float>(ai_anim->mDuration);
+	ext->ticks_per_second = static_cast<float>(ai_anim->mTicksPerSecond);
 	for (int i = 0, n = ai_anim->mNumChannels; i < n; ++i) {
 		auto& src = ai_anim->mChannels[i];
-		anim->channels.push_back(LoadNodeAnim(src));
+		ext->channels.push_back(LoadNodeAnim(src));
 	}
-	return anim;
+	return ext;
 }
 
 std::unique_ptr<SkeletalAnim::NodeAnim> AssimpHelper::LoadNodeAnim(const aiNodeAnim* ai_node)

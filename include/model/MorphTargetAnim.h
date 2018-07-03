@@ -1,16 +1,16 @@
 #pragma once
 
-#include "model/Animation.h"
+#include "model/ModelExtend.h"
 
 namespace model
 {
 
-class MorphTargetAnim : public Animation
+class MorphTargetAnim : public ModelExtend
 {
 public:
 	MorphTargetAnim(int fps, int num_frames, int num_vertices);
 
-	virtual AnimType Type() const override { return ANIM_MORPH_TARGET; }
+	virtual ModelExtendType Type() const override { return EXT_MORPH_TARGET; }
 
 	int GetFps() const { return m_fps; }
 

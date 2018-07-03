@@ -11,10 +11,10 @@ ModelInstance::ModelInstance(const std::shared_ptr<Model>& model, int anim_idx)
 	: model(model)
 	, curr_anim_index(anim_idx)
 {
-	auto& anim = model->anim;
-	if (anim && anim->Type() == ANIM_SKELETAL)
+	auto& ext = model->ext;
+	if (ext && ext->Type() == EXT_SKELETAL)
 	{
-		auto sk_anim = static_cast<SkeletalAnim*>(anim.get());
+		auto sk_anim = static_cast<SkeletalAnim*>(ext.get());
 		auto& nodes = sk_anim->GetAllNodes();
 		int sz = nodes.size();
 
@@ -50,15 +50,15 @@ ModelInstance::ModelInstance(const std::shared_ptr<Model>& model, int anim_idx)
 
 bool ModelInstance::Update()
 {
-	if (!model->anim) {
+	if (!model->ext) {
 		return false;
 	}
 
-	switch (model->anim->Type())
+	switch (model->ext->Type())
 	{
-	case ANIM_MORPH_TARGET:
+	case EXT_MORPH_TARGET:
 		return UpdateMorphTargetAnim();
-	case ANIM_SKELETAL:
+	case EXT_SKELETAL:
 		return UpdateSkeletalAnim();
 	}
 	return false;
@@ -74,19 +74,19 @@ bool ModelInstance::UpdateMorphTargetAnim()
 		return false;
 	}
 
-	auto anim = static_cast<MorphTargetAnim*>(model->anim.get());
-	if (anim->GetNumFrames() == 1)
+	auto ext = static_cast<MorphTargetAnim*>(model->ext.get());
+	if (ext->GetNumFrames() == 1)
 	{
-		anim->SetFrame(0);
-		anim->SetBlend(0);
+		ext->SetFrame(0);
+		ext->SetBlend(0);
 	}
 	else
 	{
-		float f_frame = (curr_time - m_start_time) * anim->GetFps();
-		int frame = static_cast<int>(f_frame) % anim->GetNumFrames();
-		anim->SetFrame(frame);
+		float f_frame = (curr_time - m_start_time) * ext->GetFps();
+		int frame = static_cast<int>(f_frame) % ext->GetNumFrames();
+		ext->SetFrame(frame);
 		float blend = f_frame - std::floor(f_frame);
-		anim->SetBlend(blend);
+		ext->SetBlend(blend);
 	}
 
 	return true;
@@ -94,7 +94,7 @@ bool ModelInstance::UpdateMorphTargetAnim()
 
 bool ModelInstance::UpdateSkeletalAnim()
 {
-	auto sk_anim = static_cast<SkeletalAnim*>(model->anim.get());
+	auto sk_anim = static_cast<SkeletalAnim*>(model->ext.get());
 
 	auto& anims = sk_anim->GetAllAnims();
 	if (curr_anim_index < 0 || curr_anim_index >= static_cast<int>(anims.size())) {
@@ -109,21 +109,21 @@ bool ModelInstance::UpdateSkeletalAnim()
 		return false;
 	}
 
-	auto& anim = anims[curr_anim_index];
+	auto& ext = anims[curr_anim_index];
 
 	float curr_frame = 0.0f;
-	float ticks_per_second = anim->ticks_per_second != 0 ? anim->ticks_per_second : 25.0f;
-	if (anim->duration > 0) {
-		curr_time = fmod(curr_time - m_start_time, anim->duration / ticks_per_second);
+	float ticks_per_second = ext->ticks_per_second != 0 ? ext->ticks_per_second : 25.0f;
+	if (ext->duration > 0) {
+		curr_time = fmod(curr_time - m_start_time, ext->duration / ticks_per_second);
 		curr_frame = curr_time * ticks_per_second;
 	}
 
-	std::vector<sm::mat4> channels_trans(anim->channels.size());
+	std::vector<sm::mat4> channels_trans(ext->channels.size());
 
 	// calc anim trans
-	for (int i = 0, n = anim->channels.size(); i < n; ++i)
+	for (int i = 0, n = ext->channels.size(); i < n; ++i)
 	{
-		auto& channel = anim->channels[i];
+		auto& channel = ext->channels[i];
 
 		// position
 		sm::vec3 position(0, 0, 0);
@@ -143,7 +143,7 @@ bool ModelInstance::UpdateSkeletalAnim()
 			auto& next_key = channel->position_keys[next_frame];
 			float diff_time = next_key.first- key.first;
 			if (diff_time < 0.0) {
-				diff_time += anim->duration;
+				diff_time += ext->duration;
 			}
 			if (diff_time > 0)
 			{
@@ -176,7 +176,7 @@ bool ModelInstance::UpdateSkeletalAnim()
 			auto& next_key = channel->rotation_keys[next_frame];
 			float diff_time = next_key.first - key.first;
 			if (diff_time < 0.0) {
-				diff_time += anim->duration;
+				diff_time += ext->duration;
 			}
 			if (diff_time > 0)
 			{
@@ -209,7 +209,7 @@ bool ModelInstance::UpdateSkeletalAnim()
 			auto& next_key = channel->scaling_keys[next_frame];
 			float diff_time = next_key.first - key.first;
 			if (diff_time < 0.0) {
-				diff_time += anim->duration;
+				diff_time += ext->duration;
 			}
 			if (diff_time > 0)
 			{
@@ -253,7 +253,7 @@ bool ModelInstance::UpdateSkeletalAnim()
 
 const std::vector<sm::mat4>& ModelInstance::CalcBoneMatrices(int node_idx, int mesh_idx) const
 {
-	if (!model->anim || model->anim->Type() != ANIM_SKELETAL) {
+	if (!model->ext || model->ext->Type() != EXT_SKELETAL) {
 		return m_bone_trans;
 	}
 
@@ -274,11 +274,11 @@ const std::vector<sm::mat4>& ModelInstance::CalcBoneMatrices(int node_idx, int m
 
 void ModelInstance::CalcGlobalTrans()
 {
-	if (!model->anim || model->anim->Type() != ANIM_SKELETAL) {
+	if (!model->ext || model->ext->Type() != EXT_SKELETAL) {
 		return;
 	}
 
-	auto sk_anim = static_cast<SkeletalAnim*>(model->anim.get());
+	auto sk_anim = static_cast<SkeletalAnim*>(model->ext.get());
 	auto& nodes = sk_anim->GetAllNodes();
 	size_t sz = local_trans.size();
 	if (global_trans.size() != sz) {

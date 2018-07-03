@@ -84,7 +84,7 @@ bool BspLoader::Load(Model& model, const std::string& filepath)
 
 //	model.aabb = aabb;
 
-	model.anim = std::move(bsp);
+	model.ext = std::move(bsp);
 
 	return true;
 }
@@ -619,7 +619,7 @@ void BspLoader::ChainSurfaceByTexture(BspModel& model)
 {
 	for (auto& node : model.nodes)
 	{
-		for (int i = 0; i < node.numsurfaces; ++i)
+		for (int i = 0; i < static_cast<int>(node.numsurfaces); ++i)
 		{
 			auto& s = model.surfaces[node.firstsurface + i];
 			auto& tex = model.textures[model.tex_info[s.tex_info_idx].tex_idx];
