@@ -54,6 +54,7 @@ bool BspLoader::Load(Model& model, const std::string& filepath)
 	bsp->entities = LoadEntities(fin, header.lumps[LUMP_ENTITIES]);
 	LoadSubmodels(fin, header.lumps[LUMP_MODELS], bsp->submodels);
 
+	bsp->CreateSurfaceLightmap();
 	bsp->BuildSurfaceDisplayList();
 
 	ChainSurfaceByTexture(*bsp);

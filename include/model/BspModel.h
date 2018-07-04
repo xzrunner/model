@@ -77,6 +77,9 @@ struct BspModel : public ModelExtend
 
 		uint8_t		styles[MAXLIGHTMAPS];
 
+		// light
+		int			light_s, light_t;	// gl lightmap coordinates
+		int			lightmaptexturenum;
 		uint8_t		*samples;		// [numstyles*surfsize]
 	};
 
@@ -181,7 +184,10 @@ struct BspModel : public ModelExtend
 
 	virtual ModelExtendType Type() const override { return EXT_BSP; }
 
+	void CreateSurfaceLightmap();
 	void BuildSurfaceDisplayList();
+
+	void BuildLightMap(Surface& surf, uint8_t* dest, int stride);
 
 }; // BspModel
 
