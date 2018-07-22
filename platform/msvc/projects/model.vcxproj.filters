@@ -81,6 +81,9 @@
     <ClCompile Include="..\..\..\source\BspModel.cpp">
       <Filter>loader\quake</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\MapLoader.cpp">
+      <Filter>loader\quake</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\model\ParametricEquations.h">
@@ -163,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\ModelExtendType.h">
       <Filter>dataset\extend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\MapLoader.h">
+      <Filter>loader\quake</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,7 @@
 #include "model/AssimpHelper.h"
 #include "model/MdlLoader.h"
 #include "model/BspLoader.h"
+#include "model/MapLoader.h"
 
 #include <guard/check.h>
 
@@ -33,6 +34,8 @@ bool Model::LoadFromFile(const std::string& filepath)
 		return MdlLoader::Load(*this, filepath);
 	} else if (ext == ".bsp") {
 		return BspLoader::Load(*this, filepath);
+	} else if (ext == ".map") {
+		return MapLoader::Load(*this, filepath);
 	} else {
 		GD_REPORT_ASSERT("unknown type.");
 		return false;
