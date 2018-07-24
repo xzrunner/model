@@ -13,22 +13,21 @@ namespace model
 
 struct Model;
 
-struct ModelInstance : boost::noncopyable
+class ModelInstance : boost::noncopyable
 {
+public:
 	ModelInstance(const std::shared_ptr<Model>& model, int anim_idx = 0);
 
 	bool Update();
 
 	const std::vector<sm::mat4>& CalcBoneMatrices(int node, int mesh) const;
 
-	std::shared_ptr<Model> model = nullptr;
+	const std::shared_ptr<Model>& GetModel() const { return m_model; }
 
-	int curr_anim_index = -1;
+	int  GetCurrAnimIndex() const { return m_curr_anim_index; }
+	void SetCurrAnimIndex(int idx) { m_curr_anim_index = idx; }
 
-	std::vector<sm::mat4> local_trans;
-	std::vector<sm::mat4> global_trans;
-
-	std::vector<int> channel_idx;
+	const std::vector<sm::mat4>& GetGlobalTrans() const { return m_global_trans; }
 
 private:
 	bool UpdateMorphTargetAnim();
@@ -37,6 +36,15 @@ private:
 	void CalcGlobalTrans();
 
 private:
+	std::shared_ptr<Model> m_model = nullptr;
+
+	int m_curr_anim_index = -1;
+
+	std::vector<sm::mat4> m_local_trans;
+	std::vector<sm::mat4> m_global_trans;
+
+	std::vector<int> m_channel_idx;
+
 	float m_last_time = 0;
 	float m_start_time = 0;
 
