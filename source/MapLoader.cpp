@@ -276,7 +276,7 @@ bool MapLoader::LoadEntity(Model& dst, const quake::MapEntity& src)
 				border_indices.push_back(i);
 				border_indices.push_back(i + 1);
 			}
-			border_indices.push_back(f.vertices.size() - 1);
+			border_indices.push_back(static_cast<unsigned short>(f.vertices.size() - 1));
 			border_indices.push_back(start_idx);
 		}
 
