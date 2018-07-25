@@ -8,6 +8,7 @@ enum ModelExtendType
 	EXT_MORPH_TARGET = 0,
 	EXT_SKELETAL,
 	EXT_BSP,
+	EXT_HALFEDGE_MESH,
 };
 
 }

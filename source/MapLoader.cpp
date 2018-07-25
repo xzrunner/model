@@ -3,6 +3,7 @@
 #include "model/MeshGeometry.h"
 #include "model/typedef.h"
 #include "model/Model.h"
+#include "model/HalfEdgeMesh.h"
 
 #include <unirender/Blackboard.h>
 #include <unirender/RenderContext.h>
@@ -111,6 +112,7 @@ void MapLoader::Load(std::vector<std::shared_ptr<Model>>& models, const std::str
 	for (auto& e : parser.GetAllEntities()) {
 		for (auto& b : e->brushes) {
 			b.BuildVertices();
+			b.BuildGeometry();
 		}
 	}
 
@@ -151,6 +153,7 @@ bool MapLoader::Load(Model& model, const std::string& filepath)
 	for (auto& e : entities) {
 		for (auto& b : e->brushes) {
 			b.BuildVertices();
+			b.BuildGeometry();
 		}
 	}
 
@@ -291,6 +294,13 @@ bool MapLoader::LoadEntity(Model& dst, const quake::MapEntity& src)
 
 	dst.aabb = aabb;
 	aabb.MakeEmpty();
+
+	auto mesh = std::make_unique<HalfEdgeMesh>();
+	mesh->meshes.reserve(src.brushes.size());
+	for (auto& brush : src.brushes) {
+		mesh->meshes.push_back(brush.geometry);
+	}
+	dst.ext = std::move(mesh);
 
 	return true;
 }
