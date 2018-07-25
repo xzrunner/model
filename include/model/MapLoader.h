@@ -17,6 +17,8 @@ public:
 
 	static bool Load(Model& model, const std::string& filepath);
 
+	static const float VERTEX_SCALE;
+
 private:
 	static void LoadTextures(const quake::MapEntity& world,
 		const std::string& dir);

@@ -20,8 +20,6 @@
 namespace
 {
 
-const float SCALE = 0.01f;
-
 struct Vertex
 {
 	sm::vec3 pos;
@@ -81,7 +79,7 @@ Vertex CreateVertex(const quake::BrushFace& face, const sm::vec3& pos, const ur:
 {
 	Vertex v;
 
-	v.pos = pos * SCALE;
+	v.pos = pos * model::MapLoader::VERTEX_SCALE;
 	aabb.Combine(v.pos);
 
 	if (tex) {
@@ -98,6 +96,8 @@ Vertex CreateVertex(const quake::BrushFace& face, const sm::vec3& pos, const ur:
 
 namespace model
 {
+
+const float MapLoader::VERTEX_SCALE = 0.01f;
 
 void MapLoader::Load(std::vector<std::shared_ptr<Model>>& models, const std::string& filepath)
 {
