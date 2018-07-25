@@ -48,6 +48,7 @@ struct Model : boost::noncopyable
 	std::vector<std::unique_ptr<Material>> materials;
 
 	std::vector<std::unique_ptr<Mesh>> meshes;
+	std::vector<std::unique_ptr<Mesh>> border_meshes;
 
 	std::unique_ptr<ModelExtend> ext = nullptr;
 
