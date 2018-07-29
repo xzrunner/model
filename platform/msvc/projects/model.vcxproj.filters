@@ -170,7 +170,7 @@
     <ClInclude Include="..\..\..\include\model\MapLoader.h">
       <Filter>loader\quake</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\model\HalfEdgeMesh.h">
+    <ClInclude Include="..\..\..\include\model\QuakeMapEntity.h">
       <Filter>dataset\extend</Filter>
     </ClInclude>
   </ItemGroup>

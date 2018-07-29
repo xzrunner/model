@@ -182,7 +182,7 @@ struct BspModel : public ModelExtend
 		}
 	}
 
-	virtual ModelExtendType Type() const override { return EXT_BSP; }
+	virtual ModelExtendType Type() const override { return EXT_QUAKE_BSP; }
 
 	void CreateSurfaceLightmap();
 	void BuildSurfaceDisplayList();
