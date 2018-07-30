@@ -12,11 +12,6 @@ class QuakeMapEntity : public ModelExtend
 public:
 	virtual ModelExtendType Type() const override { return EXT_QUAKE_MAP; }
 
-	//void SetBrushes(const std::vector<he::PolyhedronPtr>& brushes) {
-	//	m_brushes = brushes;
-	//}
-	//auto& GetAllBrushes() const { return m_brushes; }
-
 	void SetMapEntity(const quake::MapEntityPtr& entity) { m_map_entity = entity; }
 	const quake::MapEntityPtr& GetMapEntity() const { return m_map_entity; }
 
@@ -44,14 +39,10 @@ public:
 	auto& GetAllBrushDescs() const { return m_brush_descs; }
 
 private:
-	//// helfedge geometry
-	//std::vector<he::PolyhedronPtr> m_brushes;
+	quake::MapEntityPtr m_map_entity = nullptr;
 
-	// smallest dataset to create vertex
 	// update vbo from editor
 	std::vector<BrushDesc> m_brush_descs;
-
-	quake::MapEntityPtr m_map_entity;
 
 }; // QuakeMapEntity
 

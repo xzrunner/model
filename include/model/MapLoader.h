@@ -1,9 +1,11 @@
 #pragma once
 
+#include <quake/MapModel.h>
+
+#include <SM_Vector.h>
+
 #include <string>
 #include <vector>
-
-namespace quake { struct MapEntity; }
 
 namespace model
 {
@@ -17,13 +19,15 @@ public:
 
 	static bool Load(Model& model, const std::string& filepath);
 
+	static void UpdateVBO(Model& model, int brush_idx);
+
 	static const float VERTEX_SCALE;
 
 private:
 	static void LoadTextures(const quake::MapEntity& world,
 		const std::string& dir);
 
-	static bool LoadEntity(Model& dst, const quake::MapEntity& src);
+	static bool LoadEntity(Model& dst, const quake::MapEntityPtr& src);
 
 }; // MapLoader
 

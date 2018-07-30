@@ -3,7 +3,7 @@
 #include "model/MeshGeometry.h"
 #include "model/typedef.h"
 #include "model/Model.h"
-#include "model/HalfEdgeMesh.h"
+#include "model/QuakeMapEntity.h"
 
 #include <unirender/Blackboard.h>
 #include <unirender/RenderContext.h>
@@ -27,7 +27,8 @@ struct Vertex
 	sm::vec2 texcoord;
 };
 
-void CreateMeshRenderBuf(model::Model::Mesh& mesh, const std::vector<Vertex>& vertices)
+void CreateMeshRenderBuf(model::Model::Mesh& mesh,
+	                     const std::vector<Vertex>& vertices)
 {
 	const int stride = sizeof(Vertex) / sizeof(float);
 
@@ -51,7 +52,8 @@ void CreateMeshRenderBuf(model::Model::Mesh& mesh, const std::vector<Vertex>& ve
 	mesh.geometry.vertex_type |= model::VERTEX_FLAG_TEXCOORDS;
 }
 
-void CreateBorderMeshRenderBuf(model::Model::Mesh& mesh, const std::vector<Vertex>& vertices,
+void CreateBorderMeshRenderBuf(model::Model::Mesh& mesh,
+	                           const std::vector<Vertex>& vertices,
 	                           const std::vector<unsigned short>& indices)
 {
 	const int stride = sizeof(Vertex) / sizeof(float);
@@ -76,21 +78,47 @@ void CreateBorderMeshRenderBuf(model::Model::Mesh& mesh, const std::vector<Verte
 	mesh.geometry.vertex_type |= model::VERTEX_FLAG_TEXCOORDS;
 }
 
-Vertex CreateVertex(const quake::BrushFace& face, const sm::vec3& pos, const ur::TexturePtr& tex, sm::cube& aabb)
+Vertex CreateVertex(const quake::BrushFace& face, const sm::vec3& pos,
+	                int tex_w, int tex_h, sm::cube& aabb)
 {
 	Vertex v;
 
 	v.pos = pos * model::MapLoader::VERTEX_SCALE;
 	aabb.Combine(v.pos);
 
-	if (tex) {
-		v.texcoord = face.CalcTexCoords(
-			pos, static_cast<float>(tex->Width()), static_cast<float>(tex->Height()));
-	} else {
+	if (tex_w == 0 || tex_h == 0) {
 		v.texcoord.Set(0, 0);
+	} else {
+		v.texcoord = face.CalcTexCoords(
+			pos, static_cast<float>(tex_w), static_cast<float>(tex_h));
 	}
 
 	return v;
+}
+
+void FlushVertices(std::unique_ptr<model::Model::Mesh>& mesh,
+	               std::unique_ptr<model::Model::Mesh>& border_mesh,
+	               std::vector<Vertex>& vertices,
+	               std::vector<Vertex>& border_vertices,
+	               std::vector<unsigned short>& border_indices,
+	               model::Model& dst)
+{
+	CreateMeshRenderBuf(*mesh, vertices);
+	dst.meshes.push_back(std::move(mesh));
+	vertices.clear();
+
+	CreateBorderMeshRenderBuf(*border_mesh, border_vertices, border_indices);
+	dst.border_meshes.push_back(std::move(border_mesh));
+	border_vertices.clear();
+}
+
+void FlushBrushDesc(model::QuakeMapEntity::BrushDesc& brush_desc,
+	                model::QuakeMapEntity::MeshDesc& mesh_desc,
+	                int face_idx)
+{
+	mesh_desc.face_end = face_idx;
+	brush_desc.meshes.push_back(mesh_desc);
+	mesh_desc.face_begin = mesh_desc.face_end;
 }
 
 }
@@ -129,7 +157,7 @@ void MapLoader::Load(std::vector<std::shared_ptr<Model>>& models, const std::str
 	for (auto& entity : parser.GetAllEntities())
 	{
 		auto model = std::make_shared<Model>();
-		if (LoadEntity(*model, *entity)) {
+		if (LoadEntity(*model, entity)) {
 			models.push_back(model);
 		}
 	}
@@ -165,9 +193,55 @@ bool MapLoader::Load(Model& model, const std::string& filepath)
 	LoadTextures(*world, dir);
 
 	// load model
-	LoadEntity(model, *entities[0]);
+	LoadEntity(model, entities[0]);
 
 	return true;
+}
+
+void MapLoader::UpdateVBO(Model& model, int brush_idx)
+{
+	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
+
+	assert(model.ext && model.ext->Type() == EXT_QUAKE_MAP);
+	auto map_entity = static_cast<QuakeMapEntity*>(model.ext.get());
+	auto& brushes = map_entity->GetMapEntity()->brushes;
+	assert(brush_idx >= 0 && brush_idx < brushes.size());
+	auto& descs = map_entity->GetAllBrushDescs();
+	assert(descs.size() == brushes.size());
+
+	auto& faces = brushes[brush_idx].faces;
+	auto& desc = descs[brush_idx];
+	assert(desc.mesh_end - desc.mesh_begin == desc.meshes.size());
+	for (int i = desc.mesh_begin; i < desc.mesh_end; ++i)
+	{
+		std::vector<Vertex> vertices, border_vertices;
+		for (auto& src_mesh : desc.meshes)
+		{
+			int tex_w = src_mesh.tex_width;
+			int tex_h = src_mesh.tex_height;
+			sm::cube aabb; // todo
+			for (int j = src_mesh.face_begin; j < src_mesh.face_end; ++j)
+			{
+				auto& f = faces[j];
+				std::vector<sm::vec3> border;
+				assert(f.vertices.size() > 2);
+				for (size_t i = 1; i < f.vertices.size() - 1; ++i)
+				{
+					vertices.push_back(CreateVertex(f, f.vertices[0]->pos, tex_w, tex_h, aabb));
+					vertices.push_back(CreateVertex(f, f.vertices[i]->pos, tex_w, tex_h, aabb));
+					vertices.push_back(CreateVertex(f, f.vertices[i + 1]->pos, tex_w, tex_h, aabb));
+				}
+				for (auto& vert : f.vertices) {
+					border_vertices.push_back(CreateVertex(f, vert->pos, tex_w, tex_h, aabb));
+				}
+			}
+		}
+
+		rc.UpdateVboBuffer(model.meshes[i]->geometry.vbo, vertices.data(),
+			sizeof(Vertex) * vertices.size());
+		rc.UpdateVboBuffer(model.border_meshes[i]->geometry.vbo, border_vertices.data(),
+			sizeof(Vertex) * border_vertices.size());
+	}
 }
 
 void MapLoader::LoadTextures(const quake::MapEntity& world, const std::string& dir)
@@ -197,19 +271,33 @@ void MapLoader::LoadTextures(const quake::MapEntity& world, const std::string& d
 	}
 }
 
-bool MapLoader::LoadEntity(Model& dst, const quake::MapEntity& src)
+bool MapLoader::LoadEntity(Model& dst, const quake::MapEntityPtr& src)
 {
-	if (src.brushes.empty()) {
+	if (src->brushes.empty()) {
 		return false;
 	}
 
+	auto map_entity = std::make_unique<QuakeMapEntity>();
+
+	std::vector<QuakeMapEntity::BrushDesc> brush_descs;
+	brush_descs.reserve(src->brushes.size());
+
 	auto tex_mgr = quake::TextureManager::Instance();
 	sm::cube aabb;
-	for (auto& b : src.brushes)
+	for (auto& b : src->brushes)
 	{
+		QuakeMapEntity::BrushDesc brush_desc;
+
+		brush_desc.mesh_begin = dst.meshes.size();
+
 		if (b.faces.empty()) {
+			brush_desc.mesh_end = dst.meshes.size();
+			brush_descs.push_back(brush_desc);
 			continue;
 		}
+
+		QuakeMapEntity::MeshDesc mesh_desc;
+		mesh_desc.face_begin = 0;
 
 		// sort by texture
 		auto faces = b.faces;
@@ -225,20 +313,15 @@ bool MapLoader::LoadEntity(Model& dst, const quake::MapEntity& src)
 		std::vector<unsigned short> border_indices;
 		std::string curr_tex_name;
 		ur::TexturePtr curr_tex = nullptr;
+		int face_idx = 0;
 		for (auto& f : faces)
 		{
 			// new material
 			if (f.tex_name != curr_tex_name)
 			{
-				if (!vertices.empty())
-				{
-					CreateMeshRenderBuf(*mesh, vertices);
-					dst.meshes.push_back(std::move(mesh));
-					vertices.clear();
-
-					CreateBorderMeshRenderBuf(*border_mesh, border_vertices, border_indices);
-					dst.border_meshes.push_back(std::move(border_mesh));
-					border_vertices.clear();
+				if (!vertices.empty()) {
+					FlushVertices(mesh, border_mesh, vertices, border_vertices, border_indices, dst);
+					FlushBrushDesc(brush_desc, mesh_desc, face_idx);
 				}
 
 				mesh = std::make_unique<Model::Mesh>();
@@ -260,17 +343,25 @@ bool MapLoader::LoadEntity(Model& dst, const quake::MapEntity& src)
 				curr_tex = tex;
 			}
 
+			int tex_w = 0, tex_h = 0;
+			if (curr_tex) {
+				tex_w = curr_tex->Width();
+				tex_h = curr_tex->Height();
+			}
+			mesh_desc.tex_width  = tex_w;
+			mesh_desc.tex_height = tex_h;
+
 			assert(f.vertices.size() > 2);
 			for (size_t i = 1; i < f.vertices.size() - 1; ++i)
 			{
-				vertices.push_back(CreateVertex(f, f.vertices[0], curr_tex, aabb));
-				vertices.push_back(CreateVertex(f, f.vertices[i], curr_tex, aabb));
-				vertices.push_back(CreateVertex(f, f.vertices[i + 1], curr_tex, aabb));
+				vertices.push_back(CreateVertex(f, f.vertices[0]->pos, tex_w, tex_h, aabb));
+				vertices.push_back(CreateVertex(f, f.vertices[i]->pos, tex_w, tex_h, aabb));
+				vertices.push_back(CreateVertex(f, f.vertices[i + 1]->pos, tex_w, tex_h, aabb));
 			}
 
 			int start_idx = border_vertices.size();
 			for (auto& v : f.vertices) {
-				border_vertices.push_back(CreateVertex(f, v, curr_tex, aabb));
+				border_vertices.push_back(CreateVertex(f, v->pos, tex_w, tex_h, aabb));
 			}
 			for (int i = 0, n = f.vertices.size(); i < n; ++i) {
 				border_indices.push_back(i);
@@ -278,29 +369,27 @@ bool MapLoader::LoadEntity(Model& dst, const quake::MapEntity& src)
 			}
 			border_indices.push_back(static_cast<unsigned short>(f.vertices.size() - 1));
 			border_indices.push_back(start_idx);
+
+			++face_idx;
 		}
 
-		if (!vertices.empty())
-		{
-			CreateMeshRenderBuf(*mesh, vertices);
-			dst.meshes.push_back(std::move(mesh));
-			vertices.clear();
-
-			CreateBorderMeshRenderBuf(*border_mesh, border_vertices, border_indices);
-			dst.border_meshes.push_back(std::move(border_mesh));
-			border_vertices.clear();
+		if (!vertices.empty()) {
+			FlushVertices(mesh, border_mesh, vertices, border_vertices, border_indices, dst);
+			FlushBrushDesc(brush_desc, mesh_desc, face_idx);
 		}
+
+		brush_desc.mesh_end = dst.meshes.size();
+		assert(brush_desc.mesh_end - brush_desc.mesh_begin == brush_desc.meshes.size());
+		brush_descs.push_back(brush_desc);
 	}
 
 	dst.aabb = aabb;
 	aabb.MakeEmpty();
 
-	auto mesh = std::make_unique<HalfEdgeMesh>();
-	mesh->meshes.reserve(src.brushes.size());
-	for (auto& brush : src.brushes) {
-		mesh->meshes.push_back(brush.geometry);
-	}
-	dst.ext = std::move(mesh);
+	map_entity->SetMapEntity(src);
+	map_entity->SetBrushDescs(brush_descs);
+
+	dst.ext = std::move(map_entity);
 
 	return true;
 }
