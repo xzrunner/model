@@ -74,7 +74,7 @@ void CreateBorderMeshRenderBuf(model::Model::Mesh& mesh,
 		vi, mesh.geometry.vao, mesh.geometry.vbo, mesh.geometry.ebo);
 	int idx = mesh.geometry.sub_geometries.size();
 	mesh.geometry.sub_geometry_materials.push_back(idx);
-	mesh.geometry.sub_geometries.push_back(model::SubmeshGeometry(false, vi.vn, 0));
+	mesh.geometry.sub_geometries.push_back(model::SubmeshGeometry(true, vi.in, 0));
 	mesh.geometry.vertex_type |= model::VERTEX_FLAG_TEXCOORDS;
 }
 
@@ -363,11 +363,11 @@ bool MapLoader::LoadEntity(Model& dst, const quake::MapEntityPtr& src)
 			for (auto& v : f.vertices) {
 				border_vertices.push_back(CreateVertex(f, v->pos, tex_w, tex_h, aabb));
 			}
-			for (int i = 0, n = f.vertices.size(); i < n; ++i) {
-				border_indices.push_back(i);
-				border_indices.push_back(i + 1);
+			for (int i = 0, n = f.vertices.size() - 1; i < n; ++i) {
+				border_indices.push_back(start_idx + i);
+				border_indices.push_back(start_idx + i + 1);
 			}
-			border_indices.push_back(static_cast<unsigned short>(f.vertices.size() - 1));
+			border_indices.push_back(start_idx + static_cast<unsigned short>(f.vertices.size() - 1));
 			border_indices.push_back(start_idx);
 
 			++face_idx;
