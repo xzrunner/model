@@ -78,7 +78,7 @@ void CreateBorderMeshRenderBuf(model::Model::Mesh& mesh,
 	mesh.geometry.vertex_type |= model::VERTEX_FLAG_TEXCOORDS;
 }
 
-Vertex CreateVertex(const quake::BrushFace& face, const sm::vec3& pos,
+Vertex CreateVertex(const quake::BrushFacePtr& face, const sm::vec3& pos,
 	                int tex_w, int tex_h, sm::cube& aabb)
 {
 	Vertex v;
@@ -89,7 +89,7 @@ Vertex CreateVertex(const quake::BrushFace& face, const sm::vec3& pos,
 	if (tex_w == 0 || tex_h == 0) {
 		v.texcoord.Set(0, 0);
 	} else {
-		v.texcoord = face.CalcTexCoords(
+		v.texcoord = face->CalcTexCoords(
 			pos, static_cast<float>(tex_w), static_cast<float>(tex_h));
 	}
 
@@ -224,14 +224,14 @@ void MapLoader::UpdateVBO(Model& model, int brush_idx)
 			{
 				auto& f = faces[j];
 				std::vector<sm::vec3> border;
-				assert(f.vertices.size() > 2);
-				for (size_t i = 1; i < f.vertices.size() - 1; ++i)
+				assert(f->vertices.size() > 2);
+				for (size_t i = 1; i < f->vertices.size() - 1; ++i)
 				{
-					vertices.push_back(CreateVertex(f, f.vertices[0]->pos, tex_w, tex_h, aabb));
-					vertices.push_back(CreateVertex(f, f.vertices[i]->pos, tex_w, tex_h, aabb));
-					vertices.push_back(CreateVertex(f, f.vertices[i + 1]->pos, tex_w, tex_h, aabb));
+					vertices.push_back(CreateVertex(f, f->vertices[0]->pos, tex_w, tex_h, aabb));
+					vertices.push_back(CreateVertex(f, f->vertices[i]->pos, tex_w, tex_h, aabb));
+					vertices.push_back(CreateVertex(f, f->vertices[i + 1]->pos, tex_w, tex_h, aabb));
 				}
-				for (auto& vert : f.vertices) {
+				for (auto& vert : f->vertices) {
 					border_vertices.push_back(CreateVertex(f, vert->pos, tex_w, tex_h, aabb));
 				}
 			}
@@ -301,8 +301,9 @@ bool MapLoader::LoadEntity(Model& dst, const quake::MapEntityPtr& src)
 
 		// sort by texture
 		auto faces = b.faces;
-		std::sort(faces.begin(), faces.end(), [](const quake::BrushFace& lhs, const quake::BrushFace& rhs) {
-			return lhs.tex_name < rhs.tex_name;
+		std::sort(faces.begin(), faces.end(), 
+			[](const quake::BrushFacePtr& lhs, const quake::BrushFacePtr& rhs) {
+			return lhs->tex_name < rhs->tex_name;
 		});
 
 		// create meshes
@@ -317,7 +318,7 @@ bool MapLoader::LoadEntity(Model& dst, const quake::MapEntityPtr& src)
 		for (auto& f : faces)
 		{
 			// new material
-			if (f.tex_name != curr_tex_name)
+			if (f->tex_name != curr_tex_name)
 			{
 				if (!vertices.empty()) {
 					FlushVertices(mesh, border_mesh, vertices, border_vertices, border_indices, dst);
@@ -334,12 +335,12 @@ bool MapLoader::LoadEntity(Model& dst, const quake::MapEntityPtr& src)
 				int mat_idx = dst.materials.size();
 				mesh->material = mat_idx;
 				border_mesh->material = mat_idx;
-				auto tex = tex_mgr->Query(f.tex_name);
+				auto tex = tex_mgr->Query(f->tex_name);
 				mat->diffuse_tex = dst.textures.size();
-				dst.textures.push_back({ f.tex_name, tex });
+				dst.textures.push_back({ f->tex_name, tex });
 				dst.materials.push_back(std::move(mat));
 
-				curr_tex_name = f.tex_name;
+				curr_tex_name = f->tex_name;
 				curr_tex = tex;
 			}
 
@@ -351,23 +352,23 @@ bool MapLoader::LoadEntity(Model& dst, const quake::MapEntityPtr& src)
 			mesh_desc.tex_width  = tex_w;
 			mesh_desc.tex_height = tex_h;
 
-			assert(f.vertices.size() > 2);
-			for (size_t i = 1; i < f.vertices.size() - 1; ++i)
+			assert(f->vertices.size() > 2);
+			for (size_t i = 1; i < f->vertices.size() - 1; ++i)
 			{
-				vertices.push_back(CreateVertex(f, f.vertices[0]->pos, tex_w, tex_h, aabb));
-				vertices.push_back(CreateVertex(f, f.vertices[i]->pos, tex_w, tex_h, aabb));
-				vertices.push_back(CreateVertex(f, f.vertices[i + 1]->pos, tex_w, tex_h, aabb));
+				vertices.push_back(CreateVertex(f, f->vertices[0]->pos, tex_w, tex_h, aabb));
+				vertices.push_back(CreateVertex(f, f->vertices[i]->pos, tex_w, tex_h, aabb));
+				vertices.push_back(CreateVertex(f, f->vertices[i + 1]->pos, tex_w, tex_h, aabb));
 			}
 
 			int start_idx = border_vertices.size();
-			for (auto& v : f.vertices) {
+			for (auto& v : f->vertices) {
 				border_vertices.push_back(CreateVertex(f, v->pos, tex_w, tex_h, aabb));
 			}
-			for (int i = 0, n = f.vertices.size() - 1; i < n; ++i) {
+			for (int i = 0, n = f->vertices.size() - 1; i < n; ++i) {
 				border_indices.push_back(start_idx + i);
 				border_indices.push_back(start_idx + i + 1);
 			}
-			border_indices.push_back(start_idx + static_cast<unsigned short>(f.vertices.size() - 1));
+			border_indices.push_back(start_idx + static_cast<unsigned short>(f->vertices.size() - 1));
 			border_indices.push_back(start_idx);
 
 			++face_idx;
