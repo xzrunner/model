@@ -67,7 +67,7 @@ bool ModelInstance::Update()
 void ModelInstance::RotateJoint(int idx, const sm::Quaternion& delta)
 {
 	assert(idx >= 0 && idx < m_local_trans.size());
-	m_local_trans[idx] = m_local_trans[idx] * sm::mat4(delta);
+	m_local_trans[idx] = sm::mat4(delta) * m_local_trans[idx];
 	CalcGlobalTrans();
 }
 
