@@ -28,6 +28,7 @@ public:
 	void SetCurrAnimIndex(int idx) { m_curr_anim_index = idx; }
 
 	const std::vector<sm::mat4>& GetGlobalTrans() const { return m_global_trans; }
+	void RotateJoint(int idx, const sm::Quaternion& delta);
 
 private:
 	bool UpdateMorphTargetAnim();

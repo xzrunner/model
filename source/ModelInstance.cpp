@@ -64,6 +64,13 @@ bool ModelInstance::Update()
 	return false;
 }
 
+void ModelInstance::RotateJoint(int idx, const sm::Quaternion& delta)
+{
+	assert(idx >= 0 && idx < m_local_trans.size());
+	m_local_trans[idx] = m_local_trans[idx] * sm::mat4(delta);
+	CalcGlobalTrans();
+}
+
 bool ModelInstance::UpdateMorphTargetAnim()
 {
 	float curr_time = GlobalClock::Instance()->GetTime() * m_model->anim_speed;
