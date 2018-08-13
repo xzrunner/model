@@ -28,8 +28,11 @@ public:
 	int  GetCurrAnimIndex() const { return m_curr_anim_index; }
 	void SetCurrAnimIndex(int idx) { m_curr_anim_index = idx; }
 
-	const std::vector<sm::mat4>& GetGlobalTrans() const { return m_global_trans; }
+	auto& GetLocalTrans() const { return m_local_trans; }
+	auto& GetGlobalTrans() const { return m_global_trans; }
+
 	void RotateJoint(int idx, const sm::Quaternion& delta);
+	void TranslateJoint(int idx, const sm::vec3& offset);
 
 private:
 	bool UpdateMorphTargetAnim();

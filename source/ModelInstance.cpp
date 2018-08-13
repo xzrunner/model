@@ -216,6 +216,13 @@ void ModelInstance::RotateJoint(int idx, const sm::Quaternion& delta)
 	CalcGlobalTrans();
 }
 
+void ModelInstance::TranslateJoint(int idx, const sm::vec3& offset)
+{
+	assert(idx >= 0 && idx < m_local_trans.size());
+	m_local_trans[idx] = sm::mat4::Translated(offset.x, offset.y, offset.z) * m_local_trans[idx];
+	CalcGlobalTrans();
+}
+
 bool ModelInstance::UpdateMorphTargetAnim()
 {
 	float curr_time = GlobalClock::Instance()->GetTime() * m_model->anim_speed;
