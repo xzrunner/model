@@ -19,6 +19,7 @@ public:
 	ModelInstance(const std::shared_ptr<Model>& model, int anim_idx = 0);
 
 	bool Update();
+	bool SetFrame(int frame);
 
 	const std::vector<sm::mat4>& CalcBoneMatrices(int node, int mesh) const;
 

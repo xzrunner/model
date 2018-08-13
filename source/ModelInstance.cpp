@@ -64,6 +64,151 @@ bool ModelInstance::Update()
 	return false;
 }
 
+bool ModelInstance::SetFrame(int curr_frame)
+{
+	if (!m_model->ext) {
+		return false;
+	}
+	if (m_model->ext->Type() != EXT_SKELETAL) {
+		return false;
+	}
+
+	auto sk_anim = static_cast<SkeletalAnim*>(m_model->ext.get());
+
+	auto& anims = sk_anim->GetAllAnims();
+	auto& ext = anims[m_curr_anim_index];
+
+	std::vector<sm::mat4> channels_trans(ext->channels.size());
+
+	// calc anim trans
+	for (int i = 0, n = ext->channels.size(); i < n; ++i)
+	{
+		auto& channel = ext->channels[i];
+
+		// position
+		sm::vec3 position(0, 0, 0);
+		if (!channel->position_keys.empty())
+		{
+			unsigned int frame = 0;
+			while (frame < channel->position_keys.size() - 1)
+			{
+				if (curr_frame < channel->position_keys[frame + 1].first) {
+					break;
+				}
+				frame++;
+			}
+
+			unsigned int next_frame = (frame + 1) % channel->position_keys.size();
+			auto& key = channel->position_keys[frame];
+			auto& next_key = channel->position_keys[next_frame];
+			float diff_time = next_key.first- key.first;
+			if (diff_time < 0.0) {
+				diff_time += ext->duration;
+			}
+			if (diff_time > 0)
+			{
+				float factor = float((curr_frame - key.first) / diff_time);
+				position = key.second + (next_key.second - key.second) * factor;
+			}
+			else
+			{
+				position = key.second;
+			}
+
+			std::get<0>(m_last_pos[i]) = frame;
+		}
+
+		// rotation
+		sm::Quaternion rotation(1, 0, 0, 0);
+		if (!channel->rotation_keys.empty())
+		{
+			unsigned int frame = 0;
+			while (frame < channel->rotation_keys.size() - 1)
+			{
+				if (curr_frame < channel->rotation_keys[frame + 1].first) {
+					break;
+				}
+				frame++;
+			}
+
+			unsigned int next_frame = (frame + 1) % channel->rotation_keys.size();
+			auto& key = channel->rotation_keys[frame];
+			auto& next_key = channel->rotation_keys[next_frame];
+			float diff_time = next_key.first - key.first;
+			if (diff_time < 0.0) {
+				diff_time += ext->duration;
+			}
+			if (diff_time > 0)
+			{
+				float factor = float((curr_frame - key.first) / diff_time);
+				rotation.Slerp(key.second, next_key.second, factor);
+			}
+			else
+			{
+				rotation = key.second;
+			}
+
+			std::get<1>(m_last_pos[i]) = frame;
+		}
+
+		// scaling
+		sm::vec3 scaling(0, 0, 0);
+		if (!channel->scaling_keys.empty())
+		{
+			unsigned int frame = 0;
+			while (frame < channel->scaling_keys.size() - 1)
+			{
+				if (curr_frame < channel->scaling_keys[frame + 1].first) {
+					break;
+				}
+				frame++;
+			}
+
+			unsigned int next_frame = (frame + 1) % channel->scaling_keys.size();
+			auto& key = channel->scaling_keys[frame];
+			auto& next_key = channel->scaling_keys[next_frame];
+			float diff_time = next_key.first - key.first;
+			if (diff_time < 0.0) {
+				diff_time += ext->duration;
+			}
+			if (diff_time > 0)
+			{
+				float factor = float((curr_frame - key.first) / diff_time);
+				scaling = key.second + (next_key.second - key.second) * factor;
+			}
+			else
+			{
+				scaling = key.second;
+			}
+
+			std::get<2>(m_last_pos[i]) = frame;
+		}
+
+		sm::mat4 m(rotation);
+		m.c[0][0] *= scaling.x; m.c[0][1] *= scaling.x; m.c[0][2] *= scaling.x; m.c[0][3] = 0;
+		m.c[1][0] *= scaling.y; m.c[1][1] *= scaling.y; m.c[1][2] *= scaling.y; m.c[1][3] = 0;
+		m.c[2][0] *= scaling.z; m.c[2][1] *= scaling.z; m.c[2][2] *= scaling.z; m.c[2][3] = 0;
+		m.c[3][0] = position.x; m.c[3][1] = position.y; m.c[3][2] = position.z; m.c[3][3] = 1;
+		channels_trans[i] = m;
+	}
+
+	// update local trans
+	assert(m_channel_idx.size() == m_local_trans.size());
+	for (int i = 0, n = m_channel_idx.size(); i < n; ++i)
+	{
+		if (m_channel_idx[i] >= 0) {
+			m_local_trans[i] = channels_trans[m_channel_idx[i]];
+		} else {
+			m_local_trans[i].Identity();
+		}
+	}
+
+	// update global trans
+	CalcGlobalTrans();
+
+	return true;
+}
+
 void ModelInstance::RotateJoint(int idx, const sm::Quaternion& delta)
 {
 	assert(idx >= 0 && idx < m_local_trans.size());
