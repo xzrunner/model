@@ -65,7 +65,7 @@ struct BspModel : public ModelExtend
 		int			firstedge;	// look up in model->surfedges[], negative numbers
 		int			numedges;	// are backwards edges
 
-		uint16_t	texturemins[2];
+		int16_t	    texturemins[2];
 		uint16_t	extents[2];
 
 		Poly*       polys;
