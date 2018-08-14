@@ -223,6 +223,17 @@ void ModelInstance::TranslateJoint(int idx, const sm::vec3& offset)
 	CalcGlobalTrans();
 }
 
+void ModelInstance::SetJointRotate(int idx, const sm::mat4& ori_mat, const sm::Quaternion& rotation)
+{
+	auto& d = m_local_trans[idx];
+	d = ori_mat;
+	auto s = sm::mat4(rotation);
+	d.c[0][0] = s.c[0][0]; d.c[0][1] = s.c[0][1]; d.c[0][2] = s.c[0][2];
+	d.c[1][0] = s.c[1][0]; d.c[1][1] = s.c[1][1]; d.c[1][2] = s.c[1][2];
+	d.c[2][0] = s.c[2][0]; d.c[2][1] = s.c[2][1]; d.c[2][2] = s.c[2][2];
+	CalcGlobalTrans();
+}
+
 bool ModelInstance::UpdateMorphTargetAnim()
 {
 	float curr_time = GlobalClock::Instance()->GetTime() * m_model->anim_speed;

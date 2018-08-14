@@ -34,6 +34,8 @@ public:
 	void RotateJoint(int idx, const sm::Quaternion& delta);
 	void TranslateJoint(int idx, const sm::vec3& offset);
 
+	void SetJointRotate(int idx, const sm::mat4& ori_mat, const sm::Quaternion& rotation);
+
 private:
 	bool UpdateMorphTargetAnim();
 	bool UpdateSkeletalAnim();
