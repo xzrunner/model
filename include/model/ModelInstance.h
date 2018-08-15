@@ -31,6 +31,8 @@ public:
 	auto& GetLocalTrans() const { return m_local_trans; }
 	auto& GetGlobalTrans() const { return m_global_trans; }
 
+	void SetLocalTrans(const std::vector<sm::mat4>& local_trans);
+
 	void RotateJoint(int idx, const sm::Quaternion& delta);
 	void TranslateJoint(int idx, const sm::vec3& offset);
 

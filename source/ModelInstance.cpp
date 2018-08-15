@@ -209,6 +209,12 @@ bool ModelInstance::SetFrame(int curr_frame)
 	return true;
 }
 
+void ModelInstance::SetLocalTrans(const std::vector<sm::mat4>& local_trans)
+{
+	m_local_trans = local_trans;
+	CalcGlobalTrans();
+}
+
 void ModelInstance::RotateJoint(int idx, const sm::Quaternion& delta)
 {
 	assert(idx >= 0 && idx < m_local_trans.size());
