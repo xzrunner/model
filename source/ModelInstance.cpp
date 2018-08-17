@@ -240,6 +240,15 @@ void ModelInstance::SetJointRotate(int idx, const sm::mat4& ori_mat, const sm::Q
 	CalcGlobalTrans();
 }
 
+void ModelInstance::SetRootPos(const sm::vec3& pos)
+{
+	auto& d = m_local_trans[0];
+	d.x[12] = pos.x;
+	d.x[13] = pos.y;
+	d.x[14] = pos.z;
+	CalcGlobalTrans();
+}
+
 bool ModelInstance::UpdateMorphTargetAnim()
 {
 	float curr_time = GlobalClock::Instance()->GetTime() * m_model->anim_speed;
