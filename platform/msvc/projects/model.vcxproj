@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\source\AssimpExporter.cpp" />
     <ClCompile Include="..\..\..\source\AssimpHelper.cpp" />
     <ClCompile Include="..\..\..\source\BspLoader.cpp" />
     <ClCompile Include="..\..\..\source\BspModel.cpp" />
@@ -33,6 +34,7 @@
     <ClCompile Include="..\..\..\source\TextureLoader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\include\model\AssimpExporter.h" />
     <ClInclude Include="..\..\..\include\model\QuakeMapEntity.h" />
     <ClInclude Include="..\..\..\include\model\MapLoader.h" />
     <ClInclude Include="..\..\..\include\model\ModelExtend.h" />

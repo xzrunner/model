@@ -60,11 +60,6 @@ sm::Quaternion trans_ai_quaternion(const C_STRUCT aiQuaternion& ai_quat)
 	return quat;
 }
 
-}
-
-namespace model
-{
-
 // default pp steps
 unsigned int ppsteps = aiProcess_CalcTangentSpace | // calculate tangents and bitangents if possible
 	aiProcess_JoinIdenticalVertices    | // join identical vertices/ optimize indexing
@@ -80,6 +75,11 @@ unsigned int ppsteps = aiProcess_CalcTangentSpace | // calculate tangents and bi
 	aiProcess_OptimizeMeshes		   | // join small meshes, if possible;
 	aiProcess_SplitByBoneCount         | // split meshes with too many bones. Necessary for our (limited) hardware skinning shader
 	0;
+
+}
+
+namespace model
+{
 
 bool AssimpHelper::Load(Model& model, const std::string& filepath)
 {

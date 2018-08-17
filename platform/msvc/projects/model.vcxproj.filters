@@ -22,6 +22,9 @@
     <Filter Include="dataset\extend">
       <UniqueIdentifier>{a8690aed-4075-42d7-b6d7-bb76aeb259ca}</UniqueIdentifier>
     </Filter>
+    <Filter Include="exportor">
+      <UniqueIdentifier>{6fbf2ee5-aad9-4175-9398-f89815ef76f7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\ParametricEquations.cpp">
@@ -83,6 +86,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\source\MapLoader.cpp">
       <Filter>loader\quake</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\AssimpExporter.cpp">
+      <Filter>exportor</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -172,6 +178,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\QuakeMapEntity.h">
       <Filter>dataset\extend</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\AssimpExporter.h">
+      <Filter>exportor</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
