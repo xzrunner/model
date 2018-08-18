@@ -26,8 +26,12 @@ bool Model::LoadFromFile(const std::string& filepath)
 		return AssimpHelper::Load(*this, filepath);
 	} else if (ext == ".m3d") {
 		return M3dLoader::Load(*this, filepath);
-	} else if (ext == ".x") {
-		return AssimpHelper::Load(*this, filepath);
+	} else if (ext == ".x" || ext == ".dae") {
+		float scale = 1.0f;
+		if (ext == ".dae") {
+			scale = 0.01f;
+		}
+		return AssimpHelper::Load(*this, filepath, scale);
 	} else if (ext == ".xml") {
 		return MaxLoader::Load(*this, filepath);
 	} else if (ext == ".mdl") {

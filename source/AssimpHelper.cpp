@@ -81,7 +81,7 @@ unsigned int ppsteps = aiProcess_CalcTangentSpace | // calculate tangents and bi
 namespace model
 {
 
-bool AssimpHelper::Load(Model& model, const std::string& filepath)
+bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale)
 {
 	Assimp::Importer importer;
 	const aiScene* ai_scene = importer.ReadFile(filepath.c_str(),
@@ -116,7 +116,7 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath)
 	{
 		auto src = ai_scene->mMeshes[i];
 		sm::cube aabb;
-		model.meshes.push_back(LoadMesh(src, aabb));
+		model.meshes.push_back(LoadMesh(src, aabb, scale));
 		meshes_aabb.push_back(aabb);
 	}
 
@@ -144,6 +144,8 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath)
 	}
 
 	model.ext = std::move(ext);
+
+	model.scale = scale;
 
 	return true;
 }
@@ -229,7 +231,7 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 	return node_id;
 }
 
-std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, sm::cube& aabb)
+std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, sm::cube& aabb, float scale)
 {
 	auto mesh = std::make_unique<Model::Mesh>();
 
@@ -280,6 +282,7 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, sm::c
 		const aiVector3D& p = ai_mesh->mVertices[i];
 
 		sm::vec3 p_trans(p.x, p.y, p.z);
+		p_trans *= scale;
 		memcpy(ptr, &p_trans.x, sizeof(float) * 3);
 		ptr += sizeof(float) * 3;
 		aabb.Combine(p_trans);
@@ -399,6 +402,7 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, sm::c
 		dst.node = -1;
 		dst.name = src->mName.C_Str();
 		dst.offset_trans = trans_ai_mat(src->mOffsetMatrix);
+
 		mesh->geometry.bones.push_back(dst);
 	}
 

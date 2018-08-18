@@ -56,6 +56,8 @@ struct Model : boost::noncopyable
 
 	float anim_speed = 1;
 
+	float scale = 1.0f;
+
 }; // Model
 
 }

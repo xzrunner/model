@@ -451,7 +451,13 @@ const std::vector<sm::mat4>& ModelInstance::CalcBoneMatrices(int node_idx, int m
 	{
 		auto& bone = mesh->geometry.bones[i];
 		assert(bone.node >= 0);
+
 		m_bone_trans[i] = bone.offset_trans * m_global_trans[bone.node] * global_inv_mesh_trans;
+
+		float s = m_model->scale;
+		m_bone_trans[i].x[12] *= s;
+		m_bone_trans[i].x[13] *= s;
+		m_bone_trans[i].x[14] *= s;
 	}
 
 	return m_bone_trans;
