@@ -419,12 +419,9 @@ bool ModelInstance::UpdateSkeletalAnim()
 
 	// update local trans
 	assert(m_channel_idx.size() == m_local_trans.size());
-	for (int i = 0, n = m_channel_idx.size(); i < n; ++i)
-	{
+	for (int i = 0, n = m_channel_idx.size(); i < n; ++i) {
 		if (m_channel_idx[i] >= 0) {
 			m_local_trans[i] = channels_trans[m_channel_idx[i]];
-		} else {
-			m_local_trans[i].Identity();
 		}
 	}
 
