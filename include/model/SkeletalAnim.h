@@ -8,6 +8,8 @@
 #include <vector>
 #include <memory>
 
+#include <math.h>
+
 namespace model
 {
 
@@ -48,6 +50,10 @@ public:
 		float ticks_per_second = 0;
 
 		std::vector<std::unique_ptr<NodeAnim>> channels;
+
+		int GetMaxFrameCount() const {
+			return static_cast<int>(roundf(duration * ticks_per_second));
+		}
 
 	}; // ModelExtend
 

@@ -479,6 +479,9 @@ std::unique_ptr<SkeletalAnim::ModelExtend> AssimpHelper::LoadAnimation(const aiA
 	ext->name = ai_anim->mName.C_Str();
 	ext->duration = static_cast<float>(ai_anim->mDuration);
 	ext->ticks_per_second = static_cast<float>(ai_anim->mTicksPerSecond);
+	if (ext->ticks_per_second == 1) {
+		ext->ticks_per_second = 30;
+	}
 	for (int i = 0, n = ai_anim->mNumChannels; i < n; ++i) {
 		auto& src = ai_anim->mChannels[i];
 		ext->channels.push_back(LoadNodeAnim(src));

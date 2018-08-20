@@ -78,6 +78,11 @@ bool ModelInstance::SetFrame(int curr_frame)
 	auto& anims = sk_anim->GetAllAnims();
 	auto& ext = anims[m_curr_anim_index];
 
+	float curr_time = curr_frame / ext->ticks_per_second;
+	if (ext->duration > 0) {
+		curr_time = fmod(curr_time, ext->duration);
+	}
+
 	std::vector<sm::mat4> channels_trans(ext->channels.size());
 
 	// calc anim trans
@@ -92,7 +97,7 @@ bool ModelInstance::SetFrame(int curr_frame)
 			unsigned int frame = 0;
 			while (frame < channel->position_keys.size() - 1)
 			{
-				if (curr_frame < channel->position_keys[frame + 1].first) {
+				if (curr_time < channel->position_keys[frame + 1].first) {
 					break;
 				}
 				frame++;
@@ -107,7 +112,7 @@ bool ModelInstance::SetFrame(int curr_frame)
 			}
 			if (diff_time > 0)
 			{
-				float factor = float((curr_frame - key.first) / diff_time);
+				float factor = float((curr_time - key.first) / diff_time);
 				position = key.second + (next_key.second - key.second) * factor;
 			}
 			else
@@ -125,7 +130,7 @@ bool ModelInstance::SetFrame(int curr_frame)
 			unsigned int frame = 0;
 			while (frame < channel->rotation_keys.size() - 1)
 			{
-				if (curr_frame < channel->rotation_keys[frame + 1].first) {
+				if (curr_time < channel->rotation_keys[frame + 1].first) {
 					break;
 				}
 				frame++;
@@ -140,7 +145,7 @@ bool ModelInstance::SetFrame(int curr_frame)
 			}
 			if (diff_time > 0)
 			{
-				float factor = float((curr_frame - key.first) / diff_time);
+				float factor = float((curr_time - key.first) / diff_time);
 				rotation.Slerp(key.second, next_key.second, factor);
 			}
 			else
@@ -158,7 +163,7 @@ bool ModelInstance::SetFrame(int curr_frame)
 			unsigned int frame = 0;
 			while (frame < channel->scaling_keys.size() - 1)
 			{
-				if (curr_frame < channel->scaling_keys[frame + 1].first) {
+				if (curr_time < channel->scaling_keys[frame + 1].first) {
 					break;
 				}
 				frame++;
@@ -173,7 +178,7 @@ bool ModelInstance::SetFrame(int curr_frame)
 			}
 			if (diff_time > 0)
 			{
-				float factor = float((curr_frame - key.first) / diff_time);
+				float factor = float((curr_time - key.first) / diff_time);
 				scaling = key.second + (next_key.second - key.second) * factor;
 			}
 			else
@@ -194,12 +199,9 @@ bool ModelInstance::SetFrame(int curr_frame)
 
 	// update local trans
 	assert(m_channel_idx.size() == m_local_trans.size());
-	for (int i = 0, n = m_channel_idx.size(); i < n; ++i)
-	{
+	for (int i = 0, n = m_channel_idx.size(); i < n; ++i) {
 		if (m_channel_idx[i] >= 0) {
 			m_local_trans[i] = channels_trans[m_channel_idx[i]];
-		} else {
-			m_local_trans[i].Identity();
 		}
 	}
 
@@ -296,11 +298,8 @@ bool ModelInstance::UpdateSkeletalAnim()
 
 	auto& ext = anims[m_curr_anim_index];
 
-	float curr_frame = 0.0f;
-	float ticks_per_second = ext->ticks_per_second != 0 ? ext->ticks_per_second : 25.0f;
 	if (ext->duration > 0) {
-		curr_time = fmod(curr_time - m_start_time, ext->duration / ticks_per_second);
-		curr_frame = curr_time * ticks_per_second;
+		curr_time = fmod(curr_time - m_start_time, ext->duration);
 	}
 
 	std::vector<sm::mat4> channels_trans(ext->channels.size());
@@ -317,7 +316,7 @@ bool ModelInstance::UpdateSkeletalAnim()
 			unsigned int frame = (curr_time >= m_last_time) ? std::get<0>(m_last_pos[i]) : 0;
 			while (frame < channel->position_keys.size() - 1)
 			{
-				if (curr_frame < channel->position_keys[frame + 1].first) {
+				if (curr_time < channel->position_keys[frame + 1].first) {
 					break;
 				}
 				frame++;
@@ -332,7 +331,7 @@ bool ModelInstance::UpdateSkeletalAnim()
 			}
 			if (diff_time > 0)
 			{
-				float factor = float((curr_frame - key.first) / diff_time);
+				float factor = float((curr_time - key.first) / diff_time);
 				position = key.second + (next_key.second - key.second) * factor;
 			}
 			else
@@ -350,7 +349,7 @@ bool ModelInstance::UpdateSkeletalAnim()
 			unsigned int frame = (curr_time >= m_last_time) ? std::get<1>(m_last_pos[i]) : 0;
 			while (frame < channel->rotation_keys.size() - 1)
 			{
-				if (curr_frame < channel->rotation_keys[frame + 1].first) {
+				if (curr_time < channel->rotation_keys[frame + 1].first) {
 					break;
 				}
 				frame++;
@@ -365,7 +364,7 @@ bool ModelInstance::UpdateSkeletalAnim()
 			}
 			if (diff_time > 0)
 			{
-				float factor = float((curr_frame - key.first) / diff_time);
+				float factor = float((curr_time - key.first) / diff_time);
 				rotation.Slerp(key.second, next_key.second, factor);
 			}
 			else
@@ -383,7 +382,7 @@ bool ModelInstance::UpdateSkeletalAnim()
 			unsigned int frame = (curr_time >= m_last_time) ? std::get<2>(m_last_pos[i]) : 0;
 			while (frame < channel->scaling_keys.size() - 1)
 			{
-				if (curr_frame < channel->scaling_keys[frame + 1].first) {
+				if (curr_time < channel->scaling_keys[frame + 1].first) {
 					break;
 				}
 				frame++;
@@ -398,7 +397,7 @@ bool ModelInstance::UpdateSkeletalAnim()
 			}
 			if (diff_time > 0)
 			{
-				float factor = float((curr_frame - key.first) / diff_time);
+				float factor = float((curr_time - key.first) / diff_time);
 				scaling = key.second + (next_key.second - key.second) * factor;
 			}
 			else
