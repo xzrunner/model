@@ -52,7 +52,7 @@ public:
 		std::vector<std::unique_ptr<NodeAnim>> channels;
 
 		int GetMaxFrameCount() const {
-			return static_cast<int>(roundf(duration * ticks_per_second));
+			return static_cast<int>(roundf(duration * ticks_per_second)) + 1;
 		}
 
 	}; // ModelExtend
