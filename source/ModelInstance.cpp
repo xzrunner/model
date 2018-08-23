@@ -242,13 +242,57 @@ void ModelInstance::SetJointRotate(int idx, const sm::mat4& ori_mat, const sm::Q
 	CalcGlobalTrans();
 }
 
-void ModelInstance::SetRootPos(const sm::vec3& pos)
+void ModelInstance::SetJointRotate(int idx, const sm::Quaternion& rotation)
 {
-	auto& d = m_local_trans[0];
-	d.x[12] = pos.x;
-	d.x[13] = pos.y;
-	d.x[14] = pos.z;
+	if (idx == 1) {
+		int zz = 0;
+	}
+
+	auto& d = m_local_trans[idx];
+	auto s = sm::mat4(rotation);
+	d.c[0][0] = s.c[0][0]; d.c[0][1] = s.c[0][1]; d.c[0][2] = s.c[0][2];
+	d.c[1][0] = s.c[1][0]; d.c[1][1] = s.c[1][1]; d.c[1][2] = s.c[1][2];
+	d.c[2][0] = s.c[2][0]; d.c[2][1] = s.c[2][1]; d.c[2][2] = s.c[2][2];
 	CalcGlobalTrans();
+}
+
+void ModelInstance::SetJointTransform(int idx, const sm::Quaternion& rotation, const sm::vec3& translate)
+{
+	sm::vec3 pos, rot, scale;
+	m_local_trans[idx].Decompose(pos, rot, scale);
+
+	auto& s = scale;
+	auto r = sm::mat4(rotation);
+	auto t = translate;
+	t.x /= s.x;
+	t.y /= s.y;
+	t.z /= s.z;
+
+	m_local_trans[idx] = sm::mat4::Translated(t.x, t.y, t.z) * r * sm::mat4::Scaled(s.x, s.y, s.z);
+
+	CalcGlobalTrans();
+}
+
+void ModelInstance::ResetToTPose()
+{
+	if (m_model->ext->Type() == EXT_SKELETAL) 
+	{
+		auto sk_anim = static_cast<SkeletalAnim*>(m_model->ext.get());
+		auto& nodes = sk_anim->GetAllNodes();
+		assert(nodes.size() == m_local_trans.size());
+		for (int i = 0, n = nodes.size(); i < n; ++i)
+		{
+			sm::vec3 pos, rot, scale;
+			nodes[i]->local_trans.Decompose(pos, rot, scale);
+
+			auto& d = m_local_trans[i];
+			d.c[0][0] = scale.x; d.c[0][1] = 0;       d.c[0][2] = 0;
+			d.c[1][0] = 0;       d.c[1][1] = scale.y; d.c[1][2] = 0;
+			d.c[2][0] = 0;       d.c[2][1] = 0;       d.c[2][2] = scale.z;
+			d.c[3][0] = pos.x;   d.c[3][1] = pos.y;   d.c[3][2] = pos.z;
+		}
+		CalcGlobalTrans();
+	}
 }
 
 bool ModelInstance::UpdateMorphTargetAnim()

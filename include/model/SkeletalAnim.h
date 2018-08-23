@@ -81,6 +81,8 @@ public:
 	}
 	auto& GetAllNodes() const { return m_nodes; }
 
+	void PrintNodeTree() const;
+
 private:
 	std::vector<std::unique_ptr<Node>> m_nodes;
 

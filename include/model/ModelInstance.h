@@ -37,7 +37,10 @@ public:
 	void TranslateJoint(int idx, const sm::vec3& offset);
 
 	void SetJointRotate(int idx, const sm::mat4& ori_mat, const sm::Quaternion& rotation);
-	void SetRootPos(const sm::vec3& pos);
+	void SetJointRotate(int idx, const sm::Quaternion& rotation);
+	void SetJointTransform(int idx, const sm::Quaternion& rotation, const sm::vec3& translate);
+
+	void ResetToTPose();
 
 private:
 	bool UpdateMorphTargetAnim();
