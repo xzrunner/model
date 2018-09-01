@@ -64,8 +64,8 @@ void ParametricSurface::GenerateVertices(int vertex_type, std::vector<float>& ve
 			// Compute Texture Coordinates
 			if (vertex_type & VERTEX_FLAG_TEXCOORDS)
 			{
-				float s = m_texture_count.x * i / m_slices.x;
-				float t = m_texture_count.y * j / m_slices.y;
+				float s = /*m_texture_count.x * */i / static_cast<float>(m_slices.x);
+				float t = /*m_texture_count.y * */j / static_cast<float>(m_slices.y);
 				(*ptr++) = s;
 				(*ptr++) = t;
 			}
