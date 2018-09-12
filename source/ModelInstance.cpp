@@ -244,10 +244,6 @@ void ModelInstance::SetJointRotate(int idx, const sm::mat4& ori_mat, const sm::Q
 
 void ModelInstance::SetJointRotate(int idx, const sm::Quaternion& rotation)
 {
-	if (idx == 1) {
-		int zz = 0;
-	}
-
 	auto& d = m_local_trans[idx];
 	auto s = sm::mat4(rotation);
 	d.c[0][0] = s.c[0][0]; d.c[0][1] = s.c[0][1]; d.c[0][2] = s.c[0][2];
