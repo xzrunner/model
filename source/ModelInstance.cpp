@@ -271,7 +271,7 @@ void ModelInstance::SetJointTransform(int idx, const sm::Quaternion& rotation, c
 
 void ModelInstance::ResetToTPose()
 {
-	if (m_model->ext->Type() == EXT_SKELETAL) 
+	if (m_model->ext->Type() == EXT_SKELETAL)
 	{
 		auto sk_anim = static_cast<SkeletalAnim*>(m_model->ext.get());
 		auto& nodes = sk_anim->GetAllNodes();

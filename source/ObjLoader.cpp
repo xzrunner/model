@@ -40,7 +40,7 @@ bool ObjLoader::Load(Model& model, const std::string& filepath)
 		exit(1);
 	}
 
-	
+
 
 	//// Loop over shapes
 	//for (size_t s = 0; s < shapes.size(); s++)
@@ -80,4 +80,4 @@ bool ObjLoader::Load(Model& model, const std::string& filepath)
 	return true;
 }
 
-}	
+}

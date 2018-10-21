@@ -301,7 +301,7 @@ bool MapLoader::LoadEntity(Model& dst, const quake::MapEntityPtr& src)
 
 		// sort by texture
 		auto faces = b.faces;
-		std::sort(faces.begin(), faces.end(), 
+		std::sort(faces.begin(), faces.end(),
 			[](const quake::BrushFacePtr& lhs, const quake::BrushFacePtr& rhs) {
 			return lhs->tex_name < rhs->tex_name;
 		});
