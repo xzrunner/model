@@ -237,10 +237,11 @@ void MapLoader::UpdateVBO(Model& model, int brush_idx)
 			}
 		}
 
-		rc.UpdateVboBuffer(model.meshes[i]->geometry.vbo, vertices.data(),
+		rc.UpdateBufferRaw(ur::BUFFER_VERTEX, model.meshes[i]->geometry.vbo, vertices.data(),
 			sizeof(Vertex) * vertices.size());
-		rc.UpdateVboBuffer(model.border_meshes[i]->geometry.vbo, border_vertices.data(),
+		rc.UpdateBufferRaw(ur::BUFFER_VERTEX, model.border_meshes[i]->geometry.vbo, border_vertices.data(),
 			sizeof(Vertex) * border_vertices.size());
+
 	}
 }
 
