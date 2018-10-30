@@ -121,22 +121,36 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale)
 	}
 
 	// node
-	LoadNode(ai_scene, ai_scene->mRootNode, model, *ext, meshes_aabb, sm::mat4());
+	{
+		std::vector<std::unique_ptr<SkeletalAnim::Node>> nodes;
+		LoadNode(ai_scene, ai_scene->mRootNode, model, nodes, meshes_aabb, sm::mat4());
+		ext->SetNodes(nodes);
+	}
 
 	// todo: load lights and cameras
 
 	// bone
+	auto& nodes = ext->GetNodes();
 	for (auto& mesh : model.meshes) {
 		for (auto& bone : mesh->geometry.bones) {
-			bone.node = ext->QueryNodeByName(bone.name);
+			bone.node = -1;
+			for (int i = 0, n = nodes.size(); i < n; ++i) {
+				if (nodes[i]->name == bone.name) {
+					bone.node = i;
+					break;
+				}
+			}
 		}
 	}
 
 	// animation
+	std::vector<std::unique_ptr<SkeletalAnim::ModelExtend>> anims;
+	anims.reserve(ai_scene->mNumAnimations);
 	for (size_t i = 0; i < ai_scene->mNumAnimations; ++i) {
 		auto src = ai_scene->mAnimations[i];
-		ext->AddAnim(LoadAnimation(src));
+		anims.push_back(LoadAnimation(src));
 	}
+	ext->SetAnims(anims);
 
 	// todo
 	if (boost::filesystem::extension(filepath) == ".X") {
@@ -150,7 +164,8 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale)
 	return true;
 }
 
-int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model, SkeletalAnim& ext,
+int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model, 
+	                       std::vector<std::unique_ptr<SkeletalAnim::Node>>& nodes,
 	                       const std::vector<sm::cube>& meshes_aabb, const sm::mat4& mat)
 {
 	auto node = std::make_unique<SkeletalAnim::Node>();
@@ -158,8 +173,8 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 
 	node_raw->name = ai_node->mName.C_Str();
 
-	int node_id = ext.GetNodeSize();
-	ext.AddNode(node);
+	int node_id = nodes.size();
+	nodes.push_back(std::move(node));
 
 	node_raw->local_trans = trans_ai_mat(ai_node->mTransformation);
 
@@ -169,10 +184,10 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 	{
 		for (size_t i = 0; i < ai_node->mNumChildren; ++i)
 		{
-			int child = LoadNode(ai_scene, ai_node->mChildren[i], model, ext, meshes_aabb, child_mat);
+			int child = LoadNode(ai_scene, ai_node->mChildren[i], model, nodes, meshes_aabb, child_mat);
 			node_raw->children.push_back(child);
 
-			auto node = ext.GetNode(child);
+			auto node = nodes[child].get();
 			assert(node->parent == -1);
 			node->parent = node_id;
 		}

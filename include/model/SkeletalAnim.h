@@ -60,32 +60,24 @@ public:
 public:
 	virtual ModelExtendType Type() const override { return EXT_SKELETAL; }
 
-	int QueryNodeByName(const std::string& name) const;
+	void  SetAnims(std::vector<std::unique_ptr<ModelExtend>>& anims);
+	auto& GetAnims() const { return m_anims; }
 
-	void AddAnim(std::unique_ptr<ModelExtend>& ext) {
-		m_anims.push_back(std::move(ext));
-	}
-	auto& GetAllAnims() const { return m_anims; }
+	void  SetNodes(std::vector<std::unique_ptr<Node>>& nodes);
+	auto& GetNodes() const { return m_nodes; }
 
-	int GetNodeSize() const { return m_nodes.size(); }
-
-	void AddNode(std::unique_ptr<Node>& node) {
-		m_nodes.push_back(std::move(node));
-	}
-	Node* GetNode(int idx) {
-		if (idx < 0 || idx >= static_cast<int>(m_nodes.size())) {
-			return nullptr;
-		} else {
-			return m_nodes[idx].get();
-		}
-	}
-	auto& GetAllNodes() const { return m_nodes; }
+	auto& GetTPWorldTrans() const { return m_tpose_world_trans; }
 
 	void PrintNodeTree() const;
 
 private:
+	void InitTPoseTrans();
+
+private:
 	std::vector<std::unique_ptr<Node>> m_nodes;
 
+	std::vector<sm::mat4> m_tpose_world_trans;
+	
 	std::vector<std::unique_ptr<ModelExtend>> m_anims;
 
 }; // SkeletalAnim

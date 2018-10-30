@@ -15,7 +15,7 @@ ModelInstance::ModelInstance(const std::shared_ptr<Model>& m_model, int anim_idx
 	if (ext && ext->Type() == EXT_SKELETAL)
 	{
 		auto sk_anim = static_cast<SkeletalAnim*>(ext.get());
-		auto& nodes = sk_anim->GetAllNodes();
+		auto& nodes = sk_anim->GetNodes();
 		int sz = nodes.size();
 
 		// local trans
@@ -27,7 +27,7 @@ ModelInstance::ModelInstance(const std::shared_ptr<Model>& m_model, int anim_idx
 		// global trans
 		CalcGlobalTrans();
 
-		auto& anims = sk_anim->GetAllAnims();
+		auto& anims = sk_anim->GetAnims();
 		if (m_curr_anim_index >= 0 && m_curr_anim_index < static_cast<int>(anims.size()))
 		{
 			m_channel_idx.reserve(sz);
@@ -75,7 +75,7 @@ bool ModelInstance::SetFrame(int curr_frame)
 
 	auto sk_anim = static_cast<SkeletalAnim*>(m_model->ext.get());
 
-	auto& anims = sk_anim->GetAllAnims();
+	auto& anims = sk_anim->GetAnims();
 	auto& ext = anims[m_curr_anim_index];
 
 	float curr_time = curr_frame / ext->ticks_per_second;
@@ -274,7 +274,7 @@ void ModelInstance::ResetToTPose()
 	if (m_model->ext->Type() == EXT_SKELETAL)
 	{
 		auto sk_anim = static_cast<SkeletalAnim*>(m_model->ext.get());
-		auto& nodes = sk_anim->GetAllNodes();
+		auto& nodes = sk_anim->GetNodes();
 		assert(nodes.size() == m_local_trans.size());
 		for (int i = 0, n = nodes.size(); i < n; ++i)
 		{
@@ -323,7 +323,7 @@ bool ModelInstance::UpdateSkeletalAnim()
 {
 	auto sk_anim = static_cast<SkeletalAnim*>(m_model->ext.get());
 
-	auto& anims = sk_anim->GetAllAnims();
+	auto& anims = sk_anim->GetAnims();
 	if (m_curr_anim_index < 0 || m_curr_anim_index >= static_cast<int>(anims.size())) {
 		return false;
 	}
@@ -506,7 +506,7 @@ void ModelInstance::CalcGlobalTrans()
 	}
 
 	auto sk_anim = static_cast<SkeletalAnim*>(m_model->ext.get());
-	auto& nodes = sk_anim->GetAllNodes();
+	auto& nodes = sk_anim->GetNodes();
 	size_t sz = m_local_trans.size();
 	if (m_global_trans.size() != sz) {
 		m_global_trans.resize(sz);

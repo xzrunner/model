@@ -27,7 +27,8 @@ public:
 	static bool Load(Model& model, const std::string& filepath, float scale = 1.0f);
 
 private:
-	static int LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model, SkeletalAnim& ext,
+	static int LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model, 
+		std::vector<std::unique_ptr<SkeletalAnim::Node>>& nodes,
 		const std::vector<sm::cube>& meshes_aabb, const sm::mat4& mat);
 
 	static std::unique_ptr<Model::Mesh> LoadMesh(const aiMesh* ai_mesh, sm::cube& aabb, float scale);

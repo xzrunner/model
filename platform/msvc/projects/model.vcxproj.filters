@@ -90,6 +90,9 @@
     <ClCompile Include="..\..\..\source\AssimpExporter.cpp">
       <Filter>exportor</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\AnimIK.cpp">
+      <Filter>utility</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\model\ParametricEquations.h">
@@ -181,6 +184,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\AssimpExporter.h">
       <Filter>exportor</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\AnimIK.h">
+      <Filter>utility</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
