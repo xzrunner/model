@@ -116,7 +116,7 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale)
 	{
 		auto src = ai_scene->mMeshes[i];
 		sm::cube aabb;
-		model.meshes.push_back(LoadMesh(src, aabb, scale));
+		model.meshes.push_back(LoadMesh(model.materials, src, aabb, scale));
 		meshes_aabb.push_back(aabb);
 	}
 
@@ -246,11 +246,19 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 	return node_id;
 }
 
-std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, sm::cube& aabb, float scale)
+std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::unique_ptr<Model::Material>>& materials,
+	                                                const aiMesh* ai_mesh, sm::cube& aabb, float scale)
 {
 	auto mesh = std::make_unique<Model::Mesh>();
 
 	mesh->material = ai_mesh->mMaterialIndex;
+
+	bool has_mat_tex = false;
+	if (mesh->material >= 0 && mesh->material < static_cast<int>(materials.size())) {
+		if (materials[mesh->material]->diffuse_tex >= 0) {
+			has_mat_tex = true;
+		}
+	}
 
 	int vertex_type = 0;
 	int floats_per_vertex = 3;
@@ -266,7 +274,11 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, sm::c
 	{
 		floats_per_vertex += 2;
 		vertex_type |= VERTEX_FLAG_TEXCOORDS;
-		mesh->effect = EFFECT_DEFAULT;
+		if (has_mat_tex) {
+			mesh->effect = EFFECT_DEFAULT;
+		} else {
+			mesh->effect = EFFECT_DEFAULT_NO_TEX;
+		}
 	}
 	else
 	{
@@ -278,7 +290,15 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const aiMesh* ai_mesh, sm::c
 	{
 		floats_per_vertex += 2;
 		vertex_type |= VERTEX_FLAG_SKINNED;
-		mesh->effect = EFFECT_SKINNED;
+		if (has_mat_tex && has_texcoord) {
+			mesh->effect = EFFECT_SKINNED;
+		} else {
+			mesh->effect = EFFECT_SKINNED_NO_TEX;
+		}
+	}
+	else
+	{
+		mesh->effect = EFFECT_SKINNED_NO_TEX;
 	}
 
 	std::vector<std::vector<std::pair<int, float>>> weights_per_vertex(ai_mesh->mNumVertices);
