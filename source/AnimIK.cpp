@@ -53,8 +53,8 @@ void AnimIK::OneBone(ModelInstance& model, int joint, const sm::vec3& target,
 	model.SetJointRotate(p, sm::Quaternion::CreateFromVectors(u, v));
 }
 
-void AnimIK::TwoBones(ModelInstance& model, int joint, const sm::vec3& target, 
-	                  const sm::vec3& rot_axis, std::array<sm::vec3, 3>& debug_pos)
+void AnimIK::TwoBones(ModelInstance& model, int joint, const sm::vec3& rot_axis, 
+	                  const sm::vec3& target, std::array<sm::vec3, 3>& debug_pos)
 {
 	auto sk_anim = static_cast<SkeletalAnim*>(model.GetModel()->ext.get());
 	auto& bones = sk_anim->GetNodes();
@@ -87,8 +87,6 @@ void AnimIK::TwoBones(ModelInstance& model, int joint, const sm::vec3& target,
 		float ang1 = acosf((len1 * len1 + tot_len * tot_len - len0 * len0) / (2 * len1 * tot_len));
 		//model.SetJointRotate(pp, bones[pp]->local_trans, sm::Quaternion::CreateFromEulerAngle(-(angle - ang0), 0, 0));
 		//model.SetJointRotate(p, bones[p]->local_trans, sm::Quaternion::CreateFromEulerAngle(-(ang0 + ang1), 0, 0));
-
-		printf("ang0 %f, ang1 %f, len0 %f, len1 %f\n", ang0, ang1, len0, len1);
 
 //		auto rot_mat = sm::Quaternion::CreateFromAxisAngle(rot_axis, ang0);
 		auto rot_mat = sm::Quaternion::CreateFromAxisAngle({1, 0, 0}, ang0);
