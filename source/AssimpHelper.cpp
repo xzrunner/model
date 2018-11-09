@@ -97,8 +97,6 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale)
 		return NULL;
 	}
 
-	auto ext = std::make_unique<SkeletalAnim>();
-
 	// material
 	auto dir = boost::filesystem::path(filepath).parent_path().string();
 	model.materials.reserve(ai_scene->mNumMaterials);
@@ -120,44 +118,57 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale)
 		meshes_aabb.push_back(aabb);
 	}
 
-	// node
+	// only meshes
+	if (ai_scene->mRootNode->mNumChildren == 0)
 	{
-		std::vector<std::unique_ptr<SkeletalAnim::Node>> nodes;
-		LoadNode(ai_scene, ai_scene->mRootNode, model, nodes, meshes_aabb, sm::mat4());
-		ext->SetNodes(nodes);
+		for (auto& ab : meshes_aabb) {
+			model.aabb.Combine(ab);
+		}
 	}
+	// skeletal anim
+	else
+	{
+		auto ext = std::make_unique<SkeletalAnim>();
 
-	// todo: load lights and cameras
+		// node
+		{
+			std::vector<std::unique_ptr<SkeletalAnim::Node>> nodes;
+			LoadNode(ai_scene, ai_scene->mRootNode, model, nodes, meshes_aabb, sm::mat4());
+			ext->SetNodes(nodes);
+		}
 
-	// bone
-	auto& nodes = ext->GetNodes();
-	for (auto& mesh : model.meshes) {
-		for (auto& bone : mesh->geometry.bones) {
-			bone.node = -1;
-			for (int i = 0, n = nodes.size(); i < n; ++i) {
-				if (nodes[i]->name == bone.name) {
-					bone.node = i;
-					break;
+		// bone
+		auto& nodes = ext->GetNodes();
+		for (auto& mesh : model.meshes) {
+			for (auto& bone : mesh->geometry.bones) {
+				bone.node = -1;
+				for (int i = 0, n = nodes.size(); i < n; ++i) {
+					if (nodes[i]->name == bone.name) {
+						bone.node = i;
+						break;
+					}
 				}
 			}
 		}
+
+		// animation
+		std::vector<std::unique_ptr<SkeletalAnim::ModelExtend>> anims;
+		anims.reserve(ai_scene->mNumAnimations);
+		for (size_t i = 0; i < ai_scene->mNumAnimations; ++i) {
+			auto src = ai_scene->mAnimations[i];
+			anims.push_back(LoadAnimation(src));
+		}
+		ext->SetAnims(anims);
+
+		model.ext = std::move(ext);
 	}
 
-	// animation
-	std::vector<std::unique_ptr<SkeletalAnim::ModelExtend>> anims;
-	anims.reserve(ai_scene->mNumAnimations);
-	for (size_t i = 0; i < ai_scene->mNumAnimations; ++i) {
-		auto src = ai_scene->mAnimations[i];
-		anims.push_back(LoadAnimation(src));
-	}
-	ext->SetAnims(anims);
+	// todo: load lights and cameras
 
 	// todo
 	if (boost::filesystem::extension(filepath) == ".X") {
 		model.anim_speed = 100;
 	}
-
-	model.ext = std::move(ext);
 
 	model.scale = scale;
 
@@ -295,10 +306,6 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 		} else {
 			mesh->effect = EFFECT_SKINNED_NO_TEX;
 		}
-	}
-	else
-	{
-		mesh->effect = EFFECT_SKINNED_NO_TEX;
 	}
 
 	std::vector<std::vector<std::pair<int, float>>> weights_per_vertex(ai_mesh->mNumVertices);
