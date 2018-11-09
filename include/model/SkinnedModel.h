@@ -13,18 +13,6 @@
 namespace model
 {
 
-struct MeshMaterial
-{
-	sm::vec4 DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
-	sm::vec3 FresnelR0 = { 0.01f, 0.01f, 0.01f };
-	float Roughness = .25f;
-};
-
-struct MeshGeometry
-{
-	unsigned int vao = 0;
-};
-
 class SkinnedData;
 struct SkinnedModelInstance : boost::noncopyable
 {
@@ -46,6 +34,18 @@ struct SkinnedModelInstance : boost::noncopyable
 
 struct RenderItem : boost::noncopyable
 {
+	struct MeshMaterial
+	{
+		sm::vec4 DiffuseAlbedo = { 1.0f, 1.0f, 1.0f, 1.0f };
+		sm::vec3 FresnelR0 = { 0.01f, 0.01f, 0.01f };
+		float Roughness = .25f;
+	};
+
+	struct MeshGeometry
+	{
+		unsigned int vao = 0;
+	};
+
 	MeshMaterial* Mat = nullptr;
 	MeshGeometry Geo;
 
