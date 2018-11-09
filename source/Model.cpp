@@ -26,8 +26,6 @@ bool Model::LoadFromFile(const std::string& filepath)
 		return AssimpHelper::Load(*this, filepath);
 	} else if (ext == ".m3d") {
 		return M3dLoader::Load(*this, filepath);
-	} else if (ext == ".x" || ext == ".dae" || ext == ".fbx") {
-		return AssimpHelper::Load(*this, filepath);
 	} else if (ext == ".xml") {
 		return MaxLoader::Load(*this, filepath);
 	} else if (ext == ".mdl") {
@@ -37,8 +35,7 @@ bool Model::LoadFromFile(const std::string& filepath)
 	} else if (ext == ".map") {
 		return MapLoader::Load(*this, filepath);
 	} else {
-		GD_REPORT_ASSERT("unknown type.");
-		return false;
+		return AssimpHelper::Load(*this, filepath);
 	}
 
 	return false;
