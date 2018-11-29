@@ -20,4 +20,23 @@ MeshGeometry::~MeshGeometry()
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////
+// struct MeshRawData
+//////////////////////////////////////////////////////////////////////////
+
+void MeshRawData::CalcNormals()
+{
+	normals.resize(vertices.size());
+	for (auto& f : faces)
+	{
+		auto n = (vertices[f[1]] - vertices[f[0]]).Cross(vertices[f[2]] - vertices[f[0]]);
+		for (auto& v : f) {
+			normals[v] += n;
+		}
+	}
+	for (auto& n : normals) {
+		n.Normalize();
+	}
+}
+
 }

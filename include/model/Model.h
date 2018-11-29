@@ -15,9 +15,6 @@
 namespace model
 {
 
-struct Mesh;
-struct Node;
-
 struct Model : boost::noncopyable
 {
 	// for ResPool

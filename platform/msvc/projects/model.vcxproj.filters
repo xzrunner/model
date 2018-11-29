@@ -25,6 +25,9 @@
     <Filter Include="exportor">
       <UniqueIdentifier>{6fbf2ee5-aad9-4175-9398-f89815ef76f7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="process">
+      <UniqueIdentifier>{55b7b69e-3e2f-406e-8882-b8c410c23edf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\ParametricEquations.cpp">
@@ -91,7 +94,10 @@
       <Filter>exportor</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\source\AnimIK.cpp">
-      <Filter>utility</Filter>
+      <Filter>process</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\MeshIK.cpp">
+      <Filter>process</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -186,7 +192,10 @@
       <Filter>exportor</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\AnimIK.h">
-      <Filter>utility</Filter>
+      <Filter>process</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\MeshIK.h">
+      <Filter>process</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

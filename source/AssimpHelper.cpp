@@ -81,7 +81,7 @@ unsigned int ppsteps = aiProcess_CalcTangentSpace | // calculate tangents and bi
 namespace model
 {
 
-bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale)
+bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale, bool raw_data, uint32_t color)
 {
 	Assimp::Importer importer;
 	const aiScene* ai_scene = importer.ReadFile(filepath.c_str(),
@@ -114,7 +114,7 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale)
 	{
 		auto src = ai_scene->mMeshes[i];
 		sm::cube aabb;
-		model.meshes.push_back(LoadMesh(model.materials, src, aabb, scale));
+		model.meshes.push_back(LoadMesh(model.materials, src, aabb, scale, raw_data, color));
 		meshes_aabb.push_back(aabb);
 	}
 
@@ -175,7 +175,7 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale)
 	return true;
 }
 
-int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model, 
+int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model,
 	                       std::vector<std::unique_ptr<SkeletalAnim::Node>>& nodes,
 	                       const std::vector<sm::cube>& meshes_aabb, const sm::mat4& mat)
 {
@@ -258,7 +258,7 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 }
 
 std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::unique_ptr<Model::Material>>& materials,
-	                                                const aiMesh* ai_mesh, sm::cube& aabb, float scale)
+	                                                const aiMesh* ai_mesh, sm::cube& aabb, float scale, bool raw_data, uint32_t color)
 {
 	auto mesh = std::make_unique<Model::Mesh>();
 
@@ -294,6 +294,13 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 	else
 	{
 		mesh->effect = EFFECT_DEFAULT_NO_TEX;
+	}
+
+	const bool has_color = color != 0;
+	if (has_color) {
+		floats_per_vertex += 1;
+		vertex_type |= VERTEX_FLAG_COLOR;
+		mesh->effect = EFFECT_COLOR;
 	}
 
 	bool has_skinned = ai_mesh->HasBones();
@@ -343,6 +350,11 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 			float y = 1 - t.y;
 			memcpy(ptr, &y, sizeof(float));
 			ptr += sizeof(float);
+		}
+		if (has_color)
+		{
+			memcpy(ptr, &color, sizeof(uint32_t));
+			ptr += sizeof(uint32_t);
 		}
 		if (has_skinned)
 		{
@@ -397,6 +409,10 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 	if (has_texcoord) {
 		stride += 4 * 2;
 	}
+	// color
+	if (has_color) {
+		stride += 4;
+	}
 	// skinned
 	if (has_skinned) {
 		stride += 4 + 4;
@@ -419,6 +435,13 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 		mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
 		vi.va_list.push_back(ur::VertexAttrib("texcoord", 2, 4, stride, offset));
 		offset += 4 * 2;
+	}
+	// color
+	if (has_color)
+	{
+		mesh->geometry.vertex_type |= VERTEX_FLAG_COLOR;
+		vi.va_list.push_back(ur::VertexAttrib("color", 4, 1, stride, offset));
+		offset += 4;
 	}
 	// skinned
 	if (has_skinned)
@@ -450,7 +473,45 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 
 	delete[] buf;
 
+	if (raw_data) {
+		mesh->geometry.raw_data = LoadMeshRawData(ai_mesh, scale);
+	}
+
 	return mesh;
+}
+
+std::unique_ptr<MeshRawData> AssimpHelper::LoadMeshRawData(const aiMesh* ai_mesh, float scale)
+{
+	auto rd = std::make_unique<model::MeshRawData>();
+
+	rd->vertices.reserve(ai_mesh->mNumVertices);
+	for (size_t i = 0; i < ai_mesh->mNumVertices; ++i) {
+		auto& p = ai_mesh->mVertices[i];
+		rd->vertices.emplace_back(p.x * scale, p.y * scale, p.z * scale);
+	}
+
+	if (ai_mesh->HasNormals())
+	{
+		rd->normals.reserve(ai_mesh->mNumVertices);
+		for (size_t i = 0; i < ai_mesh->mNumVertices; ++i) {
+			auto& p = ai_mesh->mNormals[i];
+			rd->normals.emplace_back(p.x, p.y, p.z);
+		}
+	}
+
+	rd->faces.reserve(ai_mesh->mNumFaces);
+	for (size_t i = 0; i < ai_mesh->mNumFaces; ++i)
+	{
+		const aiFace& ai_face = ai_mesh->mFaces[i];
+		std::vector<int> face;
+		face.reserve(ai_face.mNumIndices);
+		for (size_t j = 0; j < ai_face.mNumIndices; ++j) {
+			face.push_back(ai_face.mIndices[j]);
+		}
+		rd->faces.push_back(face);
+	}
+
+	return rd;
 }
 
 std::unique_ptr<Model::Material> AssimpHelper::LoadMaterial(const aiMaterial* ai_material,
@@ -482,6 +543,10 @@ std::unique_ptr<Model::Material> AssimpHelper::LoadMaterial(const aiMaterial* ai
 		material->ambient.z = col.b;
 	} else {
 		material->ambient.x = material->ambient.y = material->ambient.z = 0.04f;
+	}
+	// todo:
+	if (material->ambient == sm::vec3(1, 1, 1)) {
+		material->ambient.Set(0.04f, 0.04f, 0.04f);
 	}
 	material->shininess = 50;
 

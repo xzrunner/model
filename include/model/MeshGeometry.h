@@ -28,6 +28,15 @@ struct Bone
 	sm::mat4 offset_trans;
 };
 
+struct MeshRawData
+{
+	std::vector<sm::vec3>         vertices;
+	std::vector<sm::vec3>         normals;
+	std::vector<std::vector<int>> faces;
+
+	void CalcNormals();
+};
+
 struct MeshGeometry : boost::noncopyable
 {
 	~MeshGeometry();
@@ -45,6 +54,9 @@ struct MeshGeometry : boost::noncopyable
 
 	// morph anim
 	std::vector<ur::VertexAttrib> vertex_layout;
+
+	// mesh process
+	std::unique_ptr<MeshRawData> raw_data = nullptr;
 
 	unsigned int vertex_type = 0;
 
