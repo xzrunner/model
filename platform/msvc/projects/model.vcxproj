@@ -18,7 +18,7 @@
     <ClCompile Include="..\..\..\source\BspModel.cpp" />
     <ClCompile Include="..\..\..\source\GlobalClock.cpp" />
     <ClCompile Include="..\..\..\source\M3dLoader.cpp" />
-    <ClCompile Include="..\..\..\source\MapLoader.cpp" />
+    <ClCompile Include="..\..\..\source\MapBuilder.cpp" />
     <ClCompile Include="..\..\..\source\MaxLoader.cpp" />
     <ClCompile Include="..\..\..\source\MdlLoader.cpp" />
     <ClCompile Include="..\..\..\source\MeshGeometry.cpp" />
@@ -40,7 +40,7 @@
     <ClInclude Include="..\..\..\include\model\AssimpExporter.h" />
     <ClInclude Include="..\..\..\include\model\MeshIK.h" />
     <ClInclude Include="..\..\..\include\model\QuakeMapEntity.h" />
-    <ClInclude Include="..\..\..\include\model\MapLoader.h" />
+    <ClInclude Include="..\..\..\include\model\MapBuilder.h" />
     <ClInclude Include="..\..\..\include\model\ModelExtend.h" />
     <ClInclude Include="..\..\..\include\model\ModelExtendType.h" />
     <ClInclude Include="..\..\..\include\model\AssimpHelper.h" />

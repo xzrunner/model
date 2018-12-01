@@ -12,9 +12,11 @@ namespace model
 
 struct Model;
 
-class MapLoader
+class MapBuilder
 {
 public:
+	static std::shared_ptr<Model> Create(const std::vector<sm::vec3>& polygon);
+
 	static void Load(std::vector<std::shared_ptr<Model>>& models, const std::string& filepath);
 
 	static bool Load(Model& model, const std::string& filepath);
@@ -29,6 +31,6 @@ private:
 
 	static bool LoadEntity(Model& dst, const quake::MapEntityPtr& src);
 
-}; // MapLoader
+}; // MapBuilder
 
 }

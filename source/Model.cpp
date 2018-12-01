@@ -6,7 +6,7 @@
 #include "model/AssimpHelper.h"
 #include "model/MdlLoader.h"
 #include "model/BspLoader.h"
-#include "model/MapLoader.h"
+#include "model/MapBuilder.h"
 
 #include <guard/check.h>
 
@@ -33,7 +33,7 @@ bool Model::LoadFromFile(const std::string& filepath)
 	} else if (ext == ".bsp") {
 		return BspLoader::Load(*this, filepath);
 	} else if (ext == ".map") {
-		return MapLoader::Load(*this, filepath);
+		return MapBuilder::Load(*this, filepath);
 	} else {
 		return AssimpHelper::Load(*this, filepath, 1, true, 0xffffffff);
 //		return AssimpHelper::Load(*this, filepath);

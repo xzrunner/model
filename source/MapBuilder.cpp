@@ -1,4 +1,4 @@
-#include "model/MapLoader.h"
+#include "model/MapBuilder.h"
 #include "model/EffectType.h"
 #include "model/MeshGeometry.h"
 #include "model/typedef.h"
@@ -83,7 +83,7 @@ Vertex CreateVertex(const quake::BrushFacePtr& face, const sm::vec3& pos,
 {
 	Vertex v;
 
-	v.pos = pos * model::MapLoader::VERTEX_SCALE;
+	v.pos = pos * model::MapBuilder::VERTEX_SCALE;
 	aabb.Combine(v.pos);
 
 	if (tex_w == 0 || tex_h == 0) {
@@ -92,6 +92,18 @@ Vertex CreateVertex(const quake::BrushFacePtr& face, const sm::vec3& pos,
 		v.texcoord = face->CalcTexCoords(
 			pos, static_cast<float>(tex_w), static_cast<float>(tex_h));
 	}
+
+	return v;
+}
+
+Vertex CreateVertex(const sm::vec3& pos, sm::cube& aabb)
+{
+	Vertex v;
+
+	v.pos = pos * model::MapBuilder::VERTEX_SCALE;
+	aabb.Combine(v.pos);
+
+	v.texcoord.Set(0, 0);
 
 	return v;
 }
@@ -126,9 +138,129 @@ void FlushBrushDesc(model::QuakeMapEntity::BrushDesc& brush_desc,
 namespace model
 {
 
-const float MapLoader::VERTEX_SCALE = 0.01f;
+const float MapBuilder::VERTEX_SCALE = 0.01f;
 
-void MapLoader::Load(std::vector<std::shared_ptr<Model>>& models, const std::string& filepath)
+std::shared_ptr<Model> MapBuilder::Create(const std::vector<sm::vec3>& polygon)
+{
+	if (polygon.size() < 3) {
+		return nullptr;
+	}
+
+	// scale
+	auto scaled_poly = polygon;
+	const float scale = 1.0f / MapBuilder::VERTEX_SCALE;
+	for (auto& v : scaled_poly) {
+		v *= scale;
+	}
+
+	const float dy = 0.1f;
+//	const float dy = 30;
+
+	auto model = std::make_shared<Model>();
+
+	// quake map brush data
+
+	auto map_entity = std::make_unique<QuakeMapEntity>();
+	QuakeMapEntity::BrushDesc brush_desc;
+	brush_desc.mesh_begin = 0;
+	brush_desc.mesh_end   = 1;
+	int face_num = scaled_poly.size() + 2;
+	brush_desc.meshes.push_back({ 0, 0, 0, face_num });
+	map_entity->SetBrushDescs({ brush_desc });
+
+	std::vector<std::shared_ptr<quake::BrushFace>> faces;
+	faces.reserve(face_num);
+	// top
+	{
+		sm::vec3 tri[3];
+		tri[0] = scaled_poly[0];
+		tri[1] = scaled_poly[1];
+		tri[2] = scaled_poly[2];
+		for (int i = 0; i < 3; ++i) {
+			tri[i].y += dy;
+		}
+		auto face = std::make_shared<quake::BrushFace>();
+		face->plane = sm::Plane(tri[0], tri[1], tri[2]);
+		faces.push_back(face);
+	}
+	// bottom
+	{
+		auto face = std::make_shared<quake::BrushFace>();
+		face->plane = sm::Plane(scaled_poly[2], scaled_poly[1], scaled_poly[0]);
+		faces.push_back(face);
+	}
+	// edge faces
+	for (size_t i = 0, n = scaled_poly.size(); i < n; ++i)
+	{
+		auto& v0 = scaled_poly[i];
+		auto& v1 = scaled_poly[(i + 1) % scaled_poly.size()];
+		auto face = std::make_shared<quake::BrushFace>();
+		face->plane = sm::Plane(v0, v1, { v1.x, v1.y + dy, v1.z });
+		faces.push_back(face);
+	}
+
+	quake::MapBrush brush(faces);
+	brush.BuildVertices();
+	brush.BuildGeometry();
+
+	auto entity = std::make_shared<quake::MapEntity>();
+	entity->brushes.push_back(brush);
+	map_entity->SetMapEntity(entity);
+
+	model->ext = std::move(map_entity);
+
+	// mesh
+
+	std::unique_ptr<Model::Mesh> mesh = nullptr;
+	std::unique_ptr<Model::Mesh> border_mesh = nullptr;
+
+	mesh = std::make_unique<Model::Mesh>();
+	mesh->effect = EFFECT_USER;
+
+	border_mesh = std::make_unique<Model::Mesh>();
+	border_mesh->effect = EFFECT_USER;
+
+	auto mat = std::make_unique<Model::Material>();
+	int mat_idx = model->materials.size();
+	mesh->material = mat_idx;
+	border_mesh->material = mat_idx;
+	mat->diffuse_tex = -1;
+	model->materials.push_back(std::move(mat));
+
+	std::vector<Vertex> vertices;
+	std::vector<Vertex> border_vertices;
+	std::vector<unsigned short> border_indices;
+
+	sm::cube aabb;
+	int start_idx = 0;
+	for (auto& f : faces)
+	{
+		for (size_t i = 1; i < f->vertices.size() - 1; ++i)
+		{
+			vertices.push_back(CreateVertex(f->vertices[0]->pos, aabb));
+			vertices.push_back(CreateVertex(f->vertices[i]->pos, aabb));
+			vertices.push_back(CreateVertex(f->vertices[i + 1]->pos, aabb));
+		}
+		for (auto& vert : f->vertices) {
+			border_vertices.push_back(CreateVertex(vert->pos, aabb));
+		}
+		for (int i = 0, n = f->vertices.size() - 1; i < n; ++i) {
+			border_indices.push_back(start_idx + i);
+			border_indices.push_back(start_idx + i + 1);
+		}
+		border_indices.push_back(start_idx + f->vertices.size() - 1);
+		border_indices.push_back(start_idx);
+		start_idx += f->vertices.size();
+	}
+	if (!vertices.empty()) {
+		FlushVertices(mesh, border_mesh, vertices, border_vertices, border_indices, *model);
+	}
+	model->aabb = aabb;
+
+	return model;
+}
+
+void MapBuilder::Load(std::vector<std::shared_ptr<Model>>& models, const std::string& filepath)
 {
 	std::ifstream fin(filepath);
 	std::string str((std::istreambuf_iterator<char>(fin)),
@@ -163,7 +295,7 @@ void MapLoader::Load(std::vector<std::shared_ptr<Model>>& models, const std::str
 	}
 }
 
-bool MapLoader::Load(Model& model, const std::string& filepath)
+bool MapBuilder::Load(Model& model, const std::string& filepath)
 {
 	std::ifstream fin(filepath);
 	std::string str((std::istreambuf_iterator<char>(fin)),
@@ -198,7 +330,7 @@ bool MapLoader::Load(Model& model, const std::string& filepath)
 	return true;
 }
 
-void MapLoader::UpdateVBO(Model& model, int brush_idx)
+void MapBuilder::UpdateVBO(Model& model, int brush_idx)
 {
 	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
 
@@ -212,8 +344,10 @@ void MapLoader::UpdateVBO(Model& model, int brush_idx)
 	auto& faces = brushes[brush_idx].faces;
 	auto& desc = descs[brush_idx];
 	assert(desc.mesh_end - desc.mesh_begin == desc.meshes.size());
+	// traverse brush's meshes
 	for (int i = desc.mesh_begin; i < desc.mesh_end; ++i)
 	{
+		// gen mesh's vertex buffer
 		std::vector<Vertex> vertices, border_vertices;
 		for (auto& src_mesh : desc.meshes)
 		{
@@ -237,6 +371,7 @@ void MapLoader::UpdateVBO(Model& model, int brush_idx)
 			}
 		}
 
+		// upload buffer data
 		rc.UpdateBufferRaw(ur::BUFFER_VERTEX, model.meshes[i]->geometry.vbo, vertices.data(),
 			sizeof(Vertex) * vertices.size());
 		rc.UpdateBufferRaw(ur::BUFFER_VERTEX, model.border_meshes[i]->geometry.vbo, border_vertices.data(),
@@ -245,7 +380,7 @@ void MapLoader::UpdateVBO(Model& model, int brush_idx)
 	}
 }
 
-void MapLoader::LoadTextures(const quake::MapEntity& world, const std::string& dir)
+void MapBuilder::LoadTextures(const quake::MapEntity& world, const std::string& dir)
 {
 	std::string tex_path;
 	for (auto& attr : world.attributes)
@@ -272,7 +407,7 @@ void MapLoader::LoadTextures(const quake::MapEntity& world, const std::string& d
 	}
 }
 
-bool MapLoader::LoadEntity(Model& dst, const quake::MapEntityPtr& src)
+bool MapBuilder::LoadEntity(Model& dst, const quake::MapEntityPtr& src)
 {
 	if (src->brushes.empty()) {
 		return false;

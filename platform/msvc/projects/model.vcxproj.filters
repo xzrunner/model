@@ -87,9 +87,6 @@
     <ClCompile Include="..\..\..\source\BspModel.cpp">
       <Filter>loader\quake</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\MapLoader.cpp">
-      <Filter>loader\quake</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\AssimpExporter.cpp">
       <Filter>exportor</Filter>
     </ClCompile>
@@ -98,6 +95,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\source\MeshIK.cpp">
       <Filter>process</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\MapBuilder.cpp">
+      <Filter>loader\quake</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -182,9 +182,6 @@
     <ClInclude Include="..\..\..\include\model\ModelExtendType.h">
       <Filter>dataset\extend</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\model\MapLoader.h">
-      <Filter>loader\quake</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\model\QuakeMapEntity.h">
       <Filter>dataset\extend</Filter>
     </ClInclude>
@@ -196,6 +193,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\MeshIK.h">
       <Filter>process</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\MapBuilder.h">
+      <Filter>loader\quake</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
