@@ -153,6 +153,14 @@ std::shared_ptr<Model> MapBuilder::Create(const std::vector<sm::vec3>& polygon)
 		v *= scale;
 	}
 
+	// fix dir
+	// should be clockwise, as left-hand system, top face's normal direction is y
+	auto v0 = polygon[1] - polygon[0];
+	auto v1 = polygon[2] - polygon[1];
+	if (v0.Cross(v1).Dot({ 0, 1, 0 }) < 0) {
+		std::reverse(scaled_poly.begin(), scaled_poly.end());
+	}
+
 	const float dy = 0.1f;
 //	const float dy = 30;
 
