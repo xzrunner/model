@@ -4,6 +4,7 @@
 #include <unirender/VertexAttrib.h>
 
 #include <unordered_map>
+#include <memory>
 
 #include <boost/noncopyable.hpp>
 
