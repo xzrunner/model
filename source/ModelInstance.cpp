@@ -76,6 +76,9 @@ bool ModelInstance::SetFrame(int curr_frame)
 	auto sk_anim = static_cast<SkeletalAnim*>(m_model->ext.get());
 
 	auto& anims = sk_anim->GetAnims();
+	if (anims.empty()) {
+		return false;
+	}
 	auto& ext = anims[m_curr_anim_index];
 
 	float curr_time = curr_frame / ext->ticks_per_second;
