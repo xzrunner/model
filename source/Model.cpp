@@ -35,8 +35,8 @@ bool Model::LoadFromFile(const std::string& filepath)
 	} else if (ext == ".map") {
 		return MapBuilder::Load(*this, filepath);
 	} else {
-		return AssimpHelper::Load(*this, filepath, 1, true, 0xffffffff);
-//		return AssimpHelper::Load(*this, filepath);
+//		return AssimpHelper::Load(*this, filepath, 1, true, 0xffffffff);
+		return AssimpHelper::Load(*this, filepath);
 	}
 
 	return false;
