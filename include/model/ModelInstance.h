@@ -35,6 +35,7 @@ public:
 
 	void RotateJoint(int idx, const sm::Quaternion& delta);
 	void TranslateJoint(int idx, const sm::vec3& offset);
+    void ScaleJoint(int idx, const sm::vec3& scale);
 
 	void SetJointRotate(int idx, const sm::mat4& ori_mat, const sm::Quaternion& rotation);
 	void SetJointRotate(int idx, const sm::Quaternion& rotation);

@@ -234,6 +234,13 @@ void ModelInstance::TranslateJoint(int idx, const sm::vec3& offset)
 	CalcGlobalTrans();
 }
 
+void ModelInstance::ScaleJoint(int idx, const sm::vec3& scale)
+{
+    assert(idx >= 0 && idx < m_local_trans.size());
+    m_local_trans[idx] = sm::mat4::Scaled(scale.x, scale.y, scale.z) * m_local_trans[idx];
+    CalcGlobalTrans();
+}
+
 void ModelInstance::SetJointRotate(int idx, const sm::mat4& ori_mat, const sm::Quaternion& rotation)
 {
 	auto& d = m_local_trans[idx];
