@@ -99,6 +99,9 @@
     <ClCompile Include="..\..\..\source\MapBuilder.cpp">
       <Filter>loader\quake</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\FbxLoader.cpp">
+      <Filter>loader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\model\ParametricEquations.h">
@@ -196,6 +199,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\MapBuilder.h">
       <Filter>loader\quake</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\FbxLoader.h">
+      <Filter>loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

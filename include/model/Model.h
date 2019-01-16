@@ -32,6 +32,8 @@ struct Model : boost::noncopyable
 
 	struct Mesh
 	{
+        std::string name;
+
 		MeshGeometry geometry;
 
 		int material = -1;

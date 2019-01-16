@@ -262,6 +262,8 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 {
 	auto mesh = std::make_unique<Model::Mesh>();
 
+    mesh->name = ai_mesh->mName.C_Str();
+
 	mesh->material = ai_mesh->mMaterialIndex;
 
 	bool has_mat_tex = false;

@@ -38,6 +38,14 @@ struct MeshRawData
 	void CalcNormals();
 };
 
+struct BlendShapeData
+{
+    std::string name;
+    std::vector<sm::vec3> vertices;
+    //// todo gpu
+    //unsigned int vbo = 0;
+};
+
 struct MeshGeometry : boost::noncopyable
 {
 	~MeshGeometry();
@@ -58,6 +66,9 @@ struct MeshGeometry : boost::noncopyable
 
 	// mesh process
 	std::unique_ptr<MeshRawData> raw_data = nullptr;
+
+    // blend shape
+    std::vector<std::unique_ptr<BlendShapeData>> blendshape_data;
 
 	unsigned int vertex_type = 0;
 

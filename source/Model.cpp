@@ -7,6 +7,7 @@
 #include "model/MdlLoader.h"
 #include "model/BspLoader.h"
 #include "model/MapBuilder.h"
+#include "model/FbxLoader.h"
 
 #include <guard/check.h>
 
@@ -32,11 +33,18 @@ bool Model::LoadFromFile(const std::string& filepath)
 		return MdlLoader::Load(*this, filepath);
 	} else if (ext == ".bsp") {
 		return BspLoader::Load(*this, filepath);
-	} else if (ext == ".map") {
-		return MapBuilder::Load(*this, filepath);
+    } else if (ext == ".map") {
+        return MapBuilder::Load(*this, filepath);
+    //} else if (ext == ".fbx") {
+    //    return FbxLoader::Load(*this, filepath);
 	} else {
 //		return AssimpHelper::Load(*this, filepath, 1, true, 0xffffffff);
-		return AssimpHelper::Load(*this, filepath);
+		bool ret = AssimpHelper::Load(*this, filepath);
+
+        // load blendshape
+        FbxLoader::LoadBlendShape(*this, filepath);
+
+        return ret;
 	}
 
 	return false;
