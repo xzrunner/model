@@ -350,9 +350,16 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 		if (has_texcoord)
 		{
 			const aiVector3D& t = ai_mesh->mTextureCoords[0][i];
-			memcpy(ptr, &t.x, sizeof(float));
+            float x = t.x;
+            if (x > 1) {
+                x -= std::floor(x);
+            }
+			memcpy(ptr, &x, sizeof(float));
 			ptr += sizeof(float);
 			float y = 1 - t.y;
+            if (y > 1) {
+                y -= std::floor(y);
+            }
 			memcpy(ptr, &y, sizeof(float));
 			ptr += sizeof(float);
 		}
