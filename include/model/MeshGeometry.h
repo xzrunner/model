@@ -68,6 +68,9 @@ struct MeshGeometry : boost::noncopyable
 	std::unique_ptr<MeshRawData> raw_data = nullptr;
 
     // blend shape
+    size_t n_vert = 0, n_poly = 0;
+    uint8_t* vert_buf = nullptr;
+    size_t vert_stride = 0;
     std::vector<std::unique_ptr<BlendShapeData>> blendshape_data;
 
 	unsigned int vertex_type = 0;

@@ -85,12 +85,15 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale, 
 {
 	Assimp::Importer importer;
 	const aiScene* ai_scene = importer.ReadFile(filepath.c_str(),
-		ppsteps | /* configurable pp steps */
-		aiProcess_GenSmoothNormals		   | // generate smooth normal vectors if not existing
-		aiProcess_SplitLargeMeshes         | // split large, unrenderable meshes into submeshes
-		aiProcess_Triangulate			   | // triangulate polygons with more than 3 edges
-		aiProcess_ConvertToLeftHanded	   | // convert everything to D3D left handed space
-		aiProcess_SortByPType                // make 'clean' meshes which consist of a single typ of primitives
+		//ppsteps | /* configurable pp steps */
+		//aiProcess_GenSmoothNormals		   | // generate smooth normal vectors if not existing
+		//aiProcess_SplitLargeMeshes         | // split large, unrenderable meshes into submeshes
+		//aiProcess_Triangulate			   | // triangulate polygons with more than 3 edges
+		//aiProcess_ConvertToLeftHanded	   | // convert everything to D3D left handed space
+		//aiProcess_SortByPType                // make 'clean' meshes which consist of a single typ of primitives
+
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_ValidateDataStructure
 		);
 
 	if (!ai_scene) {
@@ -473,7 +476,11 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 		mesh->geometry.bones.push_back(dst);
 	}
 
-	delete[] buf;
+//	delete[] buf;
+    mesh->geometry.n_vert = ai_mesh->mNumVertices;
+    mesh->geometry.n_poly = ai_mesh->mNumFaces;
+    mesh->geometry.vert_stride = stride;
+    mesh->geometry.vert_buf = buf;
 
 	if (raw_data) {
 		mesh->geometry.raw_data = LoadMeshRawData(ai_mesh, scale);

@@ -6,8 +6,47 @@
 
 #include <assert.h>
 
+namespace
+{
+
+void DisplayString(const char* pHeader, const char* pValue  = "" , const char* pSuffix  = "" )
+{
+    FbxString lString;
+
+    lString = pHeader;
+    lString += pValue;
+    lString += pSuffix;
+    lString += "\n";
+    FBXSDK_printf(lString);
+}
+
+}
+
 namespace model
 {
+
+bool FbxLoader::Load(Model& model, const std::string& filepath)
+{
+    FbxManager* lSdkManager = NULL;
+    FbxScene* lScene = NULL;
+
+    // Prepare the FBX SDK.
+    InitializeSdkObjects(lSdkManager, lScene);
+    // Load the scene.
+
+    bool lResult = LoadScene(lSdkManager, lScene, filepath.c_str());
+    if (!lResult) {
+        return false;
+    }
+
+    // Convert mesh, NURBS and patch into triangle mesh
+    FbxGeometryConverter lGeomConverter(lSdkManager);
+    lGeomConverter.Triangulate(lScene, /*replace*/true);
+
+    LoadContent(lScene->GetRootNode(), model);
+
+    return true;
+}
 
 bool FbxLoader::LoadBlendShape(Model& model, const std::string& filepath)
 {
@@ -22,7 +61,7 @@ bool FbxLoader::LoadBlendShape(Model& model, const std::string& filepath)
 
     LoadNode(lScene->GetRootNode(), model);
 
-    return false;
+    return true;
 }
 
 void FbxLoader::InitializeSdkObjects(FbxManager*& pManager, FbxScene*& pScene)
@@ -317,6 +356,104 @@ void FbxLoader::LoadNode(FbxNode* node, Model& model)
     for (int i = 0, n = node->GetChildCount(); i < n; ++i) {
         LoadNode(node->GetChild(i), model);
     }
+}
+
+void FbxLoader::LoadContent(fbxsdk::FbxNode* node, Model& model)
+{
+    if (node->GetNodeAttribute() == NULL)
+    {
+        FBXSDK_printf("NULL Node Attribute\n\n");
+    }
+    else
+    {
+        FbxNodeAttribute::EType lAttributeType = (node->GetNodeAttribute()->GetAttributeType());
+
+        switch (lAttributeType)
+        {
+        default:
+            break;
+        case FbxNodeAttribute::eMarker:
+ //           DisplayMarker(node);
+            break;
+
+        case FbxNodeAttribute::eSkeleton:
+//            DisplaySkeleton(node);
+            break;
+
+        case FbxNodeAttribute::eMesh:
+            LoadMesh(node, model);
+            break;
+
+        case FbxNodeAttribute::eNurbs:
+ //           DisplayNurb(node);
+            break;
+
+        case FbxNodeAttribute::ePatch:
+ //           DisplayPatch(node);
+            break;
+
+        case FbxNodeAttribute::eCamera:
+ //           DisplayCamera(node);
+            break;
+
+        case FbxNodeAttribute::eLight:
+ //           DisplayLight(node);
+            break;
+
+        case FbxNodeAttribute::eLODGroup:
+ //           DisplayLodGroup(node);
+            break;
+        }
+    }
+
+    for (int i = 0, n = node->GetChildCount(); i < n; ++i) {
+        LoadContent(node->GetChild(i), model);
+    }
+}
+
+void FbxLoader::LoadMesh(fbxsdk::FbxNode* node, Model& model)
+{
+    FbxMesh* lMesh = (FbxMesh*)node->GetNodeAttribute();
+
+    //int nbMetaData = lMesh->GetSrcObjectCount<FbxObjectMetaData>();
+    //if (nbMetaData > 0)
+    //    DisplayString("    MetaData connections ");
+
+    //for (int i = 0; i < nbMetaData; i++)
+    //{
+    //    FbxObjectMetaData* metaData = lMesh->GetSrcObject<FbxObjectMetaData>(i);
+    //    DisplayString("        Name: ", (char*)metaData->GetName());
+    //}
+
+    int lControlPointsCount = lMesh->GetControlPointsCount();
+
+    FbxVector4* lControlPoints = lMesh->GetControlPoints();
+    for (int i = 0; i < lControlPointsCount; i++)
+    {
+        // lControlPoints[i]
+    }
+
+    int lPolygonCount = lMesh->GetPolygonCount();
+    //char header[100];
+
+    //DisplayString("    Polygons");
+
+    //int vertexId = 0;
+    for (int i = 0; i < lPolygonCount; i++)
+    {
+        int lPolygonSize = lMesh->GetPolygonSize(i);
+        if (lPolygonSize != 3) {
+            int zz = 0;
+        }
+
+        for (int j = 0; j < lPolygonSize; j++)
+        {
+            int lControlPointIndex = lMesh->GetPolygonVertex(i, j);
+
+        }
+    }
+
+    printf("mesh name %s, n_pos %d, n_poly %d\n", node->GetName(), lControlPointsCount, lPolygonCount);
 }
 
 }
