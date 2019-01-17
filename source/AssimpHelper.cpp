@@ -591,8 +591,13 @@ int AssimpHelper::LoadTexture(Model& model, const std::string& filepath)
 		++idx;
 	}
 
+    auto tex = TextureLoader::LoadFromFile(filepath.c_str());
+    if (!tex) {
+        return -1;
+    }
+
 	int ret = model.textures.size();
-	model.textures.push_back({ filepath, TextureLoader::LoadFromFile(filepath.c_str()) });
+	model.textures.push_back({ filepath, tex });
 	return ret;
 }
 
