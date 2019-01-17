@@ -252,6 +252,13 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 			{
 				auto mesh = ai_node->mMeshes[i];
 				node_raw->meshes.push_back(mesh);
+                if (model.meshes[mesh]->name.empty()) {
+                    model.meshes[mesh]->name = ai_node->mName.C_Str();
+                } else {
+                    if (model.meshes[mesh]->name != ai_node->mName.C_Str()) {
+                        assert(0);
+                    }
+                }
 				CombineAABB(model.aabb, meshes_aabb[mesh], child_mat);
 			}
 		}
@@ -401,6 +408,9 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 			indices.push_back(face.mIndices[j]);
 		}
 	}
+
+    mesh->geometry.n_vertices = ai_mesh->mNumVertices;
+    mesh->geometry.n_faces = ai_mesh->mNumFaces;
 
 	ur::RenderContext::VertexInfo vi;
 
