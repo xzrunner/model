@@ -85,15 +85,21 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale, 
 {
 	Assimp::Importer importer;
 	const aiScene* ai_scene = importer.ReadFile(filepath.c_str(),
-		//ppsteps | /* configurable pp steps */
+//		ppsteps | /* configurable pp steps */
 		//aiProcess_GenSmoothNormals		   | // generate smooth normal vectors if not existing
 		//aiProcess_SplitLargeMeshes         | // split large, unrenderable meshes into submeshes
 		//aiProcess_Triangulate			   | // triangulate polygons with more than 3 edges
 		//aiProcess_ConvertToLeftHanded	   | // convert everything to D3D left handed space
 		//aiProcess_SortByPType                // make 'clean' meshes which consist of a single typ of primitives
 
-        aiProcess_JoinIdenticalVertices |
-        aiProcess_ValidateDataStructure
+        //aiProcess_SplitByBoneCount |
+
+//        aiProcess_GenSmoothNormals |
+////        aiProcess_ConvertToLeftHanded |
+//        aiProcess_JoinIdenticalVertices |
+//        aiProcess_ValidateDataStructure
+
+0
 		);
 
 	if (!ai_scene) {
@@ -336,6 +342,8 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 		}
 	}
 
+    mesh->geometry.ori_verts.reserve(ai_mesh->mNumVertices);
+
 	uint8_t* buf = new uint8_t[ai_mesh->mNumVertices * floats_per_vertex * sizeof(float)];
 	uint8_t* ptr = buf;
 	for (size_t i = 0; i < ai_mesh->mNumVertices; ++i)
@@ -347,6 +355,7 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 		memcpy(ptr, &p_trans.x, sizeof(float) * 3);
 		ptr += sizeof(float) * 3;
 		aabb.Combine(p_trans);
+        mesh->geometry.ori_verts.push_back(p_trans);
 
 		if (has_normal)
 		{
@@ -408,9 +417,6 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 			indices.push_back(face.mIndices[j]);
 		}
 	}
-
-    mesh->geometry.n_vertices = ai_mesh->mNumVertices;
-    mesh->geometry.n_faces = ai_mesh->mNumFaces;
 
 	ur::RenderContext::VertexInfo vi;
 

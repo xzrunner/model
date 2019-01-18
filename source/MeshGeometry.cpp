@@ -18,6 +18,10 @@ MeshGeometry::~MeshGeometry()
 			rc.ReleaseBuffer(ur::INDEXBUFFER, ebo);
 		}
 	}
+
+    if (vert_buf) {
+        delete[] vert_buf;
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -59,6 +59,16 @@ bool FbxLoader::LoadBlendShape(Model& model, const std::string& filepath)
 
     bool lResult = LoadScene(lSdkManager, lScene, filepath.c_str());
 
+    //FbxAxisSystem axis_sys(
+    //    static_cast<FbxAxisSystem::EUpVector>(FbxAxisSystem::eYAxis),
+    //    static_cast<FbxAxisSystem::EFrontVector>(-FbxAxisSystem::eParityOdd), 
+    //    static_cast<FbxAxisSystem::ECoordSystem>(FbxAxisSystem::eLeftHanded)
+    //);
+    //auto& old_axis_sys = lScene->GetGlobalSettings().GetAxisSystem();
+    //if (old_axis_sys != axis_sys) {
+    //    axis_sys.ConvertScene(lScene);
+    //}
+
     LoadNode(lScene->GetRootNode(), model);
 
     return true;
@@ -215,8 +225,10 @@ void FbxLoader::LoadNode(FbxNode* node, Model& model)
         return;
     }
 
-    const int lVertexCount = lMesh->GetControlPointsCount();
+    printf("node %s, mesh %s\n", node->GetName(), lMesh->GetName());
 
+    const int lVertexCount = lMesh->GetControlPointsCount();
+    const int lPolyCount = lMesh->GetPolygonCount();
 
     // No vertex to draw.
     if (lVertexCount == 0)
@@ -225,8 +237,12 @@ void FbxLoader::LoadNode(FbxNode* node, Model& model)
     }
 
     MeshGeometry* dst_mesh = nullptr;
-    for (auto& m : model.meshes) {
-        if (m->name == node->GetName()) {
+    for (auto& m : model.meshes) 
+    {
+        if (m->name == node->GetName() &&
+            m->geometry.n_vert == lMesh->GetControlPointsCount() &&
+            m->geometry.n_poly == lMesh->GetPolygonCount()) 
+        {
             dst_mesh = &m->geometry;
         }
     }
@@ -366,6 +382,15 @@ void FbxLoader::LoadContent(fbxsdk::FbxNode* node, Model& model)
     }
     else
     {
+        //int n = node->GetNodeAttributeCount();
+        //for (int i = 0; i < n; ++i)
+        //{
+        //    auto attr = node->GetNodeAttributeByIndex(i);
+        //    if (attr->GetAttributeType() == FbxNodeAttribute::eMesh) {
+        //        int zz = 0;
+        //    }
+        //}
+
         FbxNodeAttribute::EType lAttributeType = (node->GetNodeAttribute()->GetAttributeType());
 
         switch (lAttributeType)
@@ -413,6 +438,16 @@ void FbxLoader::LoadContent(fbxsdk::FbxNode* node, Model& model)
 
 void FbxLoader::LoadMesh(fbxsdk::FbxNode* node, Model& model)
 {
+    int n = node->GetNodeAttributeCount();
+    for (int i = 0; i < n; ++i)
+    {
+        auto attr = node->GetNodeAttributeByIndex(i);
+        FbxMesh* lMesh = (FbxMesh*)attr;
+        printf("mesh name %s, n_pos %d, n_poly %d\n", node->GetName(), lMesh->GetControlPointsCount(), lMesh->GetPolygonCount());
+
+
+    }
+
     FbxMesh* lMesh = (FbxMesh*)node->GetNodeAttribute();
 
     //int nbMetaData = lMesh->GetSrcObjectCount<FbxObjectMetaData>();
@@ -453,7 +488,7 @@ void FbxLoader::LoadMesh(fbxsdk::FbxNode* node, Model& model)
         }
     }
 
-    printf("mesh name %s, n_pos %d, n_poly %d\n", node->GetName(), lControlPointsCount, lPolygonCount);
+//    printf("mesh name %s, n_pos %d, n_poly %d\n", node->GetName(), lControlPointsCount, lPolygonCount);
 }
 
 }
