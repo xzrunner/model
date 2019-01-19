@@ -41,10 +41,10 @@ bool Model::LoadFromFile(const std::string& filepath)
 //		return AssimpHelper::Load(*this, filepath, 1, true, 0xffffffff);
 		bool ret = AssimpHelper::Load(*this, filepath);
 
-        // load blendshape
-        if (ext == ".fbx") {
-            FbxLoader::LoadBlendShape(*this, filepath);
-        }
+        //// load blendshape
+        //if (ext == ".fbx") {
+        //    FbxLoader::LoadBlendShape(*this, filepath);
+        //}
 
         return ret;
 	}
