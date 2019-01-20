@@ -102,6 +102,9 @@
     <ClCompile Include="..\..\..\source\FbxLoader.cpp">
       <Filter>loader</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\BlendShapeLoader.cpp">
+      <Filter>loader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\model\ParametricEquations.h">
@@ -201,6 +204,9 @@
       <Filter>loader\quake</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\FbxLoader.h">
+      <Filter>loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\BlendShapeLoader.h">
       <Filter>loader</Filter>
     </ClInclude>
   </ItemGroup>

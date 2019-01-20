@@ -14,6 +14,7 @@
     <ClCompile Include="..\..\..\source\AnimIK.cpp" />
     <ClCompile Include="..\..\..\source\AssimpExporter.cpp" />
     <ClCompile Include="..\..\..\source\AssimpHelper.cpp" />
+    <ClCompile Include="..\..\..\source\BlendShapeLoader.cpp" />
     <ClCompile Include="..\..\..\source\BspLoader.cpp" />
     <ClCompile Include="..\..\..\source\BspModel.cpp" />
     <ClCompile Include="..\..\..\source\FbxLoader.cpp" />
@@ -39,6 +40,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\..\include\model\AnimIK.h" />
     <ClInclude Include="..\..\..\include\model\AssimpExporter.h" />
+    <ClInclude Include="..\..\..\include\model\BlendShapeLoader.h" />
     <ClInclude Include="..\..\..\include\model\FbxLoader.h" />
     <ClInclude Include="..\..\..\include\model\MeshIK.h" />
     <ClInclude Include="..\..\..\include\model\QuakeMapEntity.h" />

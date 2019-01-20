@@ -154,7 +154,7 @@ bool FbxLoader::Load(Model& model, const std::string& filepath, float scale)
     return true;
 }
 
-bool FbxLoader::LoadBlendShape(Model& model, const std::string& filepath)
+bool FbxLoader::LoadBlendShapeMeshes(std::vector<std::unique_ptr<BlendShapeLoader::MeshData>>& meshes, const std::string& filepath)
 {
     FbxManager* lSdkManager = NULL;
     FbxScene* lScene = NULL;
@@ -164,23 +164,11 @@ bool FbxLoader::LoadBlendShape(Model& model, const std::string& filepath)
     // Load the scene.
 
     bool lResult = LoadScene(lSdkManager, lScene, filepath.c_str());
+    if (!lResult) {
+        return false;
+    }
 
-    //FbxAxisSystem axis_sys(
-    //    static_cast<FbxAxisSystem::EUpVector>(FbxAxisSystem::eYAxis),
-    //    static_cast<FbxAxisSystem::EFrontVector>(-FbxAxisSystem::eParityOdd),
-    //    static_cast<FbxAxisSystem::ECoordSystem>(FbxAxisSystem::eLeftHanded)
-    //);
-    //auto& old_axis_sys = lScene->GetGlobalSettings().GetAxisSystem();
-    //if (old_axis_sys != axis_sys) {
-    //    axis_sys.ConvertScene(lScene);
-    //}
-
-    //FbxGeometryConverter lGeomConverter( lSdkManager );
-    //if(!lGeomConverter.SplitMeshesPerMaterial(lScene, /*replace*/true)) {
-    //    int zz = 0;
-    //}
-
-    LoadNode(lScene->GetRootNode(), model);
+    LoadBlendShapesRecursive(meshes, lScene->GetRootNode());
 
     return true;
 }
@@ -324,11 +312,18 @@ bool FbxLoader::LoadScene(FbxManager* pManager, FbxScene* pScene, const char* pF
 
     // Convert Axis System to what is used in this example, if needed
     FbxAxisSystem SceneAxisSystem = pScene->GetGlobalSettings().GetAxisSystem();
-//    FbxAxisSystem OurAxisSystem(
-//        FbxAxisSystem::EUpVector(FbxAxisSystem::eZAxis),
-//        FbxAxisSystem::EFrontVector(-FbxAxisSystem::eParityOdd),
-//        FbxAxisSystem::eLeftHanded
-//    );
+
+    int front_sign, up_sign;
+    auto font = SceneAxisSystem.GetFrontVector(front_sign);
+    auto up = SceneAxisSystem.GetUpVector(up_sign);
+    auto sys = SceneAxisSystem.GetCoorSystem();
+
+    //FbxAxisSystem OurAxisSystem(
+    //    FbxAxisSystem::EUpVector(font * front_sign),
+    //    FbxAxisSystem::EFrontVector(up * up_sign),
+    //    FbxAxisSystem::eLeftHanded
+    //);
+
     FbxAxisSystem OurAxisSystem( FbxAxisSystem::OpenGL);
     if( SceneAxisSystem != OurAxisSystem ) {
         OurAxisSystem.ConvertScene(pScene);
@@ -422,13 +417,13 @@ bool FbxLoader::LoadScene(FbxManager* pManager, FbxScene* pScene, const char* pF
     return lStatus;
 }
 
-void FbxLoader::LoadNode(FbxNode* node, Model& model)
+void FbxLoader::LoadBlendShapesRecursive(std::vector<std::unique_ptr<BlendShapeLoader::MeshData>>& meshes, fbxsdk::FbxNode* node)
 {
     FbxMesh* lMesh = node->GetMesh();
     if (!lMesh)
     {
         for (int i = 0, n = node->GetChildCount(); i < n; ++i) {
-            LoadNode(node->GetChild(i), model);
+            LoadBlendShapesRecursive(meshes, node->GetChild(i));
         }
         return;
     }
@@ -441,21 +436,7 @@ void FbxLoader::LoadNode(FbxNode* node, Model& model)
         return;
     }
 
-    MeshGeometry* dst_mesh = nullptr;
-    for (auto& m : model.meshes)
-    {
-        if (m->name == node->GetName() &&
-            m->geometry.n_vert == lMesh->GetControlPointsCount() &&
-            m->geometry.n_poly == lMesh->GetPolygonCount())
-        {
-            dst_mesh = &m->geometry;
-        }
-    }
-    if (!dst_mesh) {
-        return;
-    }
-
-//    const VBOMesh * lMeshCache = static_cast<const VBOMesh *>(lMesh->GetUserDataPtr());
+    std::vector<std::unique_ptr<BlendShapeData>> blendshapes;
 
     // If it has some defomer connection, update the vertices position
     const bool lHasVertexCache = lMesh->GetDeformerCount(FbxDeformer::eVertexCache) &&
@@ -463,41 +444,18 @@ void FbxLoader::LoadNode(FbxNode* node, Model& model)
     const bool lHasShape = lMesh->GetShapeCount() > 0;
     const bool lHasSkin = lMesh->GetDeformerCount(FbxDeformer::eSkin) > 0;
     const bool lHasDeformation = lHasVertexCache || lHasShape || lHasSkin;
-
-    FbxVector4* lVertexArray = NULL;
-    if (/*!lMeshCache || */lHasDeformation)
-    {
-        lVertexArray = new FbxVector4[lVertexCount];
-        memcpy(lVertexArray, lMesh->GetControlPoints(), lVertexCount * sizeof(FbxVector4));
-    }
-
     if (lHasDeformation)
     {
-//        printf("node %s has deform, has vertex %d, has shape %d\n", node->GetName(), lHasVertexCache, lHasShape);
+        printf("node %s has deform, has vertex %d, has shape %d\n", node->GetName(), lHasVertexCache, lHasShape);
         if (lHasVertexCache)
         {
         }
         else
         {
-            if (lHasShape)
+            if (/*true || */lHasShape)
             {
                 const int vert_n = lMesh->GetPolygonVertexCount();
                 const int cvert_n = lMesh->GetControlPointsCount();
-
-                const int lPolygonCount = lMesh->GetPolygonCount();
-                //for (int lPolygonIndex = 0; lPolygonIndex < lPolygonCount; lPolygonIndex++)
-                //{
-                //    const int lVerticeCount = lMesh->GetPolygonSize(lPolygonIndex);
-                //    printf("%d\n", lVerticeCount);
-                //}
-
-                int tri_n = 0;
-                int poly_n = lMesh->GetPolygonCount();
-                for (int i_poly = 0; i_poly < poly_n; ++i_poly) {
-                    int vert_n = lMesh->GetPolygonSize(i_poly);
-                    tri_n += vert_n - 2;
-                }
-
 
                 FbxMesh* mesh = node->GetMesh();
                 int lBlendShapeDeformerCount = mesh->GetDeformerCount(FbxDeformer::eBlendShape);
@@ -505,40 +463,19 @@ void FbxLoader::LoadNode(FbxNode* node, Model& model)
                 for (int lBlendShapeIndex = 0; lBlendShapeIndex < lBlendShapeDeformerCount; ++lBlendShapeIndex)
                 {
                     FbxBlendShape* lBlendShape = (FbxBlendShape*)mesh->GetDeformer(lBlendShapeIndex, FbxDeformer::eBlendShape);
-
                     int lBlendShapeChannelCount = lBlendShape->GetBlendShapeChannelCount();
-//                    printf("lBlendShape %s, lBlendShapeChannelCount %d\n", lBlendShape->GetName(), lBlendShapeChannelCount);
                     for (int lChannelIndex = 0; lChannelIndex < lBlendShapeChannelCount; ++lChannelIndex)
                     {
                         FbxBlendShapeChannel* lChannel = lBlendShape->GetBlendShapeChannel(lChannelIndex);
                         assert(lChannel);
-
-                        if (lChannel)
-                        {
-                            //static int c = 0;
-                            //printf("%d\n", c++);
-                            //int zz = 0;
-
-                            //// Get the percentage of influence on this channel.
-                            //FbxAnimCurve* lFCurve = dst.GetShapeChannel(lBlendShapeIndex, lChannelIndex, pAnimLayer);
-                            //if (!lFCurve) continue;
-                            //double lWeight = lFCurve->Evaluate(pTime);
-                        }
-
                         int lTargetShapeCount = lChannel->GetTargetShapeCount();
                         assert(lTargetShapeCount == 1);
 			            for (int lTargetShapeIndex = 0; lTargetShapeIndex < lTargetShapeCount; ++lTargetShapeIndex)
 			            {
-                            static int COUNT = 0;
-
                             FbxShape* lShape = lChannel->GetTargetShape(lTargetShapeIndex);
 
 				            int j, lControlPointsCount = lShape->GetControlPointsCount();
 				            FbxVector4* lControlPoints = lShape->GetControlPoints();
-				            FbxLayerElementArrayTemplate<FbxVector4>* lNormals = NULL;
-				            bool lStatus = lShape->GetNormals(&lNormals);
-
-//                            printf("[%d] lShape %s, %d\n", COUNT++, (char*)lShape->GetName(), lControlPointsCount);
 
                             auto blendshape = std::make_unique<BlendShapeData>();
                             blendshape->name = lShape->GetName();
@@ -546,19 +483,14 @@ void FbxLoader::LoadNode(FbxNode* node, Model& model)
 				            for(j = 0; j < lControlPointsCount; j++)
 				            {
                                 blendshape->vertices.emplace_back(
-                                    lControlPoints[j].mData[0], lControlPoints[j].mData[1], lControlPoints[j].mData[2]
+                                    (float)lControlPoints[j].mData[0],
+                                    (float)lControlPoints[j].mData[1],
+                                    -(float)lControlPoints[j].mData[2]
                                 );
-                                //printf("Control Point %d", j);
-                                //printf("Coordinates: %f %f %f %f",
-                                //    lControlPoints[j].mData[0], lControlPoints[j].mData[1], lControlPoints[j].mData[2], lControlPoints[j].mData[3]);
-
-					            //if (lStatus && lNormals && lNormals->GetCount() == lControlPointsCount)
-					            //{
-                 //                   auto& p = lNormals->GetAt(j);
-                 //                   printf("Normal Vector: %f %f %f %f", p.mData[0], p.mData[1], p.mData[2], p.mData[3]);
-					            //}
 				            }
-                            dst_mesh->blendshape_data.push_back(std::move(blendshape));
+                            if (!blendshape->vertices.empty()) {
+                                blendshapes.push_back(std::move(blendshape));
+                            }
 			            }
                     }
                 }
@@ -574,8 +506,37 @@ void FbxLoader::LoadNode(FbxNode* node, Model& model)
 //        printf("node %s no deform\n", node->GetName());
     }
 
+    if (!blendshapes.empty())
+    {
+        auto mesh = std::make_unique<BlendShapeLoader::MeshData>();
+        mesh->name = node->GetName();
+
+        int controlPointCount = lMesh->GetControlPointsCount();
+        mesh->vertices.resize(controlPointCount);
+        const FbxVector4 * lControlPoints = lMesh->GetControlPoints();
+        int lPolygonCount = lMesh->GetPolygonCount();
+        for (int lPolygonIndex = 0; lPolygonIndex < lPolygonCount; lPolygonIndex++) {
+            int faceSize = lMesh->GetPolygonSize(lPolygonIndex);
+            for (int lVerticeIndex = 0; lVerticeIndex < faceSize; lVerticeIndex++) {
+                const int lControlPointIndex = lMesh->GetPolygonVertex(lPolygonIndex, lVerticeIndex);
+                mesh->vertices[lControlPointIndex] = sm::vec3(
+                    static_cast<float>(lControlPoints[lControlPointIndex][0]),
+                    static_cast<float>(lControlPoints[lControlPointIndex][1]),
+                    -static_cast<float>(lControlPoints[lControlPointIndex][2])
+                );
+            }
+        }
+
+        mesh->blendshapes = std::move(blendshapes);
+        for (auto& bs : mesh->blendshapes) {
+            assert(bs->vertices.size() == mesh->vertices.size());
+        }
+
+        meshes.push_back(std::move(mesh));
+    }
+
     for (int i = 0, n = node->GetChildCount(); i < n; ++i) {
-        LoadNode(node->GetChild(i), model);
+        LoadBlendShapesRecursive(meshes, node->GetChild(i));
     }
 }
 

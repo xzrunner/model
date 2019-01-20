@@ -1,6 +1,7 @@
 #pragma once
 
-#include <model/Model.h>
+#include "model/Model.h"
+#include "model/BlendShapeLoader.h"
 
 #include <string>
 
@@ -20,12 +21,15 @@ class FbxLoader
 {
 public:
     static bool Load(Model& model, const std::string& filepath, float scale = 1.0f);
-    static bool LoadBlendShape(Model& model, const std::string& filepath);
+
+    static bool LoadBlendShapeMeshes(std::vector<std::unique_ptr<BlendShapeLoader::MeshData>>& meshes,
+        const std::string& filepath);
 
 private:
     static void InitializeSdkObjects(fbxsdk::FbxManager*& pManager, fbxsdk::FbxScene*& pScene);
     static bool LoadScene(fbxsdk::FbxManager* pManager, fbxsdk::FbxScene* pScene, const char* pFilename);
-    static void LoadNode(fbxsdk::FbxNode* node, Model& model);
+
+    static void LoadBlendShapesRecursive(std::vector<std::unique_ptr<BlendShapeLoader::MeshData>>& meshes, fbxsdk::FbxNode* node);
 
     static void LoadContent(fbxsdk::FbxNode* node, Model& model);
     static void LoadMesh(fbxsdk::FbxNode* node, Model& model);

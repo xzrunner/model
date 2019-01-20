@@ -38,6 +38,20 @@ sm::mat4 trans_ai_mat(const C_STRUCT aiMatrix4x4& ai_mat)
 	mat.x[13] = ai_mat.b4;
 	mat.x[14] = ai_mat.c4;
 	mat.x[15] = ai_mat.d4;
+
+    //sm::vec3 trans, rotate, scale;
+    //mat.Decompose(trans, rotate, scale);
+
+    //auto mat2 = mat;
+    //mat2.x[12] = 0;
+    //mat2.x[13] = 0;
+    //mat2.x[14] = 0;
+    //sm::vec3 x = mat2 * sm::vec3(1, 0, 0);
+    //sm::vec3 y = mat2 * sm::vec3(0, 1, 0);
+    //sm::vec3 z = mat2 * sm::vec3(0, 0, 1);
+    //printf("x %f %f %f, y %f %f %f, z %f %f %f\n",
+    //    x.x, x.y, x.z, y.x, y.y, y.z, z.x, z.y, z.z);
+
 	return mat;
 }
 
@@ -85,7 +99,7 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale, 
 {
 	Assimp::Importer importer;
 	const aiScene* ai_scene = importer.ReadFile(filepath.c_str(),
-//		ppsteps | /* configurable pp steps */
+		//ppsteps | /* configurable pp steps */
 		//aiProcess_GenSmoothNormals		   | // generate smooth normal vectors if not existing
 		//aiProcess_SplitLargeMeshes         | // split large, unrenderable meshes into submeshes
 		//aiProcess_Triangulate			   | // triangulate polygons with more than 3 edges
@@ -94,12 +108,11 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale, 
 
         //aiProcess_SplitByBoneCount |
 
-//        aiProcess_GenSmoothNormals |
-////        aiProcess_ConvertToLeftHanded |
-//        aiProcess_JoinIdenticalVertices |
-//        aiProcess_ValidateDataStructure
+        aiProcess_GenSmoothNormals |
+        aiProcess_ConvertToLeftHanded |
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_ValidateDataStructure
 
-0
 		);
 
 	if (!ai_scene) {
@@ -114,6 +127,19 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale, 
 		auto src = ai_scene->mMaterials[i];
 		model.materials.push_back(LoadMaterial(src, model, dir));
 	}
+
+    ////
+    //for (size_t i = 0; i < ai_scene->mNumMeshes; ++i)
+    //{
+    //    auto ai_mesh = ai_scene->mMeshes[i];
+    //    printf("num_bones %d\n", ai_mesh->mNumBones);
+    //    for (size_t i = 0; i < ai_mesh->mNumBones; ++i)
+    //    {
+    //        auto src = ai_mesh->mBones[i];
+    //        printf("%s\n", src->mName.C_Str());
+    //        auto offset_trans = trans_ai_mat(src->mOffsetMatrix);
+    //    }
+    //}
 
 	// mesh
 	std::vector<sm::cube> meshes_aabb;
@@ -261,7 +287,10 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
                 if (model.meshes[mesh]->name.empty()) {
                     model.meshes[mesh]->name = ai_node->mName.C_Str();
                 } else {
-                    if (model.meshes[mesh]->name != ai_node->mName.C_Str()) {
+                    //if (model.meshes[mesh]->name != ai_node->mName.C_Str()) {
+                    //    assert(0);
+                    //}
+                    if (model.meshes[mesh]->name.find(ai_node->mName.C_Str()) == std::string::npos) {
                         assert(0);
                     }
                 }

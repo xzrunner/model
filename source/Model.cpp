@@ -35,16 +35,19 @@ bool Model::LoadFromFile(const std::string& filepath)
 		return BspLoader::Load(*this, filepath);
     } else if (ext == ".map") {
         return MapBuilder::Load(*this, filepath);
-    } else if (ext == ".fbx") {
-        return FbxLoader::Load(*this, filepath);
+    //} else if (ext == ".fbx") {
+    //    return FbxLoader::Load(*this, filepath);
 	} else {
 //		return AssimpHelper::Load(*this, filepath, 1, true, 0xffffffff);
 		bool ret = AssimpHelper::Load(*this, filepath);
 
-        //// load blendshape
-        //if (ext == ".fbx") {
-        //    FbxLoader::LoadBlendShape(*this, filepath);
-        //}
+        // load blendshape
+        if (ext == ".fbx")
+        {
+            std::vector<std::unique_ptr<BlendShapeLoader::MeshData>> meshes;
+            FbxLoader::LoadBlendShapeMeshes(meshes, filepath);
+            BlendShapeLoader::Load(*this, meshes);
+        }
 
         return ret;
 	}
