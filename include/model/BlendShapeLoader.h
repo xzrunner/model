@@ -14,14 +14,19 @@ struct Model;
 class BlendShapeLoader
 {
 public:
-    struct MeshData
+    struct VertBuf
     {
         std::string name;
-        std::vector<sm::vec3> vertices;
-        std::vector<std::unique_ptr<BlendShapeData>> blendshapes;
+        std::vector<sm::vec3> verts;
     };
 
-    static void Load(Model& model, std::vector<std::unique_ptr<BlendShapeLoader::MeshData>>& meshes);
+    struct MeshData
+    {
+        std::unique_ptr<VertBuf> mesh;
+        std::vector<std::unique_ptr<VertBuf>> blendshapes;
+    };
+
+    static void Load(Model& model, std::vector<std::unique_ptr<MeshData>>& meshes);
 
 }; // BlendShapeLoader
 

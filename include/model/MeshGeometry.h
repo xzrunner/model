@@ -41,9 +41,16 @@ struct MeshRawData
 struct BlendShapeData
 {
     std::string name;
-    std::vector<sm::vec3> vertices;
+
+    // compressed
+    std::vector<sm::vec3> off_verts;
+    std::vector<uint32_t> idx_verts;
+
     //// todo gpu
     //unsigned int vbo = 0;
+
+    void SetVertices(const std::vector<sm::vec3>& ori_verts,
+        const std::vector<sm::vec3>& new_verts);
 };
 
 struct MeshGeometry : boost::noncopyable
@@ -71,7 +78,6 @@ struct MeshGeometry : boost::noncopyable
     size_t n_vert = 0, n_poly = 0;
     const uint8_t* vert_buf = nullptr;
     size_t vert_stride = 0;
-    std::vector<sm::vec3> ori_verts;
     std::vector<std::unique_ptr<BlendShapeData>> blendshape_data;
 
 	unsigned int vertex_type = 0;

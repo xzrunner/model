@@ -436,7 +436,7 @@ void FbxLoader::LoadBlendShapesRecursive(std::vector<std::unique_ptr<BlendShapeL
         return;
     }
 
-    std::vector<std::unique_ptr<BlendShapeData>> blendshapes;
+    std::vector<std::unique_ptr<BlendShapeLoader::VertBuf>> blendshapes;
 
     // If it has some defomer connection, update the vertices position
     const bool lHasVertexCache = lMesh->GetDeformerCount(FbxDeformer::eVertexCache) &&
@@ -477,18 +477,18 @@ void FbxLoader::LoadBlendShapesRecursive(std::vector<std::unique_ptr<BlendShapeL
 				            int j, lControlPointsCount = lShape->GetControlPointsCount();
 				            FbxVector4* lControlPoints = lShape->GetControlPoints();
 
-                            auto blendshape = std::make_unique<BlendShapeData>();
+                            auto blendshape = std::make_unique<BlendShapeLoader::VertBuf>();
                             blendshape->name = lShape->GetName();
-                            blendshape->vertices.reserve(lControlPointsCount);
+                            blendshape->verts.reserve(lControlPointsCount);
 				            for(j = 0; j < lControlPointsCount; j++)
 				            {
-                                blendshape->vertices.emplace_back(
+                                blendshape->verts.emplace_back(
                                     (float)lControlPoints[j].mData[0],
                                     (float)lControlPoints[j].mData[1],
                                     -(float)lControlPoints[j].mData[2]
                                 );
 				            }
-                            if (!blendshape->vertices.empty()) {
+                            if (!blendshape->verts.empty()) {
                                 blendshapes.push_back(std::move(blendshape));
                             }
 			            }
@@ -509,17 +509,19 @@ void FbxLoader::LoadBlendShapesRecursive(std::vector<std::unique_ptr<BlendShapeL
     if (!blendshapes.empty())
     {
         auto mesh = std::make_unique<BlendShapeLoader::MeshData>();
-        mesh->name = node->GetName();
+
+        mesh->mesh = std::make_unique<BlendShapeLoader::VertBuf>();
+        mesh->mesh->name = node->GetName();
 
         int controlPointCount = lMesh->GetControlPointsCount();
-        mesh->vertices.resize(controlPointCount);
+        mesh->mesh->verts.resize(controlPointCount);
         const FbxVector4 * lControlPoints = lMesh->GetControlPoints();
         int lPolygonCount = lMesh->GetPolygonCount();
         for (int lPolygonIndex = 0; lPolygonIndex < lPolygonCount; lPolygonIndex++) {
             int faceSize = lMesh->GetPolygonSize(lPolygonIndex);
             for (int lVerticeIndex = 0; lVerticeIndex < faceSize; lVerticeIndex++) {
                 const int lControlPointIndex = lMesh->GetPolygonVertex(lPolygonIndex, lVerticeIndex);
-                mesh->vertices[lControlPointIndex] = sm::vec3(
+                mesh->mesh->verts[lControlPointIndex] = sm::vec3(
                     static_cast<float>(lControlPoints[lControlPointIndex][0]),
                     static_cast<float>(lControlPoints[lControlPointIndex][1]),
                     -static_cast<float>(lControlPoints[lControlPointIndex][2])
@@ -528,9 +530,6 @@ void FbxLoader::LoadBlendShapesRecursive(std::vector<std::unique_ptr<BlendShapeL
         }
 
         mesh->blendshapes = std::move(blendshapes);
-        for (auto& bs : mesh->blendshapes) {
-            assert(bs->vertices.size() == mesh->vertices.size());
-        }
 
         meshes.push_back(std::move(mesh));
     }
@@ -990,7 +989,6 @@ void FbxLoader::LoadMesh(Model::Mesh& dst, fbxsdk::FbxNode& src, sm::cube& aabb,
 		memcpy(ptr, &p_trans.x, sizeof(float) * 3);
 		ptr += sizeof(float) * 3;
 		aabb.Combine(p_trans);
-        dst.geometry.ori_verts.push_back(p_trans);
 
 		if (has_normal)
 		{

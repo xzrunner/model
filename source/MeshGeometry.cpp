@@ -44,4 +44,58 @@ void MeshRawData::CalcNormals()
 	}
 }
 
+
+//////////////////////////////////////////////////////////////////////////
+// struct BlendShapeData
+//////////////////////////////////////////////////////////////////////////
+
+void BlendShapeData::SetVertices(const std::vector<sm::vec3>& ori_verts,
+                                 const std::vector<sm::vec3>& new_verts)
+{
+    assert(ori_verts.size() == new_verts.size());
+    int ptr = -1;
+    for (int i = 0, n = ori_verts.size(); i < n; ++i)
+    {
+        if (ori_verts[i] == new_verts[i])
+        {
+            if (ptr >= 0) {
+                for (int j = ptr; j < i; ++j) {
+                    off_verts.push_back(new_verts[j] - ori_verts[j]);
+                }
+                idx_verts.push_back((ptr << 16) | (i - ptr));
+
+                ptr = -1;
+            }
+        }
+        else
+        {
+            if (ptr < 0) {
+                ptr = i;
+            }
+        }
+    }
+
+    if (ptr >= 0) {
+        for (int i = ptr, n = ori_verts.size(); i < n; ++i) {
+            off_verts.push_back(new_verts[i] - ori_verts[i]);
+        }
+        idx_verts.push_back((ptr << 16) | (ori_verts.size() - ptr));
+    }
+
+    //// stat
+    //float min = FLT_MAX, max = -FLT_MAX;
+    //for (auto& v : off_verts) {
+    //    for (int i = 0; i < 3; ++i) {
+    //        auto& f = v.xyz[i];
+    //        if (f < min) {
+    //            min = f;
+    //        }
+    //        if (f > max) {
+    //            max = f;
+    //        }
+    //    }
+    //}
+    //int zz = 0;
+}
+
 }
