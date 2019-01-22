@@ -256,7 +256,7 @@ std::shared_ptr<Model> MapBuilder::Create(const std::vector<sm::vec3>& polygon)
 			border_indices.push_back(start_idx + i);
 			border_indices.push_back(start_idx + i + 1);
 		}
-		border_indices.push_back(start_idx + f->vertices.size() - 1);
+		border_indices.push_back(static_cast<unsigned short>(start_idx + f->vertices.size() - 1));
 		border_indices.push_back(start_idx);
 		start_idx += f->vertices.size();
 	}
@@ -345,7 +345,7 @@ void MapBuilder::UpdateVBO(Model& model, int brush_idx)
 	assert(model.ext && model.ext->Type() == EXT_QUAKE_MAP);
 	auto map_entity = static_cast<QuakeMapEntity*>(model.ext.get());
 	auto& brushes = map_entity->GetMapEntity()->brushes;
-	assert(brush_idx >= 0 && brush_idx < brushes.size());
+	assert(brush_idx >= 0 && brush_idx < static_cast<int>(brushes.size()));
 	auto& descs = map_entity->GetAllBrushDescs();
 	assert(descs.size() == brushes.size());
 
