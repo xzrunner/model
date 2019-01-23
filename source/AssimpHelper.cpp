@@ -371,6 +371,13 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 		}
 	}
 
+    // fixme: to protect
+    for (auto& w : weights_per_vertex) {
+        if (w.empty()) {
+            w.push_back({ 0, 1.0f });
+        }
+    }
+
 	uint8_t* buf = new uint8_t[ai_mesh->mNumVertices * floats_per_vertex * sizeof(float)];
 	uint8_t* ptr = buf;
 	for (size_t i = 0; i < ai_mesh->mNumVertices; ++i)
