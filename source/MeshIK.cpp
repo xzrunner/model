@@ -48,7 +48,7 @@ void select_handles(
 	for (int k = 0; k < handle_region_size; ++k)
 	{
 		std::vector<int> next_ring;
-		for (int i = 0; i < curr_ring.size(); ++i)
+		for (size_t i = 0; i < curr_ring.size(); ++i)
 		{
 			int e = curr_ring[i];
 			if (visited[e]) {
@@ -60,7 +60,7 @@ void select_handles(
 			//handles_set[e] = true;
 
 			auto& adjs = adj[e];
-			for (int j = 0; j < adjs.size(); ++j) {
+			for (size_t j = 0; j < adjs.size(); ++j) {
 				next_ring.push_back(adjs[j]);
 			}
 		}
@@ -70,7 +70,7 @@ void select_handles(
 	for (int k = 0; k < unconstrained_region_size; ++k)
 	{
 		std::vector<int> next_ring;
-		for (int i = 0; i < curr_ring.size(); ++i)
+		for (size_t i = 0; i < curr_ring.size(); ++i)
 		{
 			int e = curr_ring[i];
 			if (visited[e]) {
@@ -82,7 +82,7 @@ void select_handles(
 			//unconstrained_set[e] = true;
 
 			auto& adjs = adj[e];
-			for (int j = 0; j < adjs.size(); ++j) {
+			for (size_t j = 0; j < adjs.size(); ++j) {
 				next_ring.push_back(adjs[j]);
 			}
 		}
@@ -91,7 +91,7 @@ void select_handles(
 
 
 	boundary_begin = static_cast<int>(handles.size());
-	for (int i = 0; i < curr_ring.size(); ++i)
+	for (size_t i = 0; i < curr_ring.size(); ++i)
 	{
 		int e = curr_ring[i];
 		if (visited[e]) {
