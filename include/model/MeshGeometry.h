@@ -8,8 +8,8 @@
 
 #include <boost/noncopyable.hpp>
 
-#define BLENDSHAPE_COMPRESS_FLOAT
-#define BLENDSHAPE_COMPRESS_TO8
+//#define BLENDSHAPE_COMPRESS_FLOAT
+//#define BLENDSHAPE_COMPRESS_TO8
 
 namespace model
 {
