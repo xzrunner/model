@@ -8,6 +8,9 @@
 
 #include <boost/noncopyable.hpp>
 
+#define BLENDSHAPE_COMPRESS_FLOAT
+#define BLENDSHAPE_COMPRESS_TO8
+
 namespace model
 {
 
@@ -43,7 +46,16 @@ struct BlendShapeData
     std::string name;
 
     // compressed
+#ifdef BLENDSHAPE_COMPRESS_FLOAT
+    float flt_min, flt_max;
+#ifdef BLENDSHAPE_COMPRESS_TO8
+    std::vector<uint8_t> off_verts_idx;
+#else
+    std::vector<uint16_t> off_verts_idx;
+#endif // BLENDSHAPE_COMPRESS_TO8
+#else
     std::vector<sm::vec3> off_verts;
+#endif // BLENDSHAPE_COMPRESS_FLOAT
     std::vector<uint32_t> idx_verts;
 
     //// todo gpu
@@ -51,6 +63,7 @@ struct BlendShapeData
 
     void SetVertices(const std::vector<sm::vec3>& ori_verts,
         const std::vector<sm::vec3>& new_verts);
+
 };
 
 struct MeshGeometry : boost::noncopyable
