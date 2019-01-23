@@ -972,7 +972,7 @@ void FbxLoader::LoadMesh(Model::Mesh& dst, fbxsdk::FbxNode& src, sm::cube& aabb,
                 for (int k = 0; k < lVertexIndexCount; ++k) {
                     int lIndex = lCluster->GetControlPointIndices()[k];
                     double lWeight = lCluster->GetControlPointWeights()[k];
-                    weights_per_vertex[lIndex].push_back({ lClusterIndex, lWeight });
+                    weights_per_vertex[lIndex].push_back({ lClusterIndex, static_cast<float>(lWeight) });
                 }//For each vertex
             }//lClusterCount
         }

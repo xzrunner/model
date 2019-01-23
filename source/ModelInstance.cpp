@@ -222,21 +222,21 @@ void ModelInstance::SetLocalTrans(const std::vector<sm::mat4>& local_trans)
 
 void ModelInstance::RotateJoint(int idx, const sm::Quaternion& delta)
 {
-	assert(idx >= 0 && idx < m_local_trans.size());
+	assert(idx >= 0 && idx < static_cast<int>(m_local_trans.size()));
 	m_local_trans[idx] = sm::mat4(delta) * m_local_trans[idx];
 	CalcGlobalTrans();
 }
 
 void ModelInstance::TranslateJoint(int idx, const sm::vec3& offset)
 {
-	assert(idx >= 0 && idx < m_local_trans.size());
+	assert(idx >= 0 && idx < static_cast<int>(m_local_trans.size()));
 	m_local_trans[idx] = sm::mat4::Translated(offset.x, offset.y, offset.z) * m_local_trans[idx];
 	CalcGlobalTrans();
 }
 
 void ModelInstance::ScaleJoint(int idx, const sm::vec3& scale)
 {
-    assert(idx >= 0 && idx < m_local_trans.size());
+    assert(idx >= 0 && idx < static_cast<int>(m_local_trans.size()));
     m_local_trans[idx] = sm::mat4::Scaled(scale.x, scale.y, scale.z) * m_local_trans[idx];
     CalcGlobalTrans();
 }
