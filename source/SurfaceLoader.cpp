@@ -16,10 +16,25 @@ namespace model
 
 bool SurfaceLoader::Load(Model& model, const std::string& filepath)
 {
-	auto name = boost::filesystem::path(filepath).stem().string();
+    auto name = boost::filesystem::path(filepath).stem().string();
+    sm::cube aabb;
+    auto mesh = CreateMesh(name, aabb);
+    if (!mesh) {
+        return false;
+    }
+
+	model.materials.emplace_back(std::make_unique<Model::Material>());
+	model.meshes.push_back(std::move(mesh));
+	model.aabb = aabb;
+
+	return true;
+}
+
+std::unique_ptr<Model::Mesh> SurfaceLoader::CreateMesh(const std::string& name, sm::cube& aabb)
+{
 	auto surface = SurfaceFactory::Create(name);
 	if (!surface) {
-		return false;
+		return nullptr;
 	}
 
 	const int vertex_type = VERTEX_FLAG_NORMALS;
@@ -41,9 +56,6 @@ bool SurfaceLoader::Load(Model& model, const std::string& filepath)
 	vi.va_list.push_back(ur::VertexAttrib("pos",    3, 4, 24, 0));
 	vi.va_list.push_back(ur::VertexAttrib("normal", 3, 4, 24, 12));
 
-	// material
-	model.materials.emplace_back(std::make_unique<Model::Material>());
-
 	// mesh
 	auto mesh = std::make_unique<Model::Mesh>();
 	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
@@ -54,10 +66,8 @@ bool SurfaceLoader::Load(Model& model, const std::string& filepath)
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	mesh->material = 0;
 	mesh->effect = EFFECT_DEFAULT_NO_TEX;
-	model.meshes.push_back(std::move(mesh));
 
 	// aabb
-	sm::cube aabb;
 	for (int i = 0, n = vertices.size(); i < n; )
 	{
 		sm::vec3 pos;
@@ -67,9 +77,8 @@ bool SurfaceLoader::Load(Model& model, const std::string& filepath)
 		aabb.Combine(pos);
 		i += stride;
 	}
-	model.aabb = aabb;
 
-	return true;
+    return std::move(mesh);
 }
 
 }
