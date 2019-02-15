@@ -38,8 +38,6 @@ struct Model : boost::noncopyable
 
 		int material = -1;
 
-		int effect = -1;
-
 	}; // Mesh
 
 	std::vector<std::pair<std::string, ur::TexturePtr>> textures;

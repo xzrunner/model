@@ -3,7 +3,6 @@
 #include "model/Surface.h"
 #include "model/typedef.h"
 #include "model/Model.h"
-#include "model/EffectType.h"
 
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
@@ -65,7 +64,6 @@ std::unique_ptr<Model::Mesh> SurfaceLoader::CreateMesh(const std::string& name, 
 	mesh->geometry.sub_geometry_materials.push_back(0);
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	mesh->material = 0;
-	mesh->effect = EFFECT_DEFAULT_NO_TEX;
 
 	// aabb
 	for (int i = 0, n = vertices.size(); i < n; )

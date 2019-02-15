@@ -4,7 +4,6 @@
 #include "model/SkinnedData.h"
 #include "model/Model.h"
 #include "model/typedef.h"
-#include "model/EffectType.h"
 #include "model/TextureLoader.h"
 
 #include <unirender/RenderContext.h>
@@ -72,7 +71,6 @@ bool M3dLoader::Load(Model& model, const std::string& filepath)
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
 	mesh->material = 0;
-	mesh->effect = EFFECT_DEFAULT;
 	int idx = 0;
 	GD_ASSERT(subsets.size() == mats.size(), "err material");
 	for (auto& sub : subsets)

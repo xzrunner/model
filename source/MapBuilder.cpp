@@ -1,5 +1,4 @@
 #include "model/MapBuilder.h"
-#include "model/EffectType.h"
 #include "model/MeshGeometry.h"
 #include "model/typedef.h"
 #include "model/Model.h"
@@ -223,10 +222,8 @@ std::shared_ptr<Model> MapBuilder::Create(const std::vector<sm::vec3>& polygon)
 	std::unique_ptr<Model::Mesh> border_mesh = nullptr;
 
 	mesh = std::make_unique<Model::Mesh>();
-	mesh->effect = EFFECT_USER;
 
 	border_mesh = std::make_unique<Model::Mesh>();
-	border_mesh->effect = EFFECT_USER;
 
 	auto mat = std::make_unique<Model::Material>();
 	int mat_idx = model->materials.size();
@@ -470,10 +467,8 @@ bool MapBuilder::LoadEntity(Model& dst, const quake::MapEntityPtr& src)
 				}
 
 				mesh = std::make_unique<Model::Mesh>();
-				mesh->effect = EFFECT_USER;
 
 				border_mesh = std::make_unique<Model::Mesh>();
-				border_mesh->effect = EFFECT_USER;
 
 				auto mat = std::make_unique<Model::Material>();
 				int mat_idx = dst.materials.size();

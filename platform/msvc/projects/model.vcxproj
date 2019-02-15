@@ -51,7 +51,6 @@
     <ClInclude Include="..\..\..\include\model\BspFile.h" />
     <ClInclude Include="..\..\..\include\model\BspLoader.h" />
     <ClInclude Include="..\..\..\include\model\BspModel.h" />
-    <ClInclude Include="..\..\..\include\model\EffectType.h" />
     <ClInclude Include="..\..\..\include\model\GlobalClock.h" />
     <ClInclude Include="..\..\..\include\model\M3dLoader.h" />
     <ClInclude Include="..\..\..\include\model\MaxLoader.h" />

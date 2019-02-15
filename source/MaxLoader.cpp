@@ -1,7 +1,6 @@
 #include "model/MaxLoader.h"
 #include "model/Model.h"
 #include "model/typedef.h"
-#include "model/EffectType.h"
 
 #include <SM_Vector.h>
 #include <unirender/RenderContext.h>
@@ -115,7 +114,6 @@ void MaxLoader::LoadMesh(Model& model, const rapidxml::xml_node<>* mesh_node)
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
 	mesh->material = 0;
-	mesh->effect = EFFECT_USER;
 	model.meshes.push_back(std::move(mesh));
 }
 

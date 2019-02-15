@@ -1,7 +1,6 @@
 #include "model/AssimpHelper.h"
 #include "model/typedef.h"
 #include "model/Model.h"
-#include "model/EffectType.h"
 #include "model/TextureLoader.h"
 
 #include <unirender/RenderContext.h>
@@ -318,48 +317,26 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 		}
 	}
 
-	int vertex_type = 0;
 	int floats_per_vertex = 3;
 
 	bool has_normal = ai_mesh->HasNormals();
 	if (has_normal) {
 		floats_per_vertex += 3;
-		vertex_type |= VERTEX_FLAG_NORMALS;
 	}
 
 	bool has_texcoord = ai_mesh->HasTextureCoords(0);
-	if (has_texcoord)
-	{
+	if (has_texcoord) {
 		floats_per_vertex += 2;
-		vertex_type |= VERTEX_FLAG_TEXCOORDS;
-		if (has_mat_tex) {
-			mesh->effect = EFFECT_DEFAULT;
-		} else {
-			mesh->effect = EFFECT_DEFAULT_NO_TEX;
-		}
-	}
-	else
-	{
-		mesh->effect = EFFECT_DEFAULT_NO_TEX;
 	}
 
 	const bool has_color = color != 0;
 	if (has_color) {
 		floats_per_vertex += 1;
-		vertex_type |= VERTEX_FLAG_COLOR;
-		mesh->effect = EFFECT_COLOR;
 	}
 
 	bool has_skinned = ai_mesh->HasBones();
-	if (has_skinned)
-	{
+	if (has_skinned) {
 		floats_per_vertex += 2;
-		vertex_type |= VERTEX_FLAG_SKINNED;
-		if (has_mat_tex && has_texcoord) {
-			mesh->effect = EFFECT_SKINNED;
-		} else {
-			mesh->effect = EFFECT_SKINNED_NO_TEX;
-		}
 	}
 
 	std::vector<std::vector<std::pair<int, float>>> weights_per_vertex(ai_mesh->mNumVertices);

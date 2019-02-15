@@ -2,7 +2,6 @@
 
 #include "model/MdlLoader.h"
 #include "model/Model.h"
-#include "model/EffectType.h"
 #include "model/NormalMap.h"
 #include "model/typedef.h"
 #include "model/MorphTargetAnim.h"
@@ -188,7 +187,6 @@ void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& mod
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
 	mesh->material = 0;
-	mesh->effect = EFFECT_MORPH_TARGET;
 	model.meshes.push_back(std::move(mesh));
 
 	model.ext = std::make_unique<MorphTargetAnim>(3, header.num_frames, header.num_tris * 3);

@@ -143,9 +143,6 @@
     <ClInclude Include="..\..\..\include\model\MorphTargetAnim.h">
       <Filter>dataset\extend</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\model\EffectType.h">
-      <Filter>utility</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\model\GlobalClock.h">
       <Filter>utility</Filter>
     </ClInclude>
