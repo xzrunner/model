@@ -108,6 +108,8 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale, 
 
         //aiProcess_SplitByBoneCount |
 
+        aiProcess_Triangulate |
+
         aiProcess_GlobalScale |
         aiProcess_GenSmoothNormals |
         aiProcess_ConvertToLeftHanded |
