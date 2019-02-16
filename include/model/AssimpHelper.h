@@ -33,8 +33,8 @@ private:
 		const std::vector<sm::cube>& meshes_aabb, const sm::mat4& mat);
 
 	static std::unique_ptr<Model::Mesh> LoadMesh(const std::vector<std::unique_ptr<Model::Material>>& materials,
-		const aiMesh* ai_mesh, sm::cube& aabb, float scale, bool raw_data, uint32_t color);
-	static std::unique_ptr<MeshRawData> LoadMeshRawData(const aiMesh* ai_mesh, float scale);
+		const aiMesh* ai_mesh, sm::cube& aabb, bool raw_data, uint32_t color);
+	static std::unique_ptr<MeshRawData> LoadMeshRawData(const aiMesh* ai_mesh);
 
 	static std::unique_ptr<Model::Material> LoadMaterial(const aiMaterial* ai_material,
 		Model& model, const std::string& dir);

@@ -97,6 +97,7 @@ namespace model
 bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale, bool raw_data, uint32_t color)
 {
 	Assimp::Importer importer;
+    importer.SetPropertyFloat(AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY, scale);
 	const aiScene* ai_scene = importer.ReadFile(filepath.c_str(),
 		//ppsteps | /* configurable pp steps */
 		//aiProcess_GenSmoothNormals		   | // generate smooth normal vectors if not existing
@@ -107,6 +108,7 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale, 
 
         //aiProcess_SplitByBoneCount |
 
+        aiProcess_GlobalScale |
         aiProcess_GenSmoothNormals |
         aiProcess_ConvertToLeftHanded |
         aiProcess_JoinIdenticalVertices |
@@ -148,7 +150,7 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale, 
 	{
 		auto src = ai_scene->mMeshes[i];
 		sm::cube aabb;
-		model.meshes.push_back(LoadMesh(model.materials, src, aabb, scale, raw_data, color));
+		model.meshes.push_back(LoadMesh(model.materials, src, aabb, raw_data, color));
 		meshes_aabb.push_back(aabb);
 	}
 
@@ -204,7 +206,7 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale, 
 		model.anim_speed = 100;
 	}
 
-	model.scale = scale;
+	model.scale = 1.0f;
 
 	return true;
 }
@@ -302,7 +304,7 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 }
 
 std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::unique_ptr<Model::Material>>& materials,
-	                                                const aiMesh* ai_mesh, sm::cube& aabb, float scale, bool raw_data, uint32_t color)
+	                                                const aiMesh* ai_mesh, sm::cube& aabb, bool raw_data, uint32_t color)
 {
 	auto mesh = std::make_unique<Model::Mesh>();
 
@@ -362,7 +364,6 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 		const aiVector3D& p = ai_mesh->mVertices[i];
 
 		sm::vec3 p_trans(p.x, p.y, p.z);
-		p_trans *= scale;
 		memcpy(ptr, &p_trans.x, sizeof(float) * 3);
 		ptr += sizeof(float) * 3;
 		aabb.Combine(p_trans);
@@ -516,20 +517,20 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
     mesh->geometry.vert_buf = buf;
 
 	if (raw_data) {
-		mesh->geometry.raw_data = LoadMeshRawData(ai_mesh, scale);
+		mesh->geometry.raw_data = LoadMeshRawData(ai_mesh);
 	}
 
 	return mesh;
 }
 
-std::unique_ptr<MeshRawData> AssimpHelper::LoadMeshRawData(const aiMesh* ai_mesh, float scale)
+std::unique_ptr<MeshRawData> AssimpHelper::LoadMeshRawData(const aiMesh* ai_mesh)
 {
 	auto rd = std::make_unique<model::MeshRawData>();
 
 	rd->vertices.reserve(ai_mesh->mNumVertices);
 	for (size_t i = 0; i < ai_mesh->mNumVertices; ++i) {
 		auto& p = ai_mesh->mVertices[i];
-		rd->vertices.emplace_back(p.x * scale, p.y * scale, p.z * scale);
+		rd->vertices.emplace_back(p.x, p.y, p.z);
 	}
 
 	if (ai_mesh->HasNormals())
