@@ -94,7 +94,10 @@ unsigned int ppsteps = aiProcess_CalcTangentSpace | // calculate tangents and bi
 namespace model
 {
 
-bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale, bool raw_data, uint32_t color)
+bool     AssimpHelper::m_load_raw_data = false;
+uint32_t AssimpHelper::m_vert_color = 0;
+
+bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale)
 {
 	Assimp::Importer importer;
     importer.SetPropertyFloat(AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY, scale);
@@ -152,7 +155,7 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale, 
 	{
 		auto src = ai_scene->mMeshes[i];
 		sm::cube aabb;
-		model.meshes.push_back(LoadMesh(model.materials, src, aabb, raw_data, color));
+		model.meshes.push_back(LoadMesh(model.materials, src, aabb));
 		meshes_aabb.push_back(aabb);
 	}
 
@@ -306,7 +309,7 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 }
 
 std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::unique_ptr<Model::Material>>& materials,
-	                                                const aiMesh* ai_mesh, sm::cube& aabb, bool raw_data, uint32_t color)
+	                                                const aiMesh* ai_mesh, sm::cube& aabb)
 {
 	auto mesh = std::make_unique<Model::Mesh>();
 
@@ -333,7 +336,7 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 		floats_per_vertex += 2;
 	}
 
-	const bool has_color = color != 0;
+	const bool has_color = m_vert_color != 0;
 	if (has_color) {
 		floats_per_vertex += 1;
 	}
@@ -394,7 +397,7 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 		}
 		if (has_color)
 		{
-			memcpy(ptr, &color, sizeof(uint32_t));
+			memcpy(ptr, &m_vert_color, sizeof(uint32_t));
 			ptr += sizeof(uint32_t);
 		}
 		if (has_skinned)
@@ -518,8 +521,11 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
     mesh->geometry.vert_stride = stride;
     mesh->geometry.vert_buf = buf;
 
-	if (raw_data) {
+	if (m_load_raw_data) {
 		mesh->geometry.raw_data = LoadMeshRawData(ai_mesh);
+        mesh->geometry.raw_data->weights_per_vertex = weights_per_vertex;
+
+        assert(weights_per_vertex.size() == mesh->geometry.raw_data->vertices.size());
 	}
 
 	return mesh;
