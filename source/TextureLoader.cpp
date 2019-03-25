@@ -45,6 +45,9 @@ ur::TexturePtr TextureLoader::LoadFromFile(const char* filepath)
 	case GPF_BGR_EXT:
 		tf = ur::TEXTURE_BGR_EXT;
 		break;
+    case GPF_RGB16F:
+        tf = ur::TEXTURE_RGB16F;
+        break;
     case GPF_RGB32F:
         tf = ur::TEXTURE_RGB32F;
         break;
