@@ -402,10 +402,9 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 		}
 		if (has_skinned)
 		{
-			assert(weights_per_vertex[i].size() <= 4);
 			unsigned char indices[4] = { 0, 0, 0, 0 };
 			unsigned char weights[4] = { 0, 0, 0, 0 };
-			for (int j = 0, m = weights_per_vertex[i].size(); j < m; ++j)
+			for (int j = 0, m = std::min(static_cast<int>(weights_per_vertex[i].size()), 4); j < m; ++j)
 			{
 				indices[j] = weights_per_vertex[i][j].first;
 				weights[j] = static_cast<unsigned char>(weights_per_vertex[i][j].second * 255.0f);
