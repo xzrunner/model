@@ -169,7 +169,7 @@ void BspLoader::LoadTextures(std::ifstream& fin, const BspFileLump& lump,
 				palette.IndexedToRgb(indexed, pixel_sz, rgb);
 				delete[] indexed;
 
-				rc.UpdateTexture(tex_id, rgb, mip_w, mip_h, 0, j, ur::TEXTURE_WARP_REPEAT);
+				rc.UpdateTexture(tex_id, rgb, mip_w, mip_h, 0, j);
 				delete[] rgb;
 
 				mip_w /= 2;
