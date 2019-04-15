@@ -40,10 +40,10 @@ void SkeletalAnim::InitTPoseTrans()
 		m_nodes[i]->local_trans.Decompose(pos, rot, scale);
 
 		auto& d = tpose_local_trans[i];
-		d.c[0][0] = scale.x; d.c[0][1] = 0;       d.c[0][2] = 0;
-		d.c[1][0] = 0;       d.c[1][1] = scale.y; d.c[1][2] = 0;
-		d.c[2][0] = 0;       d.c[2][1] = 0;       d.c[2][2] = scale.z;
-		d.c[3][0] = pos.x;   d.c[3][1] = pos.y;   d.c[3][2] = pos.z;
+        d.c[0][0] = scale.x; d.c[1][0] = 0;       d.c[2][0] = 0;       d.c[3][0] = pos.x;
+        d.c[0][1] = 0;       d.c[1][1] = scale.y; d.c[2][1] = 0;       d.c[3][1] = pos.y;
+        d.c[0][2] = 0;       d.c[1][2] = 0;       d.c[2][2] = scale.z; d.c[3][2] = pos.z;
+        d.c[0][3] = 0;       d.c[1][3] = 0;       d.c[2][3] = 0;       d.c[3][3] = 1;
 	}
 
 	m_tpose_world_trans.resize(m_nodes.size());

@@ -193,10 +193,10 @@ bool ModelInstance::SetFrame(int curr_frame)
 		}
 
 		sm::mat4 m(rotation);
-		m.c[0][0] *= scaling.x; m.c[0][1] *= scaling.x; m.c[0][2] *= scaling.x; m.c[0][3] = 0;
-		m.c[1][0] *= scaling.y; m.c[1][1] *= scaling.y; m.c[1][2] *= scaling.y; m.c[1][3] = 0;
-		m.c[2][0] *= scaling.z; m.c[2][1] *= scaling.z; m.c[2][2] *= scaling.z; m.c[2][3] = 0;
-		m.c[3][0] = position.x; m.c[3][1] = position.y; m.c[3][2] = position.z; m.c[3][3] = 1;
+        m.c[0][0] *= scaling.x; m.c[1][0] *= scaling.y; m.c[2][0] *= scaling.z; m.c[3][0] = position.x;
+        m.c[0][1] *= scaling.x; m.c[1][1] *= scaling.y; m.c[2][1] *= scaling.z; m.c[3][1] = position.y;
+        m.c[0][2] *= scaling.x; m.c[1][2] *= scaling.y; m.c[2][2] *= scaling.z; m.c[3][2] = position.z;
+        m.c[0][3]  = 0;         m.c[1][3]  = 0;         m.c[2][3]  = 0;         m.c[3][3] = 1;
 		channels_trans[i] = m;
 	}
 
@@ -246,9 +246,9 @@ void ModelInstance::SetJointRotate(int idx, const sm::mat4& ori_mat, const sm::Q
 	auto& d = m_local_trans[idx];
 	d = ori_mat;
 	auto s = sm::mat4(rotation);
-	d.c[0][0] = s.c[0][0]; d.c[0][1] = s.c[0][1]; d.c[0][2] = s.c[0][2];
-	d.c[1][0] = s.c[1][0]; d.c[1][1] = s.c[1][1]; d.c[1][2] = s.c[1][2];
-	d.c[2][0] = s.c[2][0]; d.c[2][1] = s.c[2][1]; d.c[2][2] = s.c[2][2];
+    d.c[0][0] = s.c[0][0]; d.c[1][0] = s.c[1][0]; d.c[2][0] = s.c[2][0];
+    d.c[0][1] = s.c[0][1]; d.c[1][1] = s.c[1][1]; d.c[2][1] = s.c[2][1];
+    d.c[0][2] = s.c[0][2]; d.c[1][2] = s.c[1][2]; d.c[2][2] = s.c[2][2];
 	CalcGlobalTrans();
 }
 
@@ -256,9 +256,9 @@ void ModelInstance::SetJointRotate(int idx, const sm::Quaternion& rotation)
 {
 	auto& d = m_local_trans[idx];
 	auto s = sm::mat4(rotation);
-	d.c[0][0] = s.c[0][0]; d.c[0][1] = s.c[0][1]; d.c[0][2] = s.c[0][2];
-	d.c[1][0] = s.c[1][0]; d.c[1][1] = s.c[1][1]; d.c[1][2] = s.c[1][2];
-	d.c[2][0] = s.c[2][0]; d.c[2][1] = s.c[2][1]; d.c[2][2] = s.c[2][2];
+    d.c[0][0] = s.c[0][0]; d.c[1][0] = s.c[1][0]; d.c[2][0] = s.c[2][0];
+    d.c[0][1] = s.c[0][1]; d.c[1][1] = s.c[1][1]; d.c[2][1] = s.c[2][1];
+    d.c[0][2] = s.c[0][2]; d.c[1][2] = s.c[1][2]; d.c[2][2] = s.c[2][2];
 	CalcGlobalTrans();
 }
 
@@ -292,10 +292,10 @@ void ModelInstance::ResetToTPose()
 			nodes[i]->local_trans.Decompose(pos, rot, scale);
 
 			auto& d = m_local_trans[i];
-			d.c[0][0] = scale.x; d.c[0][1] = 0;       d.c[0][2] = 0;
-			d.c[1][0] = 0;       d.c[1][1] = scale.y; d.c[1][2] = 0;
-			d.c[2][0] = 0;       d.c[2][1] = 0;       d.c[2][2] = scale.z;
-			d.c[3][0] = pos.x;   d.c[3][1] = pos.y;   d.c[3][2] = pos.z;
+            d.c[0][0] = scale.x; d.c[1][0] = 0;       d.c[2][0] = 0;       d.c[3][0] = pos.x;
+            d.c[0][1] = 0;       d.c[1][1] = scale.y; d.c[2][1] = 0;       d.c[3][1] = pos.y;
+            d.c[0][2] = 0;       d.c[1][2] = 0;       d.c[2][2] = scale.z; d.c[3][2] = pos.z;
+            d.c[0][3] = 0;       d.c[1][3] = 0;       d.c[2][3] = 0;       d.c[3][3] = 1;
 		}
 		CalcGlobalTrans();
 	}
@@ -459,10 +459,10 @@ bool ModelInstance::UpdateSkeletalAnim()
 		}
 
 		sm::mat4 m(rotation);
-		m.c[0][0] *= scaling.x; m.c[0][1] *= scaling.x; m.c[0][2] *= scaling.x; m.c[0][3] = 0;
-		m.c[1][0] *= scaling.y; m.c[1][1] *= scaling.y; m.c[1][2] *= scaling.y; m.c[1][3] = 0;
-		m.c[2][0] *= scaling.z; m.c[2][1] *= scaling.z; m.c[2][2] *= scaling.z; m.c[2][3] = 0;
-		m.c[3][0] = position.x; m.c[3][1] = position.y; m.c[3][2] = position.z; m.c[3][3] = 1;
+        m.c[0][0] *= scaling.x; m.c[1][0] *= scaling.y; m.c[2][0] *= scaling.z; m.c[3][0] = position.x;
+        m.c[0][1] *= scaling.x; m.c[1][1] *= scaling.y; m.c[2][1] *= scaling.z; m.c[3][1] = position.y;
+        m.c[0][2] *= scaling.x; m.c[1][2] *= scaling.y; m.c[2][2] *= scaling.z; m.c[3][2] = position.z;
+        m.c[0][3] = 0;         m.c[1][3] = 0;         m.c[2][3] = 0;         m.c[3][3] = 1;
 		channels_trans[i] = m;
 	}
 
