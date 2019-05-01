@@ -23,6 +23,7 @@
     <ClCompile Include="..\..\..\source\MapBuilder.cpp" />
     <ClCompile Include="..\..\..\source\MaxLoader.cpp" />
     <ClCompile Include="..\..\..\source\MdlLoader.cpp" />
+    <ClCompile Include="..\..\..\source\MeshBuider.cpp" />
     <ClCompile Include="..\..\..\source\MeshGeometry.cpp" />
     <ClCompile Include="..\..\..\source\MeshIK.cpp" />
     <ClCompile Include="..\..\..\source\Model.cpp" />
@@ -42,6 +43,7 @@
     <ClInclude Include="..\..\..\include\model\AssimpExporter.h" />
     <ClInclude Include="..\..\..\include\model\BlendShapeLoader.h" />
     <ClInclude Include="..\..\..\include\model\FbxLoader.h" />
+    <ClInclude Include="..\..\..\include\model\MeshBuider.h" />
     <ClInclude Include="..\..\..\include\model\MeshIK.h" />
     <ClInclude Include="..\..\..\include\model\QuakeMapEntity.h" />
     <ClInclude Include="..\..\..\include\model\MapBuilder.h" />
