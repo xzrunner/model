@@ -1,7 +1,230 @@
 #include "model/ParametricEquations.h"
+#include "model/typedef.h"
 
 namespace model
 {
+
+// box
+
+const char* const Box::TYPE_NAME = "Box";
+
+//Box::Box(float width, float height, float depth)
+//    : m_width(width)
+//    , m_height(height)
+//    , m_depth(depth)
+//{
+//}
+
+int Box::GetVertexCount() const
+{
+    return 8;
+}
+
+int Box::GetTriangleIndexCount() const
+{
+    return 36;
+}
+
+void Box::GenerateVertices(int vertex_type, std::vector<float>& vertices) const
+{
+    if ((vertex_type & VERTEX_FLAG_NORMALS) && (vertex_type & VERTEX_FLAG_TEXCOORDS))
+    {
+        vertices = {
+            // back face
+            -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+             1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
+             1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 0.0f, // bottom-right
+             1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 1.0f, 1.0f, // top-right
+            -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+            -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, 0.0f, 1.0f, // top-left
+            // front face
+            -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+             1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 0.0f, // bottom-right
+             1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+             1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 1.0f, 1.0f, // top-right
+            -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 1.0f, // top-left
+            -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+            // left face
+            -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
+            -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-left
+            -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
+            -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-left
+            -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+            -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-right
+            // right face
+             1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+             1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+             1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 1.0f, // top-right
+             1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 1.0f, // bottom-right
+             1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 1.0f, 0.0f, // top-left
+             1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, 0.0f, 0.0f, // bottom-left
+            // bottom face
+            -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
+             1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 1.0f, // top-left
+             1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
+             1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 1.0f, 0.0f, // bottom-left
+            -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 0.0f, // bottom-right
+            -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, 0.0f, 1.0f, // top-right
+            // top face
+            -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+             1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+             1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 1.0f, // top-right
+             1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 1.0f, 0.0f, // bottom-right
+            -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 1.0f, // top-left
+            -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left
+        };
+    }
+    else if (vertex_type & VERTEX_FLAG_TEXCOORDS)
+    {
+        vertices = {
+            // back face
+            -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+             1.0f,  1.0f, -1.0f, 1.0f, 1.0f, // top-right
+             1.0f, -1.0f, -1.0f, 1.0f, 0.0f, // bottom-right
+             1.0f,  1.0f, -1.0f, 1.0f, 1.0f, // top-right
+            -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, // bottom-left
+            -1.0f,  1.0f, -1.0f, 0.0f, 1.0f, // top-left
+            // front face
+            -1.0f, -1.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+             1.0f, -1.0f,  1.0f, 1.0f, 0.0f, // bottom-right
+             1.0f,  1.0f,  1.0f, 1.0f, 1.0f, // top-right
+             1.0f,  1.0f,  1.0f, 1.0f, 1.0f, // top-right
+            -1.0f,  1.0f,  1.0f, 0.0f, 1.0f, // top-left
+            -1.0f, -1.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+            // left face
+            -1.0f,  1.0f,  1.0f, 1.0f, 0.0f, // top-right
+            -1.0f,  1.0f, -1.0f, 1.0f, 1.0f, // top-left
+            -1.0f, -1.0f, -1.0f, 0.0f, 1.0f, // bottom-left
+            -1.0f, -1.0f, -1.0f, 0.0f, 1.0f, // bottom-left
+            -1.0f, -1.0f,  1.0f, 0.0f, 0.0f, // bottom-right
+            -1.0f,  1.0f,  1.0f, 1.0f, 0.0f, // top-right
+            // right face
+             1.0f,  1.0f,  1.0f, 1.0f, 0.0f, // top-left
+             1.0f, -1.0f, -1.0f, 0.0f, 1.0f, // bottom-right
+             1.0f,  1.0f, -1.0f, 1.0f, 1.0f, // top-right
+             1.0f, -1.0f, -1.0f, 0.0f, 1.0f, // bottom-right
+             1.0f,  1.0f,  1.0f, 1.0f, 0.0f, // top-left
+             1.0f, -1.0f,  1.0f, 0.0f, 0.0f, // bottom-left
+            // bottom face
+            -1.0f, -1.0f, -1.0f, 0.0f, 1.0f, // top-right
+             1.0f, -1.0f, -1.0f, 1.0f, 1.0f, // top-left
+             1.0f, -1.0f,  1.0f, 1.0f, 0.0f, // bottom-left
+             1.0f, -1.0f,  1.0f, 1.0f, 0.0f, // bottom-left
+            -1.0f, -1.0f,  1.0f, 0.0f, 0.0f, // bottom-right
+            -1.0f, -1.0f, -1.0f, 0.0f, 1.0f, // top-right
+            // top face
+            -1.0f,  1.0f, -1.0f, 0.0f, 1.0f, // top-left
+             1.0f,  1.0f , 1.0f, 1.0f, 0.0f, // bottom-right
+             1.0f,  1.0f, -1.0f, 1.0f, 1.0f, // top-right
+             1.0f,  1.0f,  1.0f, 1.0f, 0.0f, // bottom-right
+            -1.0f,  1.0f, -1.0f, 0.0f, 1.0f, // top-left
+            -1.0f,  1.0f,  1.0f, 0.0f, 0.0f  // bottom-left
+        };
+    }
+    else if (vertex_type & VERTEX_FLAG_NORMALS)
+    {
+        vertices = {
+            // back face
+            -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, // bottom-left
+             1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, // top-right
+             1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, // bottom-right
+             1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, // top-right
+            -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, -1.0f, // bottom-left
+            -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, -1.0f, // top-left
+            // front face
+            -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, // bottom-left
+             1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, // bottom-right
+             1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, // top-right
+             1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, // top-right
+            -1.0f,  1.0f,  1.0f,  0.0f,  0.0f,  1.0f, // top-left
+            -1.0f, -1.0f,  1.0f,  0.0f,  0.0f,  1.0f, // bottom-left
+            // left face
+            -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, // top-right
+            -1.0f,  1.0f, -1.0f, -1.0f,  0.0f,  0.0f, // top-left
+            -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, // bottom-left
+            -1.0f, -1.0f, -1.0f, -1.0f,  0.0f,  0.0f, // bottom-left
+            -1.0f, -1.0f,  1.0f, -1.0f,  0.0f,  0.0f, // bottom-right
+            -1.0f,  1.0f,  1.0f, -1.0f,  0.0f,  0.0f, // top-right
+            // right face
+             1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, // top-left
+             1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, // bottom-right
+             1.0f,  1.0f, -1.0f,  1.0f,  0.0f,  0.0f, // top-right
+             1.0f, -1.0f, -1.0f,  1.0f,  0.0f,  0.0f, // bottom-right
+             1.0f,  1.0f,  1.0f,  1.0f,  0.0f,  0.0f, // top-left
+             1.0f, -1.0f,  1.0f,  1.0f,  0.0f,  0.0f, // bottom-left
+            // bottom face
+            -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, // top-right
+             1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, // top-left
+             1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, // bottom-left
+             1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, // bottom-left
+            -1.0f, -1.0f,  1.0f,  0.0f, -1.0f,  0.0f, // bottom-right
+            -1.0f, -1.0f, -1.0f,  0.0f, -1.0f,  0.0f, // top-right
+            // top face
+            -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, // top-left
+             1.0f,  1.0f , 1.0f,  0.0f,  1.0f,  0.0f, // bottom-right
+             1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, // top-right
+             1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, // bottom-right
+            -1.0f,  1.0f, -1.0f,  0.0f,  1.0f,  0.0f, // top-left
+            -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f  // bottom-left
+        };
+    }
+    else
+    {
+        vertices = {
+            // back face
+            -1.0f, -1.0f, -1.0f, // bottom-left
+             1.0f,  1.0f, -1.0f, // top-right
+             1.0f, -1.0f, -1.0f, // bottom-right
+             1.0f,  1.0f, -1.0f, // top-right
+            -1.0f, -1.0f, -1.0f, // bottom-left
+            -1.0f,  1.0f, -1.0f, // top-left
+            // front face
+            -1.0f, -1.0f,  1.0f, // bottom-left
+             1.0f, -1.0f,  1.0f, // bottom-right
+             1.0f,  1.0f,  1.0f, // top-right
+             1.0f,  1.0f,  1.0f, // top-right
+            -1.0f,  1.0f,  1.0f, // top-left
+            -1.0f, -1.0f,  1.0f, // bottom-left
+            // left face
+            -1.0f,  1.0f,  1.0f, // top-right
+            -1.0f,  1.0f, -1.0f, // top-left
+            -1.0f, -1.0f, -1.0f, // bottom-left
+            -1.0f, -1.0f, -1.0f, // bottom-left
+            -1.0f, -1.0f,  1.0f, // bottom-right
+            -1.0f,  1.0f,  1.0f, // top-right
+            // right face
+             1.0f,  1.0f,  1.0f, // top-left
+             1.0f, -1.0f, -1.0f, // bottom-right
+             1.0f,  1.0f, -1.0f, // top-right
+             1.0f, -1.0f, -1.0f, // bottom-right
+             1.0f,  1.0f,  1.0f, // top-left
+             1.0f, -1.0f,  1.0f, // bottom-left
+            // bottom face
+            -1.0f, -1.0f, -1.0f, // top-right
+             1.0f, -1.0f, -1.0f, // top-left
+             1.0f, -1.0f,  1.0f, // bottom-left
+             1.0f, -1.0f,  1.0f, // bottom-left
+            -1.0f, -1.0f,  1.0f, // bottom-right
+            -1.0f, -1.0f, -1.0f, // top-right
+            // top face
+            -1.0f,  1.0f, -1.0f, // top-left
+             1.0f,  1.0f , 1.0f, // bottom-right
+             1.0f,  1.0f, -1.0f, // top-right
+             1.0f,  1.0f,  1.0f, // bottom-right
+            -1.0f,  1.0f, -1.0f, // top-left
+            -1.0f,  1.0f,  1.0f  // bottom-left
+        };
+    }
+}
+
+void Box::GenerateTriangleIndices(std::vector<unsigned short>& indices) const
+{
+    const int n = GetTriangleIndexCount();
+    indices.resize(n);
+    for (int i = 0; i < n; ++i) {
+        indices[i] = i;
+    }
+}
 
 // cone
 

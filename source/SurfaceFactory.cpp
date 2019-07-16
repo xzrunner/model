@@ -7,7 +7,9 @@ namespace model
 Surface* SurfaceFactory::Create(const std::string& name)
 {
 	Surface* surface = nullptr;
-	if (name == Cone::TYPE_NAME) {
+    if (name == Box::TYPE_NAME) {
+        surface = new Box();
+    } else if (name == Cone::TYPE_NAME) {
 		surface = new Cone(2, 1);
 	}  else if (name == Sphere::TYPE_NAME) {
 		surface = new Sphere(1);

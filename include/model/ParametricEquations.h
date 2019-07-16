@@ -8,6 +8,32 @@
 namespace model
 {
 
+class Box : public ParametricSurface
+{
+public:
+    Box() {}
+//    Box(float width, float height, float depth);
+
+    virtual int  GetVertexCount() const override;
+    virtual int  GetTriangleIndexCount() const override;
+
+    virtual void GenerateVertices(int vertex_type, std::vector<float>& vertices) const override;
+    virtual void GenerateTriangleIndices(std::vector<unsigned short>& indices) const override;
+
+    static const char* const TYPE_NAME;
+
+private:
+    virtual const char* Type() const override { return TYPE_NAME; }
+
+    virtual sm::vec3 Evaluate(const sm::vec2& domain) const override { return sm::vec3(); }
+
+//private:
+//    float m_width;
+//    float m_height;
+//    float m_depth;
+
+}; // Box
+
 class Cone : public ParametricSurface
 {
 public:
