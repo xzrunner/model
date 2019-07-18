@@ -1,11 +1,11 @@
 #pragma once
 
-#include <quake/MapModel.h>
-
 #include <SM_Vector.h>
 
 #include <string>
 #include <vector>
+
+namespace quake { struct MapEntity; }
 
 namespace model
 {
@@ -29,7 +29,7 @@ private:
 	static void LoadTextures(const quake::MapEntity& world,
 		const std::string& dir);
 
-	static bool LoadEntity(Model& dst, const quake::MapEntityPtr& src);
+	static bool LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>& src);
 
 }; // MapBuilder
 

@@ -6,6 +6,7 @@
 
 #include <unirender/Blackboard.h>
 #include <unirender/RenderContext.h>
+#include <polymesh3/Brush.h>
 #include <quake/MapParser.h>
 #include <quake/WadFileLoader.h>
 #include <quake/Palette.h>
@@ -77,7 +78,7 @@ void CreateBorderMeshRenderBuf(model::Model::Mesh& mesh,
 	mesh.geometry.vertex_type |= model::VERTEX_FLAG_TEXCOORDS;
 }
 
-Vertex CreateVertex(const quake::BrushFacePtr& face, const sm::vec3& pos,
+Vertex CreateVertex(const pm3::BrushFacePtr& face, const sm::vec3& pos,
 	                int tex_w, int tex_h, sm::cube& aabb)
 {
 	Vertex v;
@@ -175,7 +176,7 @@ std::shared_ptr<Model> MapBuilder::Create(const std::vector<sm::vec3>& polygon)
 	brush_desc.meshes.push_back({ 0, 0, 0, face_num });
 	map_entity->SetBrushDescs({ brush_desc });
 
-	std::vector<std::shared_ptr<quake::BrushFace>> faces;
+	std::vector<std::shared_ptr<pm3::BrushFace>> faces;
 	faces.reserve(face_num);
 	// top
 	{
@@ -186,13 +187,13 @@ std::shared_ptr<Model> MapBuilder::Create(const std::vector<sm::vec3>& polygon)
 		for (int i = 0; i < 3; ++i) {
 			tri[i].y += dy;
 		}
-		auto face = std::make_shared<quake::BrushFace>();
+		auto face = std::make_shared<pm3::BrushFace>();
 		face->plane = sm::Plane(tri[0], tri[1], tri[2]);
 		faces.push_back(face);
 	}
 	// bottom
 	{
-		auto face = std::make_shared<quake::BrushFace>();
+		auto face = std::make_shared<pm3::BrushFace>();
 		face->plane = sm::Plane(scaled_poly[2], scaled_poly[1], scaled_poly[0]);
 		faces.push_back(face);
 	}
@@ -201,12 +202,12 @@ std::shared_ptr<Model> MapBuilder::Create(const std::vector<sm::vec3>& polygon)
 	{
 		auto& v0 = scaled_poly[i];
 		auto& v1 = scaled_poly[(i + 1) % scaled_poly.size()];
-		auto face = std::make_shared<quake::BrushFace>();
+		auto face = std::make_shared<pm3::BrushFace>();
 		face->plane = sm::Plane(v0, v1, { v1.x, v1.y + dy, v1.z });
 		faces.push_back(face);
 	}
 
-	quake::MapBrush brush(faces);
+	pm3::Brush brush(faces);
 	brush.BuildVertices();
 	brush.BuildGeometry();
 
@@ -412,7 +413,7 @@ void MapBuilder::LoadTextures(const quake::MapEntity& world, const std::string& 
 	}
 }
 
-bool MapBuilder::LoadEntity(Model& dst, const quake::MapEntityPtr& src)
+bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>& src)
 {
 	if (src->brushes.empty()) {
 		return false;
@@ -443,7 +444,7 @@ bool MapBuilder::LoadEntity(Model& dst, const quake::MapEntityPtr& src)
 		// sort by texture
 		auto faces = b.faces;
 		std::sort(faces.begin(), faces.end(),
-			[](const quake::BrushFacePtr& lhs, const quake::BrushFacePtr& rhs) {
+			[](const pm3::BrushFacePtr& lhs, const pm3::BrushFacePtr& rhs) {
 			return lhs->tex_name < rhs->tex_name;
 		});
 
