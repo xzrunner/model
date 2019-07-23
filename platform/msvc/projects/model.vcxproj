@@ -15,6 +15,8 @@
     <ClCompile Include="..\..\..\source\AssimpExporter.cpp" />
     <ClCompile Include="..\..\..\source\AssimpHelper.cpp" />
     <ClCompile Include="..\..\..\source\BlendShapeLoader.cpp" />
+    <ClCompile Include="..\..\..\source\BrushBuilder.cpp" />
+    <ClCompile Include="..\..\..\source\BrushModel.cpp" />
     <ClCompile Include="..\..\..\source\BspLoader.cpp" />
     <ClCompile Include="..\..\..\source\BspModel.cpp" />
     <ClCompile Include="..\..\..\source\FbxLoader.cpp" />
@@ -42,6 +44,8 @@
     <ClInclude Include="..\..\..\include\model\AnimIK.h" />
     <ClInclude Include="..\..\..\include\model\AssimpExporter.h" />
     <ClInclude Include="..\..\..\include\model\BlendShapeLoader.h" />
+    <ClInclude Include="..\..\..\include\model\BrushBuilder.h" />
+    <ClInclude Include="..\..\..\include\model\BrushModel.h" />
     <ClInclude Include="..\..\..\include\model\FbxLoader.h" />
     <ClInclude Include="..\..\..\include\model\MeshBuider.h" />
     <ClInclude Include="..\..\..\include\model\MeshIK.h" />

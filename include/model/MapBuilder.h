@@ -21,10 +21,6 @@ public:
 
 	static bool Load(Model& model, const std::string& filepath);
 
-	static void UpdateVBO(Model& model, int brush_idx);
-
-	static const float VERTEX_SCALE;
-
 private:
 	static void LoadTextures(const quake::MapEntity& world,
 		const std::string& dir);

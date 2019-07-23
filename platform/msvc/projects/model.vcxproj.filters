@@ -28,6 +28,18 @@
     <Filter Include="process">
       <UniqueIdentifier>{55b7b69e-3e2f-406e-8882-b8c410c23edf}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dataset\extend\anim">
+      <UniqueIdentifier>{c9c3782a-e55b-4527-8b27-811837ab913b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dataset\extend\quake">
+      <UniqueIdentifier>{1c5bab1a-b6a9-4908-b617-8b03bc8e73d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dataset\extend\geo">
+      <UniqueIdentifier>{29a451c0-ce72-4180-acf6-2098e5c922b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="loader\geo">
+      <UniqueIdentifier>{36b837f3-76ef-4c32-bfad-a93df21c9e2d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\ParametricEquations.cpp">
@@ -54,12 +66,6 @@
     <ClCompile Include="..\..\..\source\M3dLoader.cpp">
       <Filter>loader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\SkeletalAnim.cpp">
-      <Filter>dataset\extend</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\source\MorphTargetAnim.cpp">
-      <Filter>dataset\extend</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\GlobalClock.cpp">
       <Filter>utility</Filter>
     </ClCompile>
@@ -84,9 +90,6 @@
     <ClCompile Include="..\..\..\source\TextureLoader.cpp">
       <Filter>loader</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\source\BspModel.cpp">
-      <Filter>loader\quake</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\source\AssimpExporter.cpp">
       <Filter>exportor</Filter>
     </ClCompile>
@@ -107,6 +110,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\source\MeshBuider.cpp">
       <Filter>dataset</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\MorphTargetAnim.cpp">
+      <Filter>dataset\extend\anim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\SkeletalAnim.cpp">
+      <Filter>dataset\extend\anim</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\BspModel.cpp">
+      <Filter>dataset\extend\quake</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\BrushBuilder.cpp">
+      <Filter>loader\geo</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\source\BrushModel.cpp">
+      <Filter>dataset\extend\geo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -139,12 +157,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\NormalMap.h">
       <Filter>utility</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\model\SkeletalAnim.h">
-      <Filter>dataset\extend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\model\MorphTargetAnim.h">
-      <Filter>dataset\extend</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\GlobalClock.h">
       <Filter>utility</Filter>
@@ -179,16 +191,10 @@
     <ClInclude Include="..\..\..\include\model\TextureLoader.h">
       <Filter>loader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\include\model\BspModel.h">
-      <Filter>loader\quake</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\include\model\ModelExtend.h">
       <Filter>dataset\extend</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\ModelExtendType.h">
-      <Filter>dataset\extend</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\include\model\QuakeMapEntity.h">
       <Filter>dataset\extend</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\AssimpExporter.h">
@@ -211,6 +217,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\MeshBuider.h">
       <Filter>dataset</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\MorphTargetAnim.h">
+      <Filter>dataset\extend\anim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\SkeletalAnim.h">
+      <Filter>dataset\extend\anim</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\BspModel.h">
+      <Filter>dataset\extend\quake</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\QuakeMapEntity.h">
+      <Filter>dataset\extend\quake</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\BrushModel.h">
+      <Filter>dataset\extend\geo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\BrushBuilder.h">
+      <Filter>loader\geo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
