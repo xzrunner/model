@@ -113,14 +113,15 @@ BrushBuilder::PolymeshFromBrush(const BrushModel& brush)
     {
 	    for (auto& f : b.impl.faces)
 	    {
+            auto& norm = f->plane.normal;
 		    for (size_t i = 1; i < f->vertices.size() - 1; ++i)
 		    {
-			    vertices.push_back(CreateVertex(f->vertices[0]->pos, aabb));
-			    vertices.push_back(CreateVertex(f->vertices[i]->pos, aabb));
-			    vertices.push_back(CreateVertex(f->vertices[i + 1]->pos, aabb));
+			    vertices.push_back(CreateVertex(f->vertices[0]->pos, norm, aabb));
+			    vertices.push_back(CreateVertex(f->vertices[i]->pos, norm, aabb));
+			    vertices.push_back(CreateVertex(f->vertices[i + 1]->pos, norm, aabb));
 		    }
 		    for (auto& vert : f->vertices) {
-			    border_vertices.push_back(CreateVertex(vert->pos, aabb));
+			    border_vertices.push_back(CreateVertex(vert->pos, norm, aabb));
 		    }
 		    for (int i = 0, n = f->vertices.size() - 1; i < n; ++i) {
 			    border_indices.push_back(start_idx + i);
@@ -204,8 +205,9 @@ void BrushBuilder::CreateMeshRenderBuf(model::Model::Mesh& mesh,
     vi.in = 0;
     vi.indices = nullptr;
 
-    vi.va_list.push_back(ur::VertexAttrib("pos", 3, 4, 20, 0));	// pos
-    vi.va_list.push_back(ur::VertexAttrib("texcoord", 2, 4, 20, 12));	// texcoord
+	vi.va_list.push_back(ur::VertexAttrib("pos",          3, 4, 32, 0));   // pos
+	vi.va_list.push_back(ur::VertexAttrib("normal",       3, 4, 32, 12));  // normal
+	vi.va_list.push_back(ur::VertexAttrib("texcoord",     2, 4, 32, 24));  // texcoord
 
     ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
         vi, mesh.geometry.vao, mesh.geometry.vbo, mesh.geometry.ebo);
@@ -230,8 +232,9 @@ void BrushBuilder::CreateBorderMeshRenderBuf(model::Model::Mesh& mesh,
     vi.in = indices.size();
     vi.indices = &indices[0];
 
-    vi.va_list.push_back(ur::VertexAttrib("pos", 3, 4, 20, 0));	// pos
-    vi.va_list.push_back(ur::VertexAttrib("texcoord", 2, 4, 20, 12));	// texcoord
+	vi.va_list.push_back(ur::VertexAttrib("pos",          3, 4, 32, 0));   // pos
+	vi.va_list.push_back(ur::VertexAttrib("normal",       3, 4, 32, 12));  // normal
+	vi.va_list.push_back(ur::VertexAttrib("texcoord",     2, 4, 32, 24));  // texcoord
 
     ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
         vi, mesh.geometry.vao, mesh.geometry.vbo, mesh.geometry.ebo);
@@ -249,6 +252,8 @@ BrushBuilder::CreateVertex(const pm3::BrushFacePtr& face, const sm::vec3& pos, i
     v.pos = pos * model::BrushBuilder::VERTEX_SCALE;
     aabb.Combine(v.pos);
 
+    v.normal = face->plane.normal;
+
     if (tex_w == 0 || tex_h == 0) {
         v.texcoord.Set(0, 0);
     } else {
@@ -260,12 +265,14 @@ BrushBuilder::CreateVertex(const pm3::BrushFacePtr& face, const sm::vec3& pos, i
 }
 
 BrushBuilder::Vertex
-BrushBuilder::CreateVertex(const sm::vec3& pos, sm::cube& aabb)
+BrushBuilder::CreateVertex(const sm::vec3& pos, const sm::vec3& normal, sm::cube& aabb)
 {
     Vertex v;
 
     v.pos = pos * model::BrushBuilder::VERTEX_SCALE;
     aabb.Combine(v.pos);
+
+    v.normal = normal.Normalized();
 
     v.texcoord.Set(0, 0);
 

@@ -35,6 +35,7 @@ public:
     struct Vertex
     {
         sm::vec3 pos;
+        sm::vec3 normal;
         sm::vec2 texcoord;
     };
 
@@ -44,7 +45,7 @@ public:
         const std::vector<Vertex>& vertices, const std::vector<unsigned short>& indices);
 
     static Vertex CreateVertex(const pm3::BrushFacePtr& face, const sm::vec3& pos, int tex_w, int tex_h, sm::cube& aabb);
-    static Vertex CreateVertex(const sm::vec3& pos, sm::cube& aabb);
+    static Vertex CreateVertex(const sm::vec3& pos, const sm::vec3& normal, sm::cube& aabb);
 
     static void FlushVertices(std::unique_ptr<model::Model::Mesh>& mesh,
         std::unique_ptr<model::Model::Mesh>& border_mesh,
