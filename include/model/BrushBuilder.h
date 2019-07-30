@@ -4,7 +4,7 @@
 #include "model/BrushModel.h"
 
 #include <SM_Vector.h>
-#include <polymesh3/Brush.h>
+#include <polymesh3/typedef.h>
 
 #include <memory>
 #include <vector>

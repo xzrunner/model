@@ -42,7 +42,7 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 	int face_num = scaled_poly.size() + 2;
     brush.desc.meshes.push_back({ 0, 0, 0, face_num });
 
-    auto& faces = brush.impl.faces;
+    auto& faces = brush.impl->faces;
 	faces.reserve(face_num);
 	// top
 	{
@@ -73,8 +73,8 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 		faces.push_back(face);
 	}
 
-    brush.impl.BuildVertices();
-    brush.impl.BuildGeometry();
+    brush.impl->BuildVertices();
+    brush.impl->BuildGeometry();
 
     auto model_model = std::make_unique<BrushModel>();
     std::vector<BrushModel::BrushData> brushes;
@@ -111,7 +111,7 @@ BrushBuilder::PolymeshFromBrush(const BrushModel& brush)
 	int start_idx = 0;
     for (auto& b : brush.GetBrushes())
     {
-	    for (auto& f : b.impl.faces)
+	    for (auto& f : b.impl->faces)
 	    {
             auto& norm = f->plane.normal;
 		    for (size_t i = 1; i < f->vertices.size() - 1; ++i)

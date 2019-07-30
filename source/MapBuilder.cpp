@@ -3,6 +3,7 @@
 #include "model/BrushBuilder.h"
 #include "model/BrushModel.h"
 
+#include <polymesh3/Brush.h>
 #include <quake/MapParser.h>
 #include <quake/WadFileLoader.h>
 #include <quake/Palette.h>
@@ -70,8 +71,8 @@ void MapBuilder::Load(std::vector<std::shared_ptr<Model>>& models, const std::st
 	parser.Parse();
 	for (auto& e : parser.GetAllEntities()) {
 		for (auto& b : e->brushes) {
-			b.BuildVertices();
-			b.BuildGeometry();
+			b->BuildVertices();
+			b->BuildGeometry();
 		}
 	}
 
@@ -111,8 +112,8 @@ bool MapBuilder::Load(Model& model, const std::string& filepath)
 
 	for (auto& e : entities) {
 		for (auto& b : e->brushes) {
-			b.BuildVertices();
-			b.BuildGeometry();
+			b->BuildVertices();
+			b->BuildGeometry();
 		}
 	}
 
@@ -175,7 +176,7 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 
 		brush_desc.mesh_begin = dst.meshes.size();
 
-		if (b.faces.empty()) {
+		if (b->faces.empty()) {
 			brush_desc.mesh_end = dst.meshes.size();
 			brush_descs.push_back(brush_desc);
 			continue;
@@ -185,7 +186,7 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 		mesh_desc.face_begin = 0;
 
 		// sort by texture
-		auto faces = b.faces;
+		auto faces = b->faces;
 		std::sort(faces.begin(), faces.end(),
 			[](const pm3::BrushFacePtr& lhs, const pm3::BrushFacePtr& rhs) {
 			return lhs->tex_name < rhs->tex_name;
