@@ -2,10 +2,12 @@
 
 #include "model/ModelExtend.h"
 
-#include <polymesh3/Brush.h>
+#include <polymesh3/BrushExt.h>
 
 #include <vector>
 #include <memory>
+
+namespace pm3 { struct Brush; }
 
 namespace model
 {
@@ -31,10 +33,16 @@ public:
         std::vector<MeshDesc> meshes;
     };
 
-    struct BrushData
+    struct BrushSingle
     {
-        BrushDesc  desc;
-        pm3::Brush impl;
+        BrushDesc                   desc;
+        std::shared_ptr<pm3::Brush> impl = nullptr;
+    };
+
+    struct BrushGroup
+    {
+        std::string    name;
+        pm3::BrushPart part;
     };
 
 public:
@@ -42,11 +50,16 @@ public:
 
     virtual ModelExtendType Type() const override { return EXT_BRUSH; }
 
-    void  SetBrushes(const std::vector<BrushData>& brushes) { m_brushes = brushes; }
+    void  SetBrushes(const std::vector<BrushSingle>& brushes) { m_brushes = brushes; }
     auto& GetBrushes() const { return m_brushes; }
 
+    void  SetBrushGroups(const std::vector<std::shared_ptr<BrushGroup>>& groups) { m_brush_groups = groups; }
+    auto& GetBrushGroups() const { return m_brush_groups; }
+
 private:
-    std::vector<BrushData> m_brushes;
+    std::vector<BrushSingle> m_brushes;
+
+    std::vector<std::shared_ptr<BrushGroup>> m_brush_groups;
 
 }; // BrushModel
 
