@@ -116,12 +116,12 @@ BrushBuilder::PolymeshFromBrush(const BrushModel& brush)
             auto& norm = f->plane.normal;
 		    for (size_t i = 1; i < f->vertices.size() - 1; ++i)
 		    {
-			    vertices.push_back(CreateVertex(f->vertices[0]->pos, norm, aabb));
-			    vertices.push_back(CreateVertex(f->vertices[i]->pos, norm, aabb));
-			    vertices.push_back(CreateVertex(f->vertices[i + 1]->pos, norm, aabb));
+			    vertices.push_back(CreateVertex(b.impl->vertices[f->vertices[0]], norm, aabb));
+			    vertices.push_back(CreateVertex(b.impl->vertices[f->vertices[i]], norm, aabb));
+			    vertices.push_back(CreateVertex(b.impl->vertices[f->vertices[i + 1]], norm, aabb));
 		    }
 		    for (auto& vert : f->vertices) {
-			    border_vertices.push_back(CreateVertex(vert->pos, norm, aabb));
+			    border_vertices.push_back(CreateVertex(b.impl->vertices[vert], norm, aabb));
 		    }
 		    for (int i = 0, n = f->vertices.size() - 1; i < n; ++i) {
 			    border_indices.push_back(start_idx + i);
@@ -172,12 +172,12 @@ void BrushBuilder::UpdateVBO(Model& model, const pm3::Brush& brush,
 				assert(f->vertices.size() > 2);
 				for (size_t i = 1; i < f->vertices.size() - 1; ++i)
 				{
-					vertices.push_back(CreateVertex(f, f->vertices[0]->pos, tex_w, tex_h, aabb));
-					vertices.push_back(CreateVertex(f, f->vertices[i]->pos, tex_w, tex_h, aabb));
-					vertices.push_back(CreateVertex(f, f->vertices[i + 1]->pos, tex_w, tex_h, aabb));
+					vertices.push_back(CreateVertex(f, brush.vertices[f->vertices[0]], tex_w, tex_h, aabb));
+					vertices.push_back(CreateVertex(f, brush.vertices[f->vertices[i]], tex_w, tex_h, aabb));
+					vertices.push_back(CreateVertex(f, brush.vertices[f->vertices[i + 1]], tex_w, tex_h, aabb));
 				}
 				for (auto& vert : f->vertices) {
-					border_vertices.push_back(CreateVertex(f, vert->pos, tex_w, tex_h, aabb));
+					border_vertices.push_back(CreateVertex(f, brush.vertices[vert], tex_w, tex_h, aabb));
 				}
 			}
 		}

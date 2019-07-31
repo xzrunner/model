@@ -240,20 +240,20 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 			for (size_t i = 1; i < f->vertices.size() - 1; ++i)
 			{
 				vertices.push_back(BrushBuilder::CreateVertex(
-                    f, f->vertices[0]->pos, tex_w, tex_h, aabb
+                    f, b->vertices[f->vertices[0]], tex_w, tex_h, aabb
                 ));
 				vertices.push_back(BrushBuilder::CreateVertex(
-                    f, f->vertices[i]->pos, tex_w, tex_h, aabb
+                    f, b->vertices[f->vertices[i]], tex_w, tex_h, aabb
                 ));
 				vertices.push_back(BrushBuilder::CreateVertex(
-                    f, f->vertices[i + 1]->pos, tex_w, tex_h, aabb
+                    f, b->vertices[f->vertices[i + 1]], tex_w, tex_h, aabb
                 ));
 			}
 
 			int start_idx = border_vertices.size();
 			for (auto& v : f->vertices) {
 				border_vertices.push_back(BrushBuilder::CreateVertex(
-                    f, v->pos, tex_w, tex_h, aabb
+                    f, b->vertices[v], tex_w, tex_h, aabb
                 ));
 			}
 			for (int i = 0, n = f->vertices.size() - 1; i < n; ++i) {

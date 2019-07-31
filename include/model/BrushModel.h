@@ -2,7 +2,7 @@
 
 #include "model/ModelExtend.h"
 
-#include <polymesh3/BrushExt.h>
+#include <polymesh3/typedef.h>
 
 #include <vector>
 #include <memory>
@@ -39,11 +39,28 @@ public:
         std::shared_ptr<pm3::Brush> impl = nullptr;
     };
 
+    typedef size_t                    BrushVertex;
+    typedef std::pair<size_t, size_t> BrushEdge;
+
+    typedef std::shared_ptr<BrushVertex> BrushVertexPtr;
+    typedef std::shared_ptr<BrushEdge>   BrushEdgePtr;
+
+    struct BrushPart
+    {
+        std::shared_ptr<pm3::Brush> parent = nullptr;
+
+        std::vector<BrushVertex>       vertices;
+        std::vector<BrushEdge>         edges;
+        std::vector<pm3::BrushFacePtr> faces;
+
+    }; // BrushPart
+
     struct BrushGroup
     {
-        std::string    name;
-        pm3::BrushPart part;
-    };
+        std::string name;
+        BrushPart   part;
+
+    }; // BrushGroup
 
 public:
     BrushModel() {}
