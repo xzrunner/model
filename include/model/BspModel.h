@@ -184,6 +184,9 @@ struct BspModel : public ModelExtend
 
 	virtual ModelExtendType Type() const override { return EXT_QUAKE_BSP; }
 
+    // todo
+    virtual std::unique_ptr<ModelExtend> Clone() const override { return nullptr; }
+
 	void CreateSurfaceLightmap();
 	void BuildSurfaceDisplayList();
 

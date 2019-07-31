@@ -3,6 +3,25 @@
 namespace model
 {
 
+std::unique_ptr<model::ModelExtend> SkeletalAnim::Clone() const
+{
+    auto ret = std::make_unique<SkeletalAnim>();
+
+    ret->m_nodes.reserve(m_nodes.size());
+    for (auto& n : m_nodes) {
+        ret->m_nodes.push_back(std::make_unique<Node>(*n));
+    }
+
+    ret->m_tpose_world_trans = m_tpose_world_trans;
+
+    ret->m_anims.reserve(m_anims.size());
+    for (auto& anim : m_anims) {
+        ret->m_anims.push_back(std::make_unique<SkeletalAnim::ModelExtend>(*anim));
+    }
+
+    return ret;
+}
+
 void SkeletalAnim::SetAnims(std::vector<std::unique_ptr<ModelExtend>>& anims)
 {
 	m_anims = std::move(anims);

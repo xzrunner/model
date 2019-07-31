@@ -12,6 +12,8 @@ public:
 
 	virtual ModelExtendType Type() const override { return EXT_MORPH_TARGET; }
 
+    virtual std::unique_ptr<ModelExtend> Clone() const override;
+
 	int GetFps() const { return m_fps; }
 
 	int GetNumFrames() const { return m_num_frames; }

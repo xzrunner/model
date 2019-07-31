@@ -16,7 +16,7 @@ namespace model
 class SkeletalAnim : public ModelExtend
 {
 public:
-	struct Node : boost::noncopyable
+	struct Node
 	{
 		std::string name;
 
@@ -51,6 +51,16 @@ public:
 
 		std::vector<std::unique_ptr<NodeAnim>> channels;
 
+        ModelExtend() {}
+        ModelExtend(const SkeletalAnim::ModelExtend& m)
+            : name(m.name), duration(m.duration), ticks_per_second(m.ticks_per_second)
+        {
+            channels.reserve(m.channels.size());
+            for (auto& c : m.channels) {
+                channels.push_back(std::move(std::make_unique<NodeAnim>()));
+            }
+        }
+
 		int GetMaxFrameCount() const {
 			return static_cast<int>(roundf(duration * ticks_per_second)) + 1;
 		}
@@ -59,6 +69,8 @@ public:
 
 public:
 	virtual ModelExtendType Type() const override { return EXT_SKELETAL; }
+
+    virtual std::unique_ptr<model::ModelExtend> Clone() const override;
 
 	void  SetAnims(std::vector<std::unique_ptr<ModelExtend>>& anims);
 	auto& GetAnims() const { return m_anims; }
@@ -77,7 +89,7 @@ private:
 	std::vector<std::unique_ptr<Node>> m_nodes;
 
 	std::vector<sm::mat4> m_tpose_world_trans;
-	
+
 	std::vector<std::unique_ptr<ModelExtend>> m_anims;
 
 }; // SkeletalAnim

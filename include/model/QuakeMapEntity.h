@@ -12,6 +12,8 @@ class QuakeMapEntity : public ModelExtend
 public:
 	virtual ModelExtendType Type() const override { return EXT_QUAKE_MAP; }
 
+    virtual std::unique_ptr<ModelExtend> Clone() const override;
+
 	void SetMapEntity(const std::shared_ptr<quake::MapEntity>& entity) { m_map_entity = entity; }
 	const std::shared_ptr<quake::MapEntity>& GetMapEntity() const { return m_map_entity; }
 

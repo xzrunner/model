@@ -126,6 +126,9 @@
     <ClCompile Include="..\..\..\source\BrushModel.cpp">
       <Filter>dataset\extend\geo</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\QuakeMapEntity.cpp">
+      <Filter>dataset\extend\quake</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\model\ParametricEquations.h">

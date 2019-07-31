@@ -50,6 +50,8 @@ public:
 
     virtual ModelExtendType Type() const override { return EXT_BRUSH; }
 
+    virtual std::unique_ptr<ModelExtend> Clone() const override;
+
     void  SetBrushes(const std::vector<BrushSingle>& brushes) { m_brushes = brushes; }
     auto& GetBrushes() const { return m_brushes; }
 

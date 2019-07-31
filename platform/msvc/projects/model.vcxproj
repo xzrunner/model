@@ -34,6 +34,7 @@
     <ClCompile Include="..\..\..\source\ObjLoader.cpp" />
     <ClCompile Include="..\..\..\source\ParametricEquations.cpp" />
     <ClCompile Include="..\..\..\source\ParametricSurface.cpp" />
+    <ClCompile Include="..\..\..\source\QuakeMapEntity.cpp" />
     <ClCompile Include="..\..\..\source\SkeletalAnim.cpp" />
     <ClCompile Include="..\..\..\source\SkinnedData.cpp" />
     <ClCompile Include="..\..\..\source\SurfaceFactory.cpp" />
