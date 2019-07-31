@@ -48,6 +48,10 @@ ModelInstance::ModelInstance(const std::shared_ptr<Model>& m_model, int anim_idx
 	}
 }
 
+ModelInstance::~ModelInstance()
+{
+}
+
 bool ModelInstance::Update()
 {
 	if (!m_model->ext) {
@@ -299,6 +303,11 @@ void ModelInstance::ResetToTPose()
 		}
 		CalcGlobalTrans();
 	}
+}
+
+void ModelInstance::SetModelExt(std::unique_ptr<ModelExtend>& ext)
+{
+    m_ext = std::move(ext);
 }
 
 bool ModelInstance::UpdateMorphTargetAnim()

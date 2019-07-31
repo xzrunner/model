@@ -8,15 +8,16 @@
 #include <memory>
 #include <tuple>
 
-namespace model
-{
+namespace model{
 
 struct Model;
+class ModelExtend;
 
 class ModelInstance : boost::noncopyable
 {
 public:
 	ModelInstance(const std::shared_ptr<Model>& model, int anim_idx = 0);
+    ~ModelInstance();
 
 	bool Update();
 	bool SetFrame(int frame);
@@ -43,6 +44,9 @@ public:
 
 	void ResetToTPose();
 
+    void SetModelExt(std::unique_ptr<ModelExtend>& ext);
+    auto& GetModelExt() const { return m_ext; }
+
 private:
 	bool UpdateMorphTargetAnim();
 	bool UpdateSkeletalAnim();
@@ -65,6 +69,8 @@ private:
 	std::vector<std::tuple<unsigned int, unsigned int, unsigned int> > m_last_pos;
 
 	mutable std::vector<sm::mat4> m_bone_trans;
+
+    std::unique_ptr<ModelExtend> m_ext = nullptr;
 
 }; // ModelInstance
 
