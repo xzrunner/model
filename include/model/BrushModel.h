@@ -39,29 +39,6 @@ public:
         std::shared_ptr<pm3::Brush> impl = nullptr;
     };
 
-    typedef size_t                    BrushVertex;
-    typedef std::pair<size_t, size_t> BrushEdge;
-
-    typedef std::shared_ptr<BrushVertex> BrushVertexPtr;
-    typedef std::shared_ptr<BrushEdge>   BrushEdgePtr;
-
-    struct BrushPart
-    {
-        std::shared_ptr<pm3::Brush> parent = nullptr;
-
-        std::vector<BrushVertex>       vertices;
-        std::vector<BrushEdge>         edges;
-        std::vector<pm3::BrushFacePtr> faces;
-
-    }; // BrushPart
-
-    struct BrushGroup
-    {
-        std::string name;
-        BrushPart   part;
-
-    }; // BrushGroup
-
 public:
     BrushModel() {}
 
@@ -72,13 +49,8 @@ public:
     void  SetBrushes(const std::vector<BrushSingle>& brushes) { m_brushes = brushes; }
     auto& GetBrushes() const { return m_brushes; }
 
-    void  SetBrushGroups(const std::vector<std::shared_ptr<BrushGroup>>& groups) { m_brush_groups = groups; }
-    auto& GetBrushGroups() const { return m_brush_groups; }
-
 private:
     std::vector<BrushSingle> m_brushes;
-
-    std::vector<std::shared_ptr<BrushGroup>> m_brush_groups;
 
 }; // BrushModel
 

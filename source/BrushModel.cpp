@@ -17,15 +17,6 @@ std::unique_ptr<ModelExtend> BrushModel::Clone() const
         });
     }
 
-    // todo
-    //ret->m_brush_groups.reserve(m_brush_groups.size());
-    //for (auto& s : m_brush_groups)
-    //{
-    //    ret->m_brush_groups.push_back({
-    //        std::make_shared
-    //    });
-    //}
-
     return ret;
 }
 
