@@ -36,7 +36,7 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 //	const float dy = 30;
 
 	// brush data
-    BrushModel::BrushSingle brush;
+    BrushModel::Brush brush;
     brush.desc.mesh_begin = 0;
     brush.desc.mesh_end   = 1;
 	int face_num = scaled_poly.size() + 2;
@@ -77,7 +77,7 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
     brush.impl->BuildGeometry();
 
     auto model_model = std::make_unique<BrushModel>();
-    std::vector<BrushModel::BrushSingle> brushes;
+    std::vector<BrushModel::Brush> brushes;
     brushes.push_back(brush);
     model_model->SetBrushes(brushes);
 
@@ -162,7 +162,7 @@ BrushBuilder::PolymeshFromPolygon(const std::vector<sm::vec3>& polygon)
     return model;
 }
 
-void BrushBuilder::UpdateVBO(Model& model, const BrushModel::BrushSingle& brush)
+void BrushBuilder::UpdateVBO(Model& model, const BrushModel::Brush& brush)
 {
     if (!brush.impl) {
         return;

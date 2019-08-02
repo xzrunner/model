@@ -29,7 +29,7 @@ public:
     static std::unique_ptr<Model>
         PolymeshFromPolygon(const std::vector<sm::vec3>& polygon);
 
-    static void UpdateVBO(Model& model, const BrushModel::BrushSingle& brush);
+    static void UpdateVBO(Model& model, const BrushModel::Brush& brush);
 
     // todo
 public:

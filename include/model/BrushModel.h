@@ -33,7 +33,7 @@ public:
         std::vector<MeshDesc> meshes;
     };
 
-    struct BrushSingle
+    struct Brush
     {
         BrushDesc                   desc;
         std::shared_ptr<pm3::Brush> impl = nullptr;
@@ -46,11 +46,11 @@ public:
 
     virtual std::unique_ptr<ModelExtend> Clone() const override;
 
-    void  SetBrushes(const std::vector<BrushSingle>& brushes) { m_brushes = brushes; }
+    void  SetBrushes(const std::vector<Brush>& brushes) { m_brushes = brushes; }
     auto& GetBrushes() const { return m_brushes; }
 
 private:
-    std::vector<BrushSingle> m_brushes;
+    std::vector<Brush> m_brushes;
 
 }; // BrushModel
 
