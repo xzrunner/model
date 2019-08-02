@@ -85,7 +85,7 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 }
 
 std::unique_ptr<Model>
-BrushBuilder::PolymeshFromBrush(const BrushModel& brush)
+BrushBuilder::PolymeshFromBrush(const std::vector<std::shared_ptr<pm3::Brush>>& brushes)
 {
     auto model = std::make_unique<Model>();
 
@@ -109,19 +109,19 @@ BrushBuilder::PolymeshFromBrush(const BrushModel& brush)
 
 	sm::cube aabb;
 	int start_idx = 0;
-    for (auto& b : brush.GetBrushes())
+    for (auto& b : brushes)
     {
-	    for (auto& f : b.impl->faces)
+	    for (auto& f : b->faces)
 	    {
             auto& norm = f->plane.normal;
 		    for (size_t i = 1; i < f->vertices.size() - 1; ++i)
 		    {
-			    vertices.push_back(CreateVertex(b.impl->vertices[f->vertices[0]], norm, aabb));
-			    vertices.push_back(CreateVertex(b.impl->vertices[f->vertices[i]], norm, aabb));
-			    vertices.push_back(CreateVertex(b.impl->vertices[f->vertices[i + 1]], norm, aabb));
+			    vertices.push_back(CreateVertex(b->vertices[f->vertices[0]], norm, aabb));
+			    vertices.push_back(CreateVertex(b->vertices[f->vertices[i]], norm, aabb));
+			    vertices.push_back(CreateVertex(b->vertices[f->vertices[i + 1]], norm, aabb));
 		    }
 		    for (auto& vert : f->vertices) {
-			    border_vertices.push_back(CreateVertex(b.impl->vertices[vert], norm, aabb));
+			    border_vertices.push_back(CreateVertex(b->vertices[vert], norm, aabb));
 		    }
 		    for (int i = 0, n = f->vertices.size() - 1; i < n; ++i) {
 			    border_indices.push_back(start_idx + i);
@@ -141,26 +141,42 @@ BrushBuilder::PolymeshFromBrush(const BrushModel& brush)
 }
 
 std::unique_ptr<Model>
+BrushBuilder::PolymeshFromBrush(const model::BrushModel& brush)
+{
+    auto& src_brushes = brush.GetBrushes();
+    std::vector<std::shared_ptr<pm3::Brush>> brushes;
+    brushes.reserve(src_brushes.size());
+    for (auto& b : src_brushes) {
+        brushes.push_back(b.impl);
+    }
+    return PolymeshFromBrush(brushes);
+}
+
+std::unique_ptr<Model>
 BrushBuilder::PolymeshFromPolygon(const std::vector<sm::vec3>& polygon)
 {
     auto brush_model = model::BrushBuilder::BrushFromPolygon(polygon);
     auto model = model::BrushBuilder::PolymeshFromBrush(*brush_model);
     model->ext = std::move(brush_model);
+
     return model;
 }
 
-void BrushBuilder::UpdateVBO(Model& model, const pm3::Brush& brush,
-                             const BrushModel::BrushDesc& desc)
+void BrushBuilder::UpdateVBO(Model& model, const BrushModel::BrushSingle& brush)
 {
+    if (!brush.impl) {
+        return;
+    }
+
 	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-	auto& faces = brush.faces;
-	assert(desc.mesh_end - desc.mesh_begin == desc.meshes.size());
+	auto& faces = brush.impl->faces;
+	assert(brush.desc.mesh_end - brush.desc.mesh_begin == brush.desc.meshes.size());
 	// traverse brush's meshes
-	for (int i = desc.mesh_begin; i < desc.mesh_end; ++i)
+	for (int i = brush.desc.mesh_begin; i < brush.desc.mesh_end; ++i)
 	{
 		// gen mesh's vertex buffer
 		std::vector<Vertex> vertices, border_vertices;
-		for (auto& src_mesh : desc.meshes)
+		for (auto& src_mesh : brush.desc.meshes)
 		{
 			int tex_w = src_mesh.tex_width;
 			int tex_h = src_mesh.tex_height;
@@ -172,12 +188,12 @@ void BrushBuilder::UpdateVBO(Model& model, const pm3::Brush& brush,
 				assert(f->vertices.size() > 2);
 				for (size_t i = 1; i < f->vertices.size() - 1; ++i)
 				{
-					vertices.push_back(CreateVertex(f, brush.vertices[f->vertices[0]], tex_w, tex_h, aabb));
-					vertices.push_back(CreateVertex(f, brush.vertices[f->vertices[i]], tex_w, tex_h, aabb));
-					vertices.push_back(CreateVertex(f, brush.vertices[f->vertices[i + 1]], tex_w, tex_h, aabb));
+					vertices.push_back(CreateVertex(f, brush.impl->vertices[f->vertices[0]], tex_w, tex_h, aabb));
+					vertices.push_back(CreateVertex(f, brush.impl->vertices[f->vertices[i]], tex_w, tex_h, aabb));
+					vertices.push_back(CreateVertex(f, brush.impl->vertices[f->vertices[i + 1]], tex_w, tex_h, aabb));
 				}
 				for (auto& vert : f->vertices) {
-					border_vertices.push_back(CreateVertex(f, brush.vertices[vert], tex_w, tex_h, aabb));
+					border_vertices.push_back(CreateVertex(f, brush.impl->vertices[vert], tex_w, tex_h, aabb));
 				}
 			}
 		}
