@@ -89,28 +89,28 @@ BrushBuilder::PolymeshFromBrush(const std::vector<std::shared_ptr<pm3::Brush>>& 
 {
     auto model = std::make_unique<Model>();
 
+	std::unique_ptr<Model::Mesh> mesh = nullptr;
+	std::unique_ptr<Model::Mesh> border_mesh = nullptr;
+
+	mesh = std::make_unique<Model::Mesh>();
+
+	border_mesh = std::make_unique<Model::Mesh>();
+
+	auto mat = std::make_unique<Model::Material>();
+	int mat_idx = model->materials.size();
+	mesh->material = mat_idx;
+	border_mesh->material = mat_idx;
+	mat->diffuse_tex = -1;
+	model->materials.push_back(std::move(mat));
+
+	std::vector<Vertex> vertices;
+	std::vector<Vertex> border_vertices;
+	std::vector<unsigned short> border_indices;
+
 	sm::cube aabb;
 	int start_idx = 0;
     for (auto& b : brushes)
     {
-	    std::unique_ptr<Model::Mesh> mesh = nullptr;
-	    std::unique_ptr<Model::Mesh> border_mesh = nullptr;
-
-	    mesh = std::make_unique<Model::Mesh>();
-
-	    border_mesh = std::make_unique<Model::Mesh>();
-
-	    auto mat = std::make_unique<Model::Material>();
-	    int mat_idx = model->materials.size();
-	    mesh->material = mat_idx;
-	    border_mesh->material = mat_idx;
-	    mat->diffuse_tex = -1;
-	    model->materials.push_back(std::move(mat));
-
-	    std::vector<Vertex> vertices;
-	    std::vector<Vertex> border_vertices;
-	    std::vector<unsigned short> border_indices;
-
 	    for (auto& f : b->faces)
 	    {
             auto& norm = f->plane.normal;
@@ -131,9 +131,9 @@ BrushBuilder::PolymeshFromBrush(const std::vector<std::shared_ptr<pm3::Brush>>& 
 		    border_indices.push_back(start_idx);
 		    start_idx += f->vertices.size();
 	    }
-	    if (!vertices.empty()) {
-		    FlushVertices(mesh, border_mesh, vertices, border_vertices, border_indices, *model);
-	    }
+    }
+    if (!vertices.empty()) {
+        FlushVertices(mesh, border_mesh, vertices, border_vertices, border_indices, *model);
     }
 	model->aabb = aabb;
 
