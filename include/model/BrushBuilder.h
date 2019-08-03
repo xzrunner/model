@@ -23,13 +23,14 @@ public:
     static std::unique_ptr<Model>
         PolymeshFromBrush(const std::vector<std::shared_ptr<pm3::Brush>>& brushes);
     static std::unique_ptr<Model>
-        PolymeshFromBrush(const model::BrushModel& brush);
+        PolymeshFromBrush(const model::BrushModel& brush_model);
 
     // polygon -> polymesh
     static std::unique_ptr<Model>
         PolymeshFromPolygon(const std::vector<sm::vec3>& polygon);
 
     static void UpdateVBO(Model& model, const BrushModel::Brush& brush);
+    static void UpdateVBO(Model& model, const model::BrushModel& brush_model);
 
     // todo
 public:

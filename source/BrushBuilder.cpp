@@ -89,28 +89,28 @@ BrushBuilder::PolymeshFromBrush(const std::vector<std::shared_ptr<pm3::Brush>>& 
 {
     auto model = std::make_unique<Model>();
 
-	std::unique_ptr<Model::Mesh> mesh = nullptr;
-	std::unique_ptr<Model::Mesh> border_mesh = nullptr;
-
-	mesh = std::make_unique<Model::Mesh>();
-
-	border_mesh = std::make_unique<Model::Mesh>();
-
-	auto mat = std::make_unique<Model::Material>();
-	int mat_idx = model->materials.size();
-	mesh->material = mat_idx;
-	border_mesh->material = mat_idx;
-	mat->diffuse_tex = -1;
-	model->materials.push_back(std::move(mat));
-
-	std::vector<Vertex> vertices;
-	std::vector<Vertex> border_vertices;
-	std::vector<unsigned short> border_indices;
-
 	sm::cube aabb;
 	int start_idx = 0;
     for (auto& b : brushes)
     {
+	    std::unique_ptr<Model::Mesh> mesh = nullptr;
+	    std::unique_ptr<Model::Mesh> border_mesh = nullptr;
+
+	    mesh = std::make_unique<Model::Mesh>();
+
+	    border_mesh = std::make_unique<Model::Mesh>();
+
+	    auto mat = std::make_unique<Model::Material>();
+	    int mat_idx = model->materials.size();
+	    mesh->material = mat_idx;
+	    border_mesh->material = mat_idx;
+	    mat->diffuse_tex = -1;
+	    model->materials.push_back(std::move(mat));
+
+	    std::vector<Vertex> vertices;
+	    std::vector<Vertex> border_vertices;
+	    std::vector<unsigned short> border_indices;
+
 	    for (auto& f : b->faces)
 	    {
             auto& norm = f->plane.normal;
@@ -141,9 +141,9 @@ BrushBuilder::PolymeshFromBrush(const std::vector<std::shared_ptr<pm3::Brush>>& 
 }
 
 std::unique_ptr<Model>
-BrushBuilder::PolymeshFromBrush(const model::BrushModel& brush)
+BrushBuilder::PolymeshFromBrush(const model::BrushModel& brush_model)
 {
-    auto& src_brushes = brush.GetBrushes();
+    auto& src_brushes = brush_model.GetBrushes();
     std::vector<std::shared_ptr<pm3::Brush>> brushes;
     brushes.reserve(src_brushes.size());
     for (auto& b : src_brushes) {
@@ -205,6 +205,13 @@ void BrushBuilder::UpdateVBO(Model& model, const BrushModel::Brush& brush)
 			sizeof(Vertex) * border_vertices.size());
 
 	}
+}
+
+void BrushBuilder::UpdateVBO(Model& model, const model::BrushModel& brush_model)
+{
+    for (auto& brush : brush_model.GetBrushes()) {
+        UpdateVBO(model, brush);
+    }
 }
 
 void BrushBuilder::CreateMeshRenderBuf(model::Model::Mesh& mesh,
