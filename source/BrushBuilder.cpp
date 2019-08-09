@@ -41,6 +41,7 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
     brush.desc.mesh_end   = 1;
 	int face_num = scaled_poly.size() + 2;
     brush.desc.meshes.push_back({ 0, 0, 0, face_num });
+    brush.impl = std::make_shared<pm3::Brush>();
 
     auto& faces = brush.impl->faces;
 	faces.reserve(face_num);
