@@ -8,8 +8,6 @@
 namespace model
 {
 
-const float BrushBuilder::VERTEX_SCALE = 0.01f;
-
 std::unique_ptr<BrushModel>
 BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 {
@@ -17,19 +15,14 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 		return nullptr;
 	}
 
-	// scale
-	auto scaled_poly = polygon;
-	const float scale = 1.0f / VERTEX_SCALE;
-	for (auto& v : scaled_poly) {
-		v *= scale;
-	}
+    auto fixed_poly = polygon;
 
 	// fix dir
 	// should be clockwise, as left-hand system, top face's normal direction is y
 	auto v0 = polygon[1] - polygon[0];
 	auto v1 = polygon[2] - polygon[1];
 	if (v0.Cross(v1).Dot({ 0, 1, 0 }) < 0) {
-		std::reverse(scaled_poly.begin(), scaled_poly.end());
+		std::reverse(fixed_poly.begin(), fixed_poly.end());
 	}
 
 	const float dy = 0.1f;
@@ -39,7 +32,7 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
     BrushModel::Brush brush;
     brush.desc.mesh_begin = 0;
     brush.desc.mesh_end   = 1;
-	int face_num = scaled_poly.size() + 2;
+	int face_num = fixed_poly.size() + 2;
     brush.desc.meshes.push_back({ 0, 0, 0, face_num });
     brush.impl = std::make_shared<pm3::Brush>();
 
@@ -48,9 +41,9 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 	// top
 	{
 		sm::vec3 tri[3];
-		tri[0] = scaled_poly[0];
-		tri[1] = scaled_poly[1];
-		tri[2] = scaled_poly[2];
+		tri[0] = fixed_poly[0];
+		tri[1] = fixed_poly[1];
+		tri[2] = fixed_poly[2];
 		for (int i = 0; i < 3; ++i) {
 			tri[i].y += dy;
 		}
@@ -61,14 +54,14 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 	// bottom
 	{
 		auto face = std::make_shared<pm3::BrushFace>();
-		face->plane = sm::Plane(scaled_poly[2], scaled_poly[1], scaled_poly[0]);
+		face->plane = sm::Plane(fixed_poly[2], fixed_poly[1], fixed_poly[0]);
 		faces.push_back(face);
 	}
 	// edge faces
-	for (size_t i = 0, n = scaled_poly.size(); i < n; ++i)
+	for (size_t i = 0, n = fixed_poly.size(); i < n; ++i)
 	{
-		auto& v0 = scaled_poly[i];
-		auto& v1 = scaled_poly[(i + 1) % scaled_poly.size()];
+		auto& v0 = fixed_poly[i];
+		auto& v1 = fixed_poly[(i + 1) % fixed_poly.size()];
 		auto face = std::make_shared<pm3::BrushFace>();
 		face->plane = sm::Plane(v0, v1, { v1.x, v1.y + dy, v1.z });
 		faces.push_back(face);
@@ -273,7 +266,7 @@ BrushBuilder::CreateVertex(const pm3::BrushFacePtr& face, const sm::vec3& pos, i
 {
     Vertex v;
 
-    v.pos = pos * model::BrushBuilder::VERTEX_SCALE;
+    v.pos = pos;
     aabb.Combine(v.pos);
 
     v.normal = face->plane.normal;
@@ -293,7 +286,7 @@ BrushBuilder::CreateVertex(const sm::vec3& pos, const sm::vec3& normal, sm::cube
 {
     Vertex v;
 
-    v.pos = pos * model::BrushBuilder::VERTEX_SCALE;
+    v.pos = pos;
     aabb.Combine(v.pos);
 
     v.normal = normal.Normalized();

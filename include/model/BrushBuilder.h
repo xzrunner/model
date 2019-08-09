@@ -54,8 +54,6 @@ public:
         std::vector<Vertex>& vertices, std::vector<Vertex>& border_vertices,
         std::vector<unsigned short>& border_indices, model::Model& dst);
 
-    static const float VERTEX_SCALE;
-
 }; // BrushBuilder
 
 }
