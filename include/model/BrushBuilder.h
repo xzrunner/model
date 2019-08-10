@@ -21,7 +21,7 @@ public:
 
     // brush -> polymesh
     static std::unique_ptr<Model>
-        PolymeshFromBrush(const std::vector<std::shared_ptr<pm3::Brush>>& brushes);
+        PolymeshFromBrush(const std::vector<pm3::PolytopePtr>& brushes);
     static std::unique_ptr<Model>
         PolymeshFromBrush(const model::BrushModel& brush_model);
 
@@ -46,7 +46,7 @@ public:
     static void CreateBorderMeshRenderBuf(model::Model::Mesh& mesh,
         const std::vector<Vertex>& vertices, const std::vector<unsigned short>& indices);
 
-    static Vertex CreateVertex(const pm3::BrushFacePtr& face, const sm::vec3& pos, int tex_w, int tex_h, sm::cube& aabb);
+    static Vertex CreateVertex(const pm3::FacePtr& face, const sm::vec3& pos, int tex_w, int tex_h, sm::cube& aabb);
     static Vertex CreateVertex(const sm::vec3& pos, const sm::vec3& normal, sm::cube& aabb);
 
     static void FlushVertices(std::unique_ptr<model::Model::Mesh>& mesh,

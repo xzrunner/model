@@ -1,7 +1,7 @@
 #include "model/BrushBuilder.h"
 #include "model/typedef.h"
 
-#include <polymesh3/Brush.h>
+#include <polymesh3/Geometry.h>
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
 
@@ -34,9 +34,8 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
     brush.desc.mesh_end   = 1;
 	int face_num = fixed_poly.size() + 2;
     brush.desc.meshes.push_back({ 0, 0, 0, face_num });
-    brush.impl = std::make_shared<pm3::Brush>();
 
-    auto& faces = brush.impl->faces;
+    std::vector<pm3::FacePtr> faces;
 	faces.reserve(face_num);
 	// top
 	{
@@ -47,13 +46,13 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 		for (int i = 0; i < 3; ++i) {
 			tri[i].y += dy;
 		}
-		auto face = std::make_shared<pm3::BrushFace>();
+		auto face = std::make_shared<pm3::Face>();
 		face->plane = sm::Plane(tri[0], tri[1], tri[2]);
 		faces.push_back(face);
 	}
 	// bottom
 	{
-		auto face = std::make_shared<pm3::BrushFace>();
+		auto face = std::make_shared<pm3::Face>();
 		face->plane = sm::Plane(fixed_poly[2], fixed_poly[1], fixed_poly[0]);
 		faces.push_back(face);
 	}
@@ -62,13 +61,11 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 	{
 		auto& v0 = fixed_poly[i];
 		auto& v1 = fixed_poly[(i + 1) % fixed_poly.size()];
-		auto face = std::make_shared<pm3::BrushFace>();
+		auto face = std::make_shared<pm3::Face>();
 		face->plane = sm::Plane(v0, v1, { v1.x, v1.y + dy, v1.z });
 		faces.push_back(face);
 	}
-
-    brush.impl->BuildVertices();
-    brush.impl->BuildGeometry();
+    brush.impl = std::make_shared<pm3::Polytope>(faces);
 
     auto model_model = std::make_unique<BrushModel>();
     std::vector<BrushModel::Brush> brushes;
@@ -79,7 +76,7 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 }
 
 std::unique_ptr<Model>
-BrushBuilder::PolymeshFromBrush(const std::vector<std::shared_ptr<pm3::Brush>>& brushes)
+BrushBuilder::PolymeshFromBrush(const std::vector<pm3::PolytopePtr>& brushes)
 {
     auto model = std::make_unique<Model>();
 
@@ -105,25 +102,27 @@ BrushBuilder::PolymeshFromBrush(const std::vector<std::shared_ptr<pm3::Brush>>& 
 	int start_idx = 0;
     for (auto& b : brushes)
     {
-	    for (auto& f : b->faces)
+        auto& faces  = b->Faces();
+        auto& points = b->Points();
+	    for (auto& f : faces)
 	    {
             auto& norm = f->plane.normal;
-		    for (size_t i = 1; i < f->vertices.size() - 1; ++i)
+		    for (size_t i = 1; i < f->points.size() - 1; ++i)
 		    {
-			    vertices.push_back(CreateVertex(b->vertices[f->vertices[0]], norm, aabb));
-			    vertices.push_back(CreateVertex(b->vertices[f->vertices[i]], norm, aabb));
-			    vertices.push_back(CreateVertex(b->vertices[f->vertices[i + 1]], norm, aabb));
+			    vertices.push_back(CreateVertex(points[f->points[0]], norm, aabb));
+			    vertices.push_back(CreateVertex(points[f->points[i]], norm, aabb));
+			    vertices.push_back(CreateVertex(points[f->points[i + 1]], norm, aabb));
 		    }
-		    for (auto& vert : f->vertices) {
-			    border_vertices.push_back(CreateVertex(b->vertices[vert], norm, aabb));
+		    for (auto& vert : f->points) {
+			    border_vertices.push_back(CreateVertex(points[vert], norm, aabb));
 		    }
-		    for (int i = 0, n = f->vertices.size() - 1; i < n; ++i) {
+		    for (int i = 0, n = f->points.size() - 1; i < n; ++i) {
 			    border_indices.push_back(start_idx + i);
 			    border_indices.push_back(start_idx + i + 1);
 		    }
-		    border_indices.push_back(static_cast<unsigned short>(start_idx + f->vertices.size() - 1));
+		    border_indices.push_back(static_cast<unsigned short>(start_idx + f->points.size() - 1));
 		    border_indices.push_back(start_idx);
-		    start_idx += f->vertices.size();
+		    start_idx += f->points.size();
 	    }
     }
     if (!vertices.empty()) {
@@ -138,7 +137,7 @@ std::unique_ptr<Model>
 BrushBuilder::PolymeshFromBrush(const model::BrushModel& brush_model)
 {
     auto& src_brushes = brush_model.GetBrushes();
-    std::vector<std::shared_ptr<pm3::Brush>> brushes;
+    std::vector<pm3::PolytopePtr> brushes;
     brushes.reserve(src_brushes.size());
     for (auto& b : src_brushes) {
         brushes.push_back(b.impl);
@@ -163,7 +162,8 @@ void BrushBuilder::UpdateVBO(Model& model, const BrushModel::Brush& brush)
     }
 
 	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-	auto& faces = brush.impl->faces;
+	auto& faces = brush.impl->Faces();
+    auto& points = brush.impl->Points();
 	assert(brush.desc.mesh_end - brush.desc.mesh_begin == brush.desc.meshes.size());
 	// traverse brush's meshes
 	for (int i = brush.desc.mesh_begin; i < brush.desc.mesh_end; ++i)
@@ -179,15 +179,15 @@ void BrushBuilder::UpdateVBO(Model& model, const BrushModel::Brush& brush)
 			{
 				auto& f = faces[j];
 				std::vector<sm::vec3> border;
-				assert(f->vertices.size() > 2);
-				for (size_t i = 1; i < f->vertices.size() - 1; ++i)
+				assert(f->points.size() > 2);
+				for (size_t i = 1; i < f->points.size() - 1; ++i)
 				{
-					vertices.push_back(CreateVertex(f, brush.impl->vertices[f->vertices[0]], tex_w, tex_h, aabb));
-					vertices.push_back(CreateVertex(f, brush.impl->vertices[f->vertices[i]], tex_w, tex_h, aabb));
-					vertices.push_back(CreateVertex(f, brush.impl->vertices[f->vertices[i + 1]], tex_w, tex_h, aabb));
+					vertices.push_back(CreateVertex(f, points[f->points[0]], tex_w, tex_h, aabb));
+					vertices.push_back(CreateVertex(f, points[f->points[i]], tex_w, tex_h, aabb));
+					vertices.push_back(CreateVertex(f, points[f->points[i + 1]], tex_w, tex_h, aabb));
 				}
-				for (auto& vert : f->vertices) {
-					border_vertices.push_back(CreateVertex(f, brush.impl->vertices[vert], tex_w, tex_h, aabb));
+				for (auto& vert : f->points) {
+					border_vertices.push_back(CreateVertex(f, points[vert], tex_w, tex_h, aabb));
 				}
 			}
 		}
@@ -262,7 +262,7 @@ void BrushBuilder::CreateBorderMeshRenderBuf(model::Model::Mesh& mesh,
 }
 
 BrushBuilder::Vertex
-BrushBuilder::CreateVertex(const pm3::BrushFacePtr& face, const sm::vec3& pos, int tex_w, int tex_h, sm::cube& aabb)
+BrushBuilder::CreateVertex(const pm3::FacePtr& face, const sm::vec3& pos, int tex_w, int tex_h, sm::cube& aabb)
 {
     Vertex v;
 
@@ -274,7 +274,7 @@ BrushBuilder::CreateVertex(const pm3::BrushFacePtr& face, const sm::vec3& pos, i
     if (tex_w == 0 || tex_h == 0) {
         v.texcoord.Set(0, 0);
     } else {
-        v.texcoord = face->CalcTexCoords(
+        v.texcoord = face->tex_map.CalcTexCoords(
             pos, static_cast<float>(tex_w), static_cast<float>(tex_h));
     }
 

@@ -3,7 +3,7 @@
 #include "model/BrushBuilder.h"
 #include "model/BrushModel.h"
 
-#include <polymesh3/Brush.h>
+#include <polymesh3/Geometry.h>
 #include <quake/MapParser.h>
 #include <quake/WadFileLoader.h>
 #include <quake/Palette.h>
@@ -71,8 +71,7 @@ void MapBuilder::Load(std::vector<std::shared_ptr<Model>>& models, const std::st
 	parser.Parse();
 	for (auto& e : parser.GetAllEntities()) {
 		for (auto& b : e->brushes) {
-			b->BuildVertices();
-			b->BuildGeometry();
+			b->Build();
 		}
 	}
 
@@ -112,8 +111,7 @@ bool MapBuilder::Load(Model& model, const std::string& filepath)
 
 	for (auto& e : entities) {
 		for (auto& b : e->brushes) {
-			b->BuildVertices();
-			b->BuildGeometry();
+            b->Build();
 		}
 	}
 
@@ -176,7 +174,7 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 
 		brush_desc.mesh_begin = dst.meshes.size();
 
-		if (b->faces.empty()) {
+		if (b->Faces().empty()) {
 			brush_desc.mesh_end = dst.meshes.size();
 			brush_descs.push_back(brush_desc);
 			continue;
@@ -186,10 +184,10 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 		mesh_desc.face_begin = 0;
 
 		// sort by texture
-		auto faces = b->faces;
+		auto faces = b->Faces();
 		std::sort(faces.begin(), faces.end(),
-			[](const pm3::BrushFacePtr& lhs, const pm3::BrushFacePtr& rhs) {
-			return lhs->tex_name < rhs->tex_name;
+			[](const pm3::FacePtr& lhs, const pm3::FacePtr& rhs) {
+			return lhs->tex_map.tex_name < rhs->tex_map.tex_name;
 		});
 
 		// create meshes
@@ -204,7 +202,7 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 		for (auto& f : faces)
 		{
 			// new material
-			if (f->tex_name != curr_tex_name)
+			if (f->tex_map.tex_name != curr_tex_name)
 			{
 				if (!vertices.empty()) {
                     BrushBuilder::FlushVertices(mesh, border_mesh, vertices, border_vertices, border_indices, dst);
@@ -219,12 +217,12 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 				int mat_idx = dst.materials.size();
 				mesh->material = mat_idx;
 				border_mesh->material = mat_idx;
-				auto tex = tex_mgr->Query(f->tex_name);
+				auto tex = tex_mgr->Query(f->tex_map.tex_name);
 				mat->diffuse_tex = dst.textures.size();
-				dst.textures.push_back({ f->tex_name, tex });
+				dst.textures.push_back({ f->tex_map.tex_name, tex });
 				dst.materials.push_back(std::move(mat));
 
-				curr_tex_name = f->tex_name;
+				curr_tex_name = f->tex_map.tex_name;
 				curr_tex = tex;
 			}
 
@@ -236,31 +234,31 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 			mesh_desc.tex_width  = tex_w;
 			mesh_desc.tex_height = tex_h;
 
-			assert(f->vertices.size() > 2);
-			for (size_t i = 1; i < f->vertices.size() - 1; ++i)
+			assert(f->points.size() > 2);
+			for (size_t i = 1; i < f->points.size() - 1; ++i)
 			{
 				vertices.push_back(BrushBuilder::CreateVertex(
-                    f, b->vertices[f->vertices[0]], tex_w, tex_h, aabb
+                    f, b->Points()[f->points[0]], tex_w, tex_h, aabb
                 ));
 				vertices.push_back(BrushBuilder::CreateVertex(
-                    f, b->vertices[f->vertices[i]], tex_w, tex_h, aabb
+                    f, b->Points()[f->points[i]], tex_w, tex_h, aabb
                 ));
 				vertices.push_back(BrushBuilder::CreateVertex(
-                    f, b->vertices[f->vertices[i + 1]], tex_w, tex_h, aabb
+                    f, b->Points()[f->points[i + 1]], tex_w, tex_h, aabb
                 ));
 			}
 
 			int start_idx = border_vertices.size();
-			for (auto& v : f->vertices) {
+			for (auto& v : f->points) {
 				border_vertices.push_back(BrushBuilder::CreateVertex(
-                    f, b->vertices[v], tex_w, tex_h, aabb
+                    f, b->Points()[v], tex_w, tex_h, aabb
                 ));
 			}
-			for (int i = 0, n = f->vertices.size() - 1; i < n; ++i) {
+			for (int i = 0, n = f->points.size() - 1; i < n; ++i) {
 				border_indices.push_back(start_idx + i);
 				border_indices.push_back(start_idx + i + 1);
 			}
-			border_indices.push_back(start_idx + static_cast<unsigned short>(f->vertices.size() - 1));
+			border_indices.push_back(start_idx + static_cast<unsigned short>(f->points.size() - 1));
 			border_indices.push_back(start_idx);
 
 			++face_idx;

@@ -1,6 +1,6 @@
 #include "model/BrushModel.h"
 
-#include <polymesh3/Brush.h>
+#include <polymesh3/Geometry.h>
 
 namespace model
 {
@@ -13,7 +13,7 @@ std::unique_ptr<ModelExtend> BrushModel::Clone() const
     for (auto& s : m_brushes)
     {
         ret->m_brushes.push_back({
-            s.desc, std::make_shared<pm3::Brush>(*s.impl)
+            s.desc, std::make_shared<pm3::Polytope>(*s.impl)
         });
     }
 

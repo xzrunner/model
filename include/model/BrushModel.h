@@ -7,7 +7,7 @@
 #include <vector>
 #include <memory>
 
-namespace pm3 { struct Brush; }
+namespace pm3 { class Polytope; }
 
 namespace model
 {
@@ -35,8 +35,8 @@ public:
 
     struct Brush
     {
-        BrushDesc                   desc;
-        std::shared_ptr<pm3::Brush> impl = nullptr;
+        BrushDesc        desc;
+        pm3::PolytopePtr impl = nullptr;
     };
 
 public:
