@@ -46,6 +46,7 @@ public:
 
     void SetModelExt(std::unique_ptr<ModelExtend>& ext);
     auto& GetModelExt() const { return m_ext; }
+    auto& GetModelExt() { return m_ext; }
 
 private:
 	bool UpdateMorphTargetAnim();
