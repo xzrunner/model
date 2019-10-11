@@ -230,7 +230,7 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 
 	node_raw->local_trans = trans_ai_mat(ai_node->mTransformation);
 
-	auto child_mat = mat * node_raw->local_trans;
+	auto child_mat = mat * node_raw->local_trans;   // mat mul
 
 	if (ai_node->mNumChildren)
 	{

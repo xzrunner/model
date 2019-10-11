@@ -1170,7 +1170,7 @@ int FbxLoader::LoadNodesRecursive(fbxsdk::FbxNode* fbx_node, Model& model,
     //const FbxVector4 lS = fbx_node->GetGeometricScaling(FbxNode::eSourcePivot);
     //node_raw->local_trans = trans_fbx_mat({ lT, lR, lS });
 
-    auto child_mat = mat * node_raw->local_trans;
+    auto child_mat = mat * node_raw->local_trans;   // mat mul
 
     if (fbx_node->GetChildCount() > 0)
     {

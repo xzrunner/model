@@ -509,7 +509,7 @@ const std::vector<sm::mat4>& ModelInstance::CalcBoneMatrices(int node_idx, int m
             continue;
         }
 
-		m_bone_trans[i] = bone.offset_trans * m_global_trans[bone.node] * global_inv_mesh_trans;
+		m_bone_trans[i] = bone.offset_trans * m_global_trans[bone.node] * global_inv_mesh_trans; // mat mul
 
 		float s = m_model->scale;
 		m_bone_trans[i].x[12] *= s;
@@ -537,7 +537,7 @@ void ModelInstance::CalcGlobalTrans()
 		auto g_trans = m_local_trans[i];
 		int parent = nodes[i]->parent;
 		while (parent != -1) {
-			g_trans = g_trans * m_local_trans[parent];
+			g_trans = m_local_trans[parent] * g_trans;
 			parent = nodes[parent]->parent;
 		}
 		m_global_trans[i] = g_trans;

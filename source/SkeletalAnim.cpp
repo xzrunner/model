@@ -71,7 +71,7 @@ void SkeletalAnim::InitTPoseTrans()
 		auto g_trans = tpose_local_trans[i];
 		int parent = m_nodes[i]->parent;
 		while (parent != -1) {
-			g_trans = g_trans * tpose_local_trans[parent];
+			g_trans = tpose_local_trans[parent] * g_trans;
 			parent = m_nodes[parent]->parent;
 		}
 		m_tpose_world_trans[i] = g_trans;
