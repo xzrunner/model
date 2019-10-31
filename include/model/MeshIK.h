@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-namespace ml { class Sorkine04; }
+namespace meshlab { class Sorkine04; }
 
 namespace model
 {
@@ -25,7 +25,7 @@ public:
 private:
 	MeshGeometry& m_mesh;
 
-	std::unique_ptr<ml::Sorkine04> m_solver = nullptr;
+	std::unique_ptr<meshlab::Sorkine04> m_solver = nullptr;
 
 	std::vector<int> m_handles;
 	std::vector<int> m_unconstrained;

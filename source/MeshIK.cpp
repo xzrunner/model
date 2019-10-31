@@ -149,7 +149,7 @@ void MeshIK::PrepareDeform(int main_handle, int handle_region_size, int unconstr
 		std::copy(f.begin(), f.end(), std::back_inserter(cells));
 	}
 
-	m_solver = std::make_unique<ml::Sorkine04>(cells, &rd->vertices.data()->x, rd->vertices.size() * 3, combined, m_handles.size(), true);
+	m_solver = std::make_unique<meshlab::Sorkine04>(cells, &rd->vertices.data()->x, rd->vertices.size() * 3, combined, m_handles.size(), true);
 }
 
 void MeshIK::Deform(const sm::vec3& translate)
