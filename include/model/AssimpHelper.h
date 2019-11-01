@@ -26,6 +26,7 @@ class AssimpHelper
 {
 public:
 	static bool Load(Model& model, const std::string& filepath, float scale = 1.0f);
+    static bool Load(std::vector<std::unique_ptr<MeshRawData>>& meshes, const std::string& filepath);
 
     // config
     static void SetLoadRawData(bool load_raw_data) { m_load_raw_data = load_raw_data; }

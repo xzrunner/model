@@ -216,6 +216,30 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale)
 	return true;
 }
 
+bool AssimpHelper::Load(std::vector<std::unique_ptr<MeshRawData>>& meshes, const std::string& filepath)
+{
+	Assimp::Importer importer;
+	const aiScene* ai_scene = importer.ReadFile(filepath.c_str(),
+        aiProcess_Triangulate |
+        aiProcess_GlobalScale |
+        aiProcess_GenSmoothNormals |
+        aiProcess_ConvertToLeftHanded |
+        aiProcess_JoinIdenticalVertices |
+        aiProcess_ValidateDataStructure
+	);
+
+	if (!ai_scene) {
+		return false;
+	}
+
+    meshes.clear();
+	for (size_t i = 0; i < ai_scene->mNumMeshes; ++i) {
+        meshes.push_back(LoadMeshRawData(ai_scene->mMeshes[i]));
+	}
+
+	return true;
+}
+
 int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model& model,
 	                       std::vector<std::unique_ptr<SkeletalAnim::Node>>& nodes,
 	                       const std::vector<sm::cube>& meshes_aabb, const sm::mat4& mat)
