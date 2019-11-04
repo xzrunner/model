@@ -573,6 +573,15 @@ std::unique_ptr<MeshRawData> AssimpHelper::LoadMeshRawData(const aiMesh* ai_mesh
 		}
 	}
 
+    if (ai_mesh->HasTextureCoords(0))
+    {
+        rd->texcoords.reserve(ai_mesh->mNumVertices);
+        for (size_t i = 0; i < ai_mesh->mNumVertices; ++i) {
+            auto& p = ai_mesh->mTextureCoords[0][i];
+            rd->texcoords.emplace_back(p.x, p.y);
+        }
+    }
+
 	rd->faces.reserve(ai_mesh->mNumFaces);
 	for (size_t i = 0; i < ai_mesh->mNumFaces; ++i)
 	{
