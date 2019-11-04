@@ -36,6 +36,7 @@ struct MeshRawData
 {
 	std::vector<sm::vec3>         vertices;
 	std::vector<sm::vec3>         normals;
+    std::vector<sm::vec2>         texcoords;
 	std::vector<std::vector<int>> faces;
     std::vector<std::vector<std::pair<int, float>>> weights_per_vertex;
 
