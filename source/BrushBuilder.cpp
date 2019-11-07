@@ -76,7 +76,8 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 }
 
 std::unique_ptr<Model>
-BrushBuilder::PolymeshFromBrush(const std::vector<pm3::PolytopePtr>& brushes)
+BrushBuilder::PolymeshFromBrush(const std::vector<pm3::PolytopePtr>& brushes,
+                                const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords)
 {
     auto model = std::make_unique<Model>();
 
@@ -100,25 +101,27 @@ BrushBuilder::PolymeshFromBrush(const std::vector<pm3::PolytopePtr>& brushes)
 
 	sm::cube aabb;
 	int start_idx = 0;
-    for (auto& b : brushes)
+    for (int i = 0, n = brushes.size(); i < n; ++i)
     {
+        auto& b = brushes[i];
         auto& faces  = b->Faces();
         auto& points = b->Points();
-	    for (auto& f : faces)
+        for (int j = 0, m = faces.size(); j < m; ++j)
 	    {
+            auto& f = faces[j];
             auto& norm = f->plane.normal;
-		    for (size_t i = 1; i < f->points.size() - 1; ++i)
+		    for (size_t k = 1; k < f->points.size() - 1; ++k)
 		    {
-			    vertices.push_back(CreateVertex(points[f->points[0]]->pos, norm, aabb));
-			    vertices.push_back(CreateVertex(points[f->points[i]]->pos, norm, aabb));
-			    vertices.push_back(CreateVertex(points[f->points[i + 1]]->pos, norm, aabb));
+			    vertices.push_back(CreateVertex(points[f->points[0]]->pos, norm, texcoords[i][j][0], aabb));
+			    vertices.push_back(CreateVertex(points[f->points[k]]->pos, norm, texcoords[i][j][k], aabb));
+			    vertices.push_back(CreateVertex(points[f->points[k + 1]]->pos, norm, texcoords[i][j][k + 1], aabb));
 		    }
-		    for (auto& vert : f->points) {
-			    border_vertices.push_back(CreateVertex(points[vert]->pos, norm, aabb));
+            for (size_t k = 0, l = f->points.size(); k < l; ++k) {
+			    border_vertices.push_back(CreateVertex(points[f->points[k]]->pos, norm, texcoords[i][j][k], aabb));
 		    }
-		    for (int i = 0, n = f->points.size() - 1; i < n; ++i) {
-			    border_indices.push_back(start_idx + i);
-			    border_indices.push_back(start_idx + i + 1);
+		    for (int k = 0, n = f->points.size() - 1; k < n; ++k) {
+			    border_indices.push_back(start_idx + k);
+			    border_indices.push_back(start_idx + k + 1);
 		    }
 		    border_indices.push_back(static_cast<unsigned short>(start_idx + f->points.size() - 1));
 		    border_indices.push_back(start_idx);
@@ -134,7 +137,8 @@ BrushBuilder::PolymeshFromBrush(const std::vector<pm3::PolytopePtr>& brushes)
 }
 
 std::unique_ptr<Model>
-BrushBuilder::PolymeshFromBrush(const model::BrushModel& brush_model)
+BrushBuilder::PolymeshFromBrush(const model::BrushModel& brush_model,
+                                const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords)
 {
     auto& src_brushes = brush_model.GetBrushes();
     std::vector<pm3::PolytopePtr> brushes;
@@ -142,14 +146,15 @@ BrushBuilder::PolymeshFromBrush(const model::BrushModel& brush_model)
     for (auto& b : src_brushes) {
         brushes.push_back(b.impl);
     }
-    return PolymeshFromBrush(brushes);
+    return PolymeshFromBrush(brushes, texcoords);
 }
 
 std::unique_ptr<Model>
 BrushBuilder::PolymeshFromPolygon(const std::vector<sm::vec3>& polygon)
 {
     auto brush_model = model::BrushBuilder::BrushFromPolygon(polygon);
-    auto model = model::BrushBuilder::PolymeshFromBrush(*brush_model);
+    std::vector<sm::vec2> texcoords(polygon.size(), sm::vec2(0, 0));
+    auto model = model::BrushBuilder::PolymeshFromBrush(*brush_model, {{ texcoords }});
     model->ext = std::move(brush_model);
 
     return model;
@@ -282,7 +287,8 @@ BrushBuilder::CreateVertex(const pm3::FacePtr& face, const sm::vec3& pos, int te
 }
 
 BrushBuilder::Vertex
-BrushBuilder::CreateVertex(const sm::vec3& pos, const sm::vec3& normal, sm::cube& aabb)
+BrushBuilder::CreateVertex(const sm::vec3& pos, const sm::vec3& normal,
+                           const sm::vec2& texcoord, sm::cube& aabb)
 {
     Vertex v;
 
@@ -291,7 +297,7 @@ BrushBuilder::CreateVertex(const sm::vec3& pos, const sm::vec3& normal, sm::cube
 
     v.normal = normal.Normalized();
 
-    v.texcoord.Set(0, 0);
+    v.texcoord = texcoord;
 
     return v;
 }
