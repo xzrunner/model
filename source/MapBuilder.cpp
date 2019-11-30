@@ -53,8 +53,7 @@ std::shared_ptr<Model> MapBuilder::Create(const std::vector<sm::vec3>& polygon)
     entity->brushes.push_back(brushes[0].impl);
 	map_entity->SetMapEntity(entity);
 
-    std::vector<sm::vec2> texcoords(polygon.size(), sm::vec2(0, 0));
-    auto model = BrushBuilder::PolymeshFromBrush(*brush_model, {{ texcoords }});
+    auto model = BrushBuilder::PolymeshFromBrushPN(*brush_model);
     assert(model);
 	model->ext = std::move(map_entity);
 
@@ -206,7 +205,8 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 			if (f->tex_map.tex_name != curr_tex_name)
 			{
 				if (!vertices.empty()) {
-                    BrushBuilder::FlushVertices(mesh, border_mesh, vertices, border_vertices, border_indices, dst);
+                    BrushBuilder::FlushVertices(BrushBuilder::VertexType::PosNormTex,
+                        mesh, border_mesh, vertices, border_vertices, border_indices, dst);
 					FlushBrushDesc(brush_desc, mesh_desc, face_idx);
 				}
 
@@ -235,24 +235,26 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 			mesh_desc.tex_width  = tex_w;
 			mesh_desc.tex_height = tex_h;
 
+            static const sm::vec3 WHITE(1.0f, 1.0f, 1.0f);
+
 			assert(f->points.size() > 2);
 			for (size_t i = 1; i < f->points.size() - 1; ++i)
 			{
 				vertices.push_back(BrushBuilder::CreateVertex(
-                    f, b->Points()[f->points[0]]->pos, tex_w, tex_h, aabb
+                    f, b->Points()[f->points[0]]->pos, tex_w, tex_h, WHITE, aabb
                 ));
 				vertices.push_back(BrushBuilder::CreateVertex(
-                    f, b->Points()[f->points[i]]->pos, tex_w, tex_h, aabb
+                    f, b->Points()[f->points[i]]->pos, tex_w, tex_h, WHITE, aabb
                 ));
 				vertices.push_back(BrushBuilder::CreateVertex(
-                    f, b->Points()[f->points[i + 1]]->pos, tex_w, tex_h, aabb
+                    f, b->Points()[f->points[i + 1]]->pos, tex_w, tex_h, WHITE, aabb
                 ));
 			}
 
 			int start_idx = border_vertices.size();
 			for (auto& v : f->points) {
 				border_vertices.push_back(BrushBuilder::CreateVertex(
-                    f, b->Points()[v]->pos, tex_w, tex_h, aabb
+                    f, b->Points()[v]->pos, tex_w, tex_h, WHITE, aabb
                 ));
 			}
 			for (int i = 0, n = f->points.size() - 1; i < n; ++i) {
@@ -266,7 +268,8 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 		}
 
 		if (!vertices.empty()) {
-            BrushBuilder::FlushVertices(mesh, border_mesh, vertices, border_vertices, border_indices, dst);
+            BrushBuilder::FlushVertices(BrushBuilder::VertexType::PosNormTex,
+                mesh, border_mesh, vertices, border_vertices, border_indices, dst);
 			FlushBrushDesc(brush_desc, mesh_desc, face_idx);
 		}
 
