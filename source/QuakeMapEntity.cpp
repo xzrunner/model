@@ -1,6 +1,6 @@
 #include "model/QuakeMapEntity.h"
 
-#include <polymesh3/Geometry.h>
+#include <polymesh3/Polytope.h>
 #include <quake/MapEntity.h>
 
 namespace model

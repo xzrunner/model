@@ -1,6 +1,6 @@
 #include "model/BrushModel.h"
 
-#include <polymesh3/Geometry.h>
+#include <polymesh3/Polytope.h>
 
 namespace model
 {

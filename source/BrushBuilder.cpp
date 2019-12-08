@@ -1,7 +1,7 @@
 #include "model/BrushBuilder.h"
 #include "model/typedef.h"
 
-#include <polymesh3/Geometry.h>
+#include <polymesh3/Polytope.h>
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
 
@@ -175,7 +175,7 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 	int face_num = fixed_poly.size() + 2;
     brush.desc.meshes.push_back({ 0, 0, 0, face_num });
 
-    std::vector<pm3::FacePtr> faces;
+    std::vector<pm3::Polytope::FacePtr> faces;
 	faces.reserve(face_num);
 	// top
 	{
@@ -186,13 +186,13 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 		for (int i = 0; i < 3; ++i) {
 			tri[i].y += dy;
 		}
-		auto face = std::make_shared<pm3::Face>();
+		auto face = std::make_shared<pm3::Polytope::Face>();
 		face->plane = sm::Plane(tri[0], tri[1], tri[2]);
 		faces.push_back(face);
 	}
 	// bottom
 	{
-		auto face = std::make_shared<pm3::Face>();
+		auto face = std::make_shared<pm3::Polytope::Face>();
 		face->plane = sm::Plane(fixed_poly[2], fixed_poly[1], fixed_poly[0]);
 		faces.push_back(face);
 	}
@@ -201,7 +201,7 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 	{
 		auto& v0 = fixed_poly[i];
 		auto& v1 = fixed_poly[(i + 1) % fixed_poly.size()];
-		auto face = std::make_shared<pm3::Face>();
+		auto face = std::make_shared<pm3::Polytope::Face>();
 		face->plane = sm::Plane(v0, v1, { v1.x, v1.y + dy, v1.z });
 		faces.push_back(face);
 	}
@@ -450,7 +450,7 @@ void BrushBuilder::CreateBorderMeshRenderBuf(VertexType type, model::Model::Mesh
 }
 
 BrushBuilder::Vertex
-BrushBuilder::CreateVertex(const pm3::FacePtr& face, const sm::vec3& pos, int tex_w, int tex_h,
+BrushBuilder::CreateVertex(const pm3::Polytope::FacePtr& face, const sm::vec3& pos, int tex_w, int tex_h,
                            const sm::vec3& color, sm::cube& aabb)
 {
     Vertex v;

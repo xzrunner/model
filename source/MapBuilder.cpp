@@ -3,7 +3,7 @@
 #include "model/BrushBuilder.h"
 #include "model/BrushModel.h"
 
-#include <polymesh3/Geometry.h>
+#include <polymesh3/Polytope.h>
 #include <quake/MapParser.h>
 #include <quake/WadFileLoader.h>
 #include <quake/Palette.h>
@@ -71,7 +71,7 @@ void MapBuilder::Load(std::vector<std::shared_ptr<Model>>& models, const std::st
 	parser.Parse();
 	for (auto& e : parser.GetAllEntities()) {
 		for (auto& b : e->brushes) {
-			b->Build();
+			b->BuildFromFaces();
 		}
 	}
 
@@ -111,7 +111,7 @@ bool MapBuilder::Load(Model& model, const std::string& filepath)
 
 	for (auto& e : entities) {
 		for (auto& b : e->brushes) {
-            b->Build();
+            b->BuildFromFaces();
 		}
 	}
 
@@ -186,7 +186,7 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 		// sort by texture
 		auto faces = b->Faces();
 		std::sort(faces.begin(), faces.end(),
-			[](const pm3::FacePtr& lhs, const pm3::FacePtr& rhs) {
+			[](const pm3::Polytope::FacePtr& lhs, const pm3::Polytope::FacePtr& rhs) {
 			return lhs->tex_map.tex_name < rhs->tex_map.tex_name;
 		});
 

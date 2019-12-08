@@ -2,8 +2,6 @@
 
 #include "model/ModelExtend.h"
 
-#include <polymesh3/typedef.h>
-
 #include <vector>
 #include <memory>
 
@@ -35,8 +33,8 @@ public:
 
     struct Brush
     {
-        BrushDesc        desc;
-        pm3::PolytopePtr impl = nullptr;
+        BrushDesc desc;
+        std::shared_ptr<pm3::Polytope> impl = nullptr;
     };
 
 public:

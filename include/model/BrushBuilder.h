@@ -4,7 +4,7 @@
 #include "model/BrushModel.h"
 
 #include <SM_Vector.h>
-#include <polymesh3/typedef.h>
+#include <polymesh3/Polytope.h>
 
 #include <memory>
 #include <vector>
@@ -26,10 +26,10 @@ public:
         PosNormTex,
         PosNormCol,
     };
-    static std::unique_ptr<Model> PolymeshFromBrushPN(const std::vector<pm3::PolytopePtr>& brushes);
+    static std::unique_ptr<Model> PolymeshFromBrushPN(const std::vector<std::shared_ptr<pm3::Polytope>>& brushes);
     static std::unique_ptr<Model> PolymeshFromBrushPN(const model::BrushModel& brush_model);
     static std::unique_ptr<Model> PolymeshFromBrushPNT(
-        const std::vector<pm3::PolytopePtr>& brushes,
+        const std::vector<std::shared_ptr<pm3::Polytope>>& brushes,
         const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords
     );
     static std::unique_ptr<Model> PolymeshFromBrushPNT(
@@ -37,7 +37,7 @@ public:
         const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords
     );
     static std::unique_ptr<Model> PolymeshFromBrushPNC(
-        const std::vector<pm3::PolytopePtr>& brushes,
+        const std::vector<std::shared_ptr<pm3::Polytope>>& brushes,
         const std::vector<std::vector<std::vector<sm::vec3>>>& colors
     );
     static std::unique_ptr<Model> PolymeshFromBrushPNC(
@@ -46,7 +46,7 @@ public:
     );
 private:
     static std::unique_ptr<Model> PolymeshFromBrush(
-        VertexType type, const std::vector<pm3::PolytopePtr>& brushes,
+        VertexType type, const std::vector<std::shared_ptr<pm3::Polytope>>& brushes,
         const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords,
         const std::vector<std::vector<std::vector<sm::vec3>>>& colors
     );
@@ -78,7 +78,7 @@ public:
     static void CreateBorderMeshRenderBuf(VertexType type, model::Model::Mesh& mesh,
         const std::vector<Vertex>& vertices, const std::vector<unsigned short>& indices);
 
-    static Vertex CreateVertex(const pm3::FacePtr& face, const sm::vec3& pos,
+    static Vertex CreateVertex(const pm3::Polytope::FacePtr& face, const sm::vec3& pos,
         int tex_w, int tex_h, const sm::vec3& color, sm::cube& aabb);
 
     static void FlushVertices(VertexType type, std::unique_ptr<model::Model::Mesh>& mesh,
