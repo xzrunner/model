@@ -1,6 +1,8 @@
 #include "model/BrushBuilder.h"
 #include "model/typedef.h"
 
+#include <SM_Calc.h>
+#include <SM_Triangulation.h>
 #include <polymesh3/Polytope.h>
 #include <unirender/RenderContext.h>
 #include <unirender/Blackboard.h>
@@ -287,12 +289,11 @@ BrushBuilder::PolymeshFromBrush(VertexType type, const std::vector<pm3::Polytope
 	    {
             auto& f = faces[j];
             auto& norm = f->plane.normal;
-		    for (size_t k = 1; k < f->points.size() - 1; ++k)
-		    {
-			    vertices.push_back(create_vertex(points[f->points[0]]->pos, norm, texcoords, colors, i, j, 0, aabb));
-			    vertices.push_back(create_vertex(points[f->points[k]]->pos, norm, texcoords, colors, i, j, k, aabb));
-			    vertices.push_back(create_vertex(points[f->points[k + 1]]->pos, norm, texcoords, colors, i, j, k + 1, aabb));
-		    }
+            std::vector<size_t> tris_idx;
+            Triangulation(tris_idx, points, f->points);
+            for (auto& idx : tris_idx) {
+                vertices.push_back(create_vertex(points[idx]->pos, norm, texcoords, colors, i, j, idx, aabb));
+            }
             for (size_t k = 0, l = f->points.size(); k < l; ++k) {
 			    border_vertices.push_back(create_vertex(points[f->points[k]]->pos, norm, texcoords, colors, i, j, k, aabb));
 		    }
@@ -487,6 +488,55 @@ void BrushBuilder::FlushVertices(VertexType type,
     CreateBorderMeshRenderBuf(type, *border_mesh, border_vertices, border_indices);
     dst.border_meshes.push_back(std::move(border_mesh));
     border_vertices.clear();
+}
+
+void BrushBuilder::Triangulation(std::vector<size_t>& dst_tris, const std::vector<pm3::Polytope::PointPtr>& src_pts,
+                                 const std::vector<size_t>& src_face)
+{
+    std::vector<sm::vec3> border3;
+    border3.reserve(src_face.size());
+    for (auto& idx : src_face) {
+        border3.push_back(src_pts[idx]->pos);
+    }
+    auto norm = sm::calc_face_normal(border3);
+    auto rot = sm::mat4(sm::Quaternion::CreateFromVectors(norm, sm::vec3(0, 1, 0)));
+    auto inv_rot = rot.Inverted();
+
+    std::vector<sm::vec2> border2;
+    border2.reserve(src_face.size());
+
+    std::map<sm::vec2, size_t> pos2idx;
+    for (auto& idx : src_face)
+    {
+        auto& pos3 = src_pts[idx]->pos;
+        auto p3_rot = rot * pos3;
+        sm::vec2 pos2(p3_rot.x, p3_rot.z);
+        auto status = pos2idx.insert({ pos2, idx });
+        //assert(status.second);
+
+        border2.push_back(pos2);
+    }
+
+    std::vector<sm::vec2> tris;
+    sm::triangulate_normal(border2, tris);
+    assert(tris.size() % 3 == 0);
+    dst_tris.reserve(tris.size());
+    for (size_t i = 0, n = tris.size(); i < n; )
+    {
+        std::vector<sm::vec2*> tri(3);
+        for (size_t j = 0; j < 3; ++j) {
+            tri[j] = &tris[i++];
+        }
+        if (sm::is_turn_left(*tri[0], *tri[1], *tri[2])) {
+            std::reverse(tri.begin(), tri.end());
+        }
+        for (size_t j = 0; j < 3; ++j)
+        {
+            auto itr = pos2idx.find(*tri[j]);
+            assert(itr != pos2idx.end());
+            dst_tris.push_back(itr->second);
+        }
+    }
 }
 
 }

@@ -55,6 +55,7 @@ private:
         const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords,
         const std::vector<std::vector<std::vector<sm::vec3>>>& colors
     );
+
 public:
 
     // polygon -> polymesh
@@ -85,6 +86,10 @@ public:
         std::unique_ptr<model::Model::Mesh>& border_mesh,
         std::vector<Vertex>& vertices, std::vector<Vertex>& border_vertices,
         std::vector<unsigned short>& border_indices, model::Model& dst);
+
+private:
+    static void Triangulation(std::vector<size_t>& dst_tris, const std::vector<pm3::Polytope::PointPtr>& src_pts,
+        const std::vector<size_t>& src_face);
 
 }; // BrushBuilder
 
