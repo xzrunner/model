@@ -237,31 +237,31 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 
             static const sm::vec3 WHITE(1.0f, 1.0f, 1.0f);
 
-			assert(f->points.size() > 2);
-			for (size_t i = 1; i < f->points.size() - 1; ++i)
+			assert(f->border.size() > 2);
+			for (size_t i = 1; i < f->border.size() - 1; ++i)
 			{
 				vertices.push_back(BrushBuilder::CreateVertex(
-                    f, b->Points()[f->points[0]]->pos, tex_w, tex_h, WHITE, aabb
+                    f, b->Points()[f->border[0]]->pos, tex_w, tex_h, WHITE, aabb
                 ));
 				vertices.push_back(BrushBuilder::CreateVertex(
-                    f, b->Points()[f->points[i]]->pos, tex_w, tex_h, WHITE, aabb
+                    f, b->Points()[f->border[i]]->pos, tex_w, tex_h, WHITE, aabb
                 ));
 				vertices.push_back(BrushBuilder::CreateVertex(
-                    f, b->Points()[f->points[i + 1]]->pos, tex_w, tex_h, WHITE, aabb
+                    f, b->Points()[f->border[i + 1]]->pos, tex_w, tex_h, WHITE, aabb
                 ));
 			}
 
 			int start_idx = border_vertices.size();
-			for (auto& v : f->points) {
+			for (auto& v : f->border) {
 				border_vertices.push_back(BrushBuilder::CreateVertex(
                     f, b->Points()[v]->pos, tex_w, tex_h, WHITE, aabb
                 ));
 			}
-			for (int i = 0, n = f->points.size() - 1; i < n; ++i) {
+			for (int i = 0, n = f->border.size() - 1; i < n; ++i) {
 				border_indices.push_back(start_idx + i);
 				border_indices.push_back(start_idx + i + 1);
 			}
-			border_indices.push_back(start_idx + static_cast<unsigned short>(f->points.size() - 1));
+			border_indices.push_back(start_idx + static_cast<unsigned short>(f->border.size() - 1));
 			border_indices.push_back(start_idx);
 
 			++face_idx;

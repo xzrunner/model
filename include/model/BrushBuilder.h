@@ -88,8 +88,8 @@ public:
         std::vector<unsigned short>& border_indices, model::Model& dst);
 
 private:
-    static void Triangulation(std::vector<size_t>& dst_tris, const std::vector<pm3::Polytope::PointPtr>& src_pts,
-        const std::vector<size_t>& src_face);
+    static std::vector<size_t> Triangulation(const std::vector<pm3::Polytope::PointPtr>& verts,
+        const std::vector<size_t>& border, const std::vector<std::vector<size_t>>& holes);
 
 }; // BrushBuilder
 

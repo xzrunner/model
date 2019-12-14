@@ -289,21 +289,20 @@ BrushBuilder::PolymeshFromBrush(VertexType type, const std::vector<pm3::Polytope
 	    {
             auto& f = faces[j];
             auto& norm = f->plane.normal;
-            std::vector<size_t> tris_idx;
-            Triangulation(tris_idx, points, f->points);
+            auto tris_idx = Triangulation(points, f->border, f->holes);
             for (auto& idx : tris_idx) {
                 vertices.push_back(create_vertex(points[idx]->pos, norm, texcoords, colors, i, j, idx, aabb));
             }
-            for (size_t k = 0, l = f->points.size(); k < l; ++k) {
-			    border_vertices.push_back(create_vertex(points[f->points[k]]->pos, norm, texcoords, colors, i, j, k, aabb));
+            for (size_t k = 0, l = f->border.size(); k < l; ++k) {
+			    border_vertices.push_back(create_vertex(points[f->border[k]]->pos, norm, texcoords, colors, i, j, k, aabb));
 		    }
-		    for (int k = 0, n = f->points.size() - 1; k < n; ++k) {
+		    for (int k = 0, n = f->border.size() - 1; k < n; ++k) {
 			    border_indices.push_back(start_idx + k);
 			    border_indices.push_back(start_idx + k + 1);
 		    }
-		    border_indices.push_back(static_cast<unsigned short>(start_idx + f->points.size() - 1));
+		    border_indices.push_back(static_cast<unsigned short>(start_idx + f->border.size() - 1));
 		    border_indices.push_back(start_idx);
-		    start_idx += f->points.size();
+		    start_idx += f->border.size();
 	    }
     }
     if (!vertices.empty()) {
@@ -365,15 +364,12 @@ void BrushBuilder::UpdateVBO(Model& model, const BrushModel::Brush& brush)
 			for (int j = src_mesh.face_begin; j < src_mesh.face_end; ++j)
 			{
 				auto& f = faces[j];
-				std::vector<sm::vec3> border;
-				assert(f->points.size() > 2);
-				for (size_t i = 1; i < f->points.size() - 1; ++i)
-				{
-					vertices.push_back(CreateVertex(f, points[f->points[0]]->pos, tex_w, tex_h, WHITE, aabb));
-					vertices.push_back(CreateVertex(f, points[f->points[i]]->pos, tex_w, tex_h, WHITE, aabb));
-					vertices.push_back(CreateVertex(f, points[f->points[i + 1]]->pos, tex_w, tex_h, WHITE, aabb));
-				}
-				for (auto& vert : f->points) {
+                auto tris_idx = Triangulation(points, f->border, f->holes);
+                for (auto& idx : tris_idx) {
+                    vertices.push_back(CreateVertex(f, points[f->border[idx]]->pos, tex_w, tex_h, WHITE, aabb));
+                }
+				assert(f->border.size() > 2);
+				for (auto& vert : f->border) {
 					border_vertices.push_back(CreateVertex(f, points[vert]->pos, tex_w, tex_h, WHITE, aabb));
 				}
 			}
@@ -490,37 +486,52 @@ void BrushBuilder::FlushVertices(VertexType type,
     border_vertices.clear();
 }
 
-void BrushBuilder::Triangulation(std::vector<size_t>& dst_tris, const std::vector<pm3::Polytope::PointPtr>& src_pts,
-                                 const std::vector<size_t>& src_face)
+std::vector<size_t>
+BrushBuilder::Triangulation(const std::vector<pm3::Polytope::PointPtr>& verts,
+                            const std::vector<size_t>& border, const std::vector<std::vector<size_t>>& holes)
 {
     std::vector<sm::vec3> border3;
-    border3.reserve(src_face.size());
-    for (auto& idx : src_face) {
-        border3.push_back(src_pts[idx]->pos);
+    border3.reserve(border.size());
+    for (auto& idx : border) {
+        border3.push_back(verts[idx]->pos);
     }
     auto norm = sm::calc_face_normal(border3);
     auto rot = sm::mat4(sm::Quaternion::CreateFromVectors(norm, sm::vec3(0, 1, 0)));
     auto inv_rot = rot.Inverted();
 
-    std::vector<sm::vec2> border2;
-    border2.reserve(src_face.size());
-
     std::map<sm::vec2, size_t> pos2idx;
-    for (auto& idx : src_face)
+    auto trans_loop3to2 = [&](const std::vector<pm3::Polytope::PointPtr>& verts,
+                              const std::vector<size_t>& loop3) -> std::vector<sm::vec2>
     {
-        auto& pos3 = src_pts[idx]->pos;
-        auto p3_rot = rot * pos3;
-        sm::vec2 pos2(p3_rot.x, p3_rot.z);
-        auto status = pos2idx.insert({ pos2, idx });
-        //assert(status.second);
+        std::vector<sm::vec2> loop2;
+        loop2.reserve(loop3.size());
+        for (size_t i = 0, n = loop3.size(); i < n; ++i)
+        {
+            auto& pos3 = verts[loop3[i]]->pos;
+            auto p3_rot = rot * pos3;
+            sm::vec2 pos2(p3_rot.x, p3_rot.z);
+            auto status = pos2idx.insert({ pos2, i });
+            assert(status.second);
 
-        border2.push_back(pos2);
+            loop2.push_back(pos2);
+        }
+        return loop2;
+    };
+
+    auto border2 = trans_loop3to2(verts, border);
+
+    std::vector<std::vector<sm::vec2>> holes2;
+    holes2.resize(holes.size());
+    for (size_t i = 0, n = holes.size(); i < n; ++i) {
+        holes2[i] = trans_loop3to2(verts, holes[i]);
     }
 
+    std::vector<size_t> ret;
+
     std::vector<sm::vec2> tris;
-    sm::triangulate_normal(border2, tris);
+    sm::triangulate_holes(border2, holes2, tris);
     assert(tris.size() % 3 == 0);
-    dst_tris.reserve(tris.size());
+    ret.reserve(tris.size());
     for (size_t i = 0, n = tris.size(); i < n; )
     {
         std::vector<sm::vec2*> tri(3);
@@ -534,9 +545,11 @@ void BrushBuilder::Triangulation(std::vector<size_t>& dst_tris, const std::vecto
         {
             auto itr = pos2idx.find(*tri[j]);
             assert(itr != pos2idx.end());
-            dst_tris.push_back(itr->second);
+            ret.push_back(itr->second);
         }
     }
+
+    return ret;
 }
 
 }
