@@ -497,22 +497,19 @@ BrushBuilder::Triangulation(const std::vector<pm3::Polytope::PointPtr>& verts,
     }
     auto norm = sm::calc_face_normal(border3);
     auto rot = sm::mat4(sm::Quaternion::CreateFromVectors(norm, sm::vec3(0, 1, 0)));
-    auto inv_rot = rot.Inverted();
 
     std::map<sm::vec2, size_t> pos2idx;
     auto trans_loop3to2 = [&](const std::vector<pm3::Polytope::PointPtr>& verts,
                               const std::vector<size_t>& loop3) -> std::vector<sm::vec2>
     {
-        size_t start_idx = pos2idx.size();
-
         std::vector<sm::vec2> loop2;
         loop2.reserve(loop3.size());
-        for (size_t i = 0, n = loop3.size(); i < n; ++i)
+        for (auto& idx : loop3)
         {
-            auto& pos3 = verts[loop3[i]]->pos;
+            auto& pos3 = verts[idx]->pos;
             auto p3_rot = rot * pos3;
             sm::vec2 pos2(p3_rot.x, p3_rot.z);
-            auto status = pos2idx.insert({ pos2, start_idx + i });
+            auto status = pos2idx.insert({ pos2, idx });
             assert(status.second);
 
             loop2.push_back(pos2);
