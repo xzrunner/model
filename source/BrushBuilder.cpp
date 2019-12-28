@@ -331,9 +331,14 @@ std::unique_ptr<Model>
 BrushBuilder::PolymeshFromPolygon(const std::vector<sm::vec3>& polygon)
 {
     auto brush_model = model::BrushBuilder::BrushFromPolygon(polygon);
-    std::vector<sm::vec2> texcoords(polygon.size(), sm::vec2(0, 0));
-    std::vector<sm::vec3> colors(polygon.size(), sm::vec3(1, 1, 1));
-    auto model = model::BrushBuilder::PolymeshFromBrush(VertexType::PosNorm, *brush_model, {{ texcoords }}, {{ colors }});
+    auto& brushes = brush_model->GetBrushes();
+    assert(brushes.size() == 1);
+    const size_t p_num = brushes[0].impl->Points().size();
+    const size_t f_num = brushes[0].impl->Faces().size();
+    std::vector<sm::vec2> texcoords(p_num, sm::vec2(0, 0));
+    std::vector<sm::vec3> colors(p_num, sm::vec3(1, 1, 1));
+    auto model = model::BrushBuilder::PolymeshFromBrush(VertexType::PosNorm, *brush_model,
+        {{ f_num, texcoords }}, {{ f_num, colors }});
     model->ext = std::move(brush_model);
 
     return model;
@@ -366,7 +371,7 @@ void BrushBuilder::UpdateVBO(Model& model, const BrushModel::Brush& brush)
 				auto& f = faces[j];
                 auto tris_idx = Triangulation(points, f->border, f->holes);
                 for (auto& idx : tris_idx) {
-                    vertices.push_back(CreateVertex(f, points[f->border[idx]]->pos, tex_w, tex_h, WHITE, aabb));
+                    vertices.push_back(CreateVertex(f, points[idx]->pos, tex_w, tex_h, WHITE, aabb));
                 }
 				assert(f->border.size() > 2);
 				for (auto& vert : f->border) {
