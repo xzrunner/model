@@ -11,7 +11,7 @@
 namespace model
 {
 
-ur::TexturePtr TextureLoader::LoadFromFile(const char* filepath)
+ur::TexturePtr TextureLoader::LoadFromFile(const char* filepath, int mipmap_levels)
 {
 	if (!boost::filesystem::is_regular_file(filepath)) {
 		return false;
@@ -68,7 +68,7 @@ ur::TexturePtr TextureLoader::LoadFromFile(const char* filepath)
 	}
 
 	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-	auto texid = rc.CreateTexture(pixels, w, h, tf);
+	auto texid = rc.CreateTexture(pixels, w, h, tf, mipmap_levels);
 	free(pixels);
 
 	return std::make_unique<ur::Texture>(&rc, w, h, tf, texid);
