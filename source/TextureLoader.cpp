@@ -33,6 +33,9 @@ ur::TexturePtr TextureLoader::LoadFromFile(const char* filepath, int mipmap_leve
 	case GPF_ALPHA: case GPF_LUMINANCE: case GPF_LUMINANCE_ALPHA:
 		tf = ur::TEXTURE_A8;
 		break;
+    case GPF_RED:
+        tf = ur::TEXTURE_RED;
+        break;
 	case GPF_RGB:
 		tf = ur::TEXTURE_RGB;
 		break;
@@ -86,7 +89,7 @@ ur::TexturePtr TextureLoader::LoadFromMemory(const unsigned char* pixels, int wi
 		format = ur::TEXTURE_RGB;
 		break;
 	case 1:
-		format = ur::TEXTURE_A8;
+		format = ur::TEXTURE_RED;
 		break;
 	default:
 		assert(0);
