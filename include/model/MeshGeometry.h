@@ -1,7 +1,6 @@
 #pragma once
 
 #include <SM_Matrix.h>
-#include <unirender/VertexAttrib.h>
 
 #include <unordered_map>
 #include <memory>
@@ -10,6 +9,8 @@
 
 //#define BLENDSHAPE_COMPRESS_FLOAT
 //#define BLENDSHAPE_COMPRESS_TO8
+
+namespace ur2 { class VertexArray; }
 
 namespace model
 {
@@ -72,9 +73,7 @@ struct MeshGeometry : boost::noncopyable
 {
 	~MeshGeometry();
 
-	unsigned int vao = 0;
-	unsigned int vbo = 0;
-	unsigned int ebo = 0;
+    std::shared_ptr<ur2::VertexArray> vertex_array = nullptr;
 
 //	std::unordered_map<std::string, SubmeshGeometry> sub_geometries;
 	std::vector<SubmeshGeometry> sub_geometries;
@@ -83,8 +82,8 @@ struct MeshGeometry : boost::noncopyable
 	// skeletal anim
 	std::vector<Bone> bones;
 
-	// morph anim
-	std::vector<ur::VertexAttrib> vertex_layout;
+	//// morph anim
+	//std::vector<ur::VertexAttrib> vertex_layout;
 
 	// mesh process
 	std::unique_ptr<MeshRawData> raw_data = nullptr;

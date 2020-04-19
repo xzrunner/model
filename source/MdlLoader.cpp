@@ -8,9 +8,10 @@
 #include "model/TextureLoader.h"
 
 #include <quake/Palette.h>
-#include <unirender/RenderContext.h>
-#include <unirender/Blackboard.h>
 #include <SM_Cube.h>
+#include <unirender2/Device.h>
+#include <unirender2/VertexBuffer.h>
+#include <unirender2/VertexBufferAttribute.h>
 
 #include <fstream>
 #include <memory>
@@ -31,7 +32,7 @@ const float SCALE = 0.1f;
 namespace model
 {
 
-bool MdlLoader::Load(Model& model, const std::string& filepath)
+bool MdlLoader::Load(const ur2::Device& dev, Model& model, const std::string& filepath)
 {
 	std::ifstream fin(filepath, std::ios::binary);
 	if (fin.fail()) {
@@ -45,13 +46,13 @@ bool MdlLoader::Load(Model& model, const std::string& filepath)
 		return false;
 	}
 
-	LoadMaterial(header, fin, model, filepath);
-	LoadMesh(header, fin, model);
+	LoadMaterial(dev, header, fin, model, filepath);
+	LoadMesh(dev, header, fin, model);
 
 	return true;
 }
 
-void MdlLoader::LoadMaterial(const MdlHeader& header, std::ifstream& fin,
+void MdlLoader::LoadMaterial(const ur2::Device& dev, const MdlHeader& header, std::ifstream& fin,
 	                         Model& model, const std::string& filepath)
 {
 	quake::Palette palette;
@@ -71,7 +72,7 @@ void MdlLoader::LoadMaterial(const MdlHeader& header, std::ifstream& fin,
 
 		auto material = std::make_unique<Model::Material>();
 		material->diffuse_tex = model.textures.size();
-		auto tex = TextureLoader::LoadFromMemory(rgb, header.skinwidth, header.skinheight, 3);
+		auto tex = TextureLoader::LoadFromMemory(dev, rgb, header.skinwidth, header.skinheight, 3);
 		model.textures.push_back({ filepath + std::to_string(i), std::move(tex) });
 		model.materials.push_back(std::move(material));
 
@@ -80,7 +81,8 @@ void MdlLoader::LoadMaterial(const MdlHeader& header, std::ifstream& fin,
 	delete[] skins;
 }
 
-void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& model)
+void MdlLoader::LoadMesh(const ur2::Device& dev, const MdlHeader& header,
+                         std::ifstream& fin, Model& model)
 {
 	MdlTexcoord* mdl_texcoords = new MdlTexcoord[header.num_verts];
 	fin.read(reinterpret_cast<char*>(mdl_texcoords), sizeof(MdlTexcoord) * header.num_verts);
@@ -168,18 +170,30 @@ void MdlLoader::LoadMesh(const MdlHeader& header, std::ifstream& fin, Model& mod
 
 	int vt_sz = sizeof(Vertex) * vertices.size();
 	int tc_sz = sizeof(sm::vec2) * texcoords.size();
-	uint8_t* buf = new uint8_t[vt_sz + tc_sz];
+    const int buf_sz = vt_sz + tc_sz;
+	uint8_t* buf = new uint8_t[buf_sz];
 	memcpy(buf, vertices.data(), vt_sz);
 	memcpy(buf + vt_sz, texcoords.data(), tc_sz);
-	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-	mesh->geometry.vbo = rc.CreateBuffer(ur::VERTEXBUFFER, buf, vt_sz + tc_sz);
+
+    auto va = dev.CreateVertexArray();
+    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, buf_sz);
+    vbuf->ReadFromMemory(buf, buf_sz, 0);
 	delete[] buf;
 
-	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("pose1_vert",   3, 4, 24, 0));
-	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("pose1_normal", 3, 4, 24, 12));
-	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("pose2_vert",   3, 4, 24, 0));
-	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("pose2_normal", 3, 4, 24, 12));
-	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("texcoord",     2, 4, 0, vt_sz));
+    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs;
+    vbuf_attrs.resize(5);
+    // pose1_vert, pose2_vert
+    vbuf_attrs[0] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 3, 0, 24
+    );
+    // pose1_normal, pose2_normal
+    vbuf_attrs[1] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 3, 12, 24
+    );
+    // texcoord
+    vbuf_attrs[2] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 2, 20, 24
+    );
 
 	int vertices_n = header.num_tris * 3;
 	int offset = 0;

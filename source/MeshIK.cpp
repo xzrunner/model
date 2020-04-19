@@ -2,8 +2,8 @@
 #include "model/MeshGeometry.h"
 
 #include <meshlab/Sorkine04.h>
-#include <unirender/Blackboard.h>
-#include <unirender/RenderContext.h>
+#include <unirender2/VertexArray.h>
+#include <unirender2/VertexBuffer.h>
 
 namespace
 {
@@ -185,8 +185,8 @@ void MeshIK::Deform(const sm::vec3& translate)
 		memcpy(ptr, &m_colors[i], sizeof(uint32_t));
 		ptr += sizeof(uint32_t);
 	}
-	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-	rc.UpdateBufferRaw(ur::BUFFER_VERTEX, m_mesh.vbo, buf, buf_sz, 0);
+
+    m_mesh.vertex_array->GetVertexBuffer()->ReadFromMemory(buf, buf_sz, 0);
 	delete[] buf;
 }
 

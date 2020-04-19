@@ -1,6 +1,8 @@
 #include "model/BlendShapeLoader.h"
 #include "model/Model.h"
 
+#include <map>
+
 namespace model
 {
 

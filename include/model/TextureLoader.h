@@ -1,6 +1,8 @@
 #pragma once
 
-#include <unirender/Texture.h>
+#include <unirender2/typedef.h>
+
+namespace ur2 { class Device; }
 
 namespace model
 {
@@ -8,8 +10,10 @@ namespace model
 class TextureLoader
 {
 public:
-	static ur::TexturePtr LoadFromFile(const char* filepath, int mipmap_levels = 0);
-	static ur::TexturePtr LoadFromMemory(const unsigned char* pixels, int width, int height, int channels);
+	static ur2::TexturePtr
+        LoadFromFile(const ur2::Device& dev, const char* filepath, int mipmap_levels = 0);
+	static ur2::TexturePtr
+        LoadFromMemory(const ur2::Device& dev, const unsigned char* pixels, int width, int height, int channels);
 
 }; // TextureLoader
 

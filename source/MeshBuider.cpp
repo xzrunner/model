@@ -1,19 +1,17 @@
 #include "model/MeshBuider.h"
 #include "model/typedef.h"
 
-#include <unirender/Blackboard.h>
-#include <unirender/RenderContext.h>
+#include <unirender2/Device.h>
+#include <unirender2/VertexBuffer.h>
+#include <unirender2/VertexBufferAttribute.h>
+#include <unirender2/VertexArray.h>
 
 namespace model
 {
 
 std::unique_ptr<Model::Mesh>
-MeshBuider::CreateCube(const sm::vec3& half_extents)
+MeshBuider::CreateCube(const ur2::Device& dev, const sm::vec3& half_extents)
 {
-    auto mesh = std::make_unique<Model::Mesh>();
-
-	ur::RenderContext::VertexInfo vi;
-
     auto& sz = half_extents;
     float vertices[] = {
         // back face
@@ -60,18 +58,30 @@ MeshBuider::CreateCube(const sm::vec3& half_extents)
         -sz.x,  sz.y,  sz.z,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left
     };
 
-    const size_t stride = 8;    // float number
-	vi.vn = sizeof(vertices) / sizeof(vertices[0]) / stride;
-	vi.vertices = &vertices[0];
-	vi.stride = stride * sizeof(float);
+    auto va = dev.CreateVertexArray();
 
-	vi.va_list.push_back(ur::VertexAttrib("pos",      3, 4, 32, 0));   // pos
-	vi.va_list.push_back(ur::VertexAttrib("normal",   3, 4, 32, 12));  // normal
-	vi.va_list.push_back(ur::VertexAttrib("texcoord", 2, 4, 32, 24));  // texcoord
+    auto vbuf_sz = sizeof(vertices);
+    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+    vbuf->ReadFromMemory(vertices, vbuf_sz, 0);
+    va->SetVertexBuffer(vbuf);
 
-	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
-		vi, mesh->geometry.vao, mesh->geometry.vbo, mesh->geometry.ebo);
-	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(false, vi.vn, 0));
+    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs;
+    vbuf_attrs.resize(3);
+    vbuf_attrs[0] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 3, 0, 32
+    );
+    vbuf_attrs[1] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 3, 12, 32
+    );
+    vbuf_attrs[2] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 2, 24, 32
+    );
+    va->SetVertexBufferAttrs(vbuf_attrs);
+
+    auto mesh = std::make_unique<Model::Mesh>();
+    mesh->geometry.vertex_array = va;
+    int v_num = sizeof(vertices) / sizeof(vertices[0]) / 8;
+	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(false, v_num, 0));
 	mesh->geometry.sub_geometry_materials.push_back(0);
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;

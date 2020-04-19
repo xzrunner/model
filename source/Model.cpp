@@ -21,20 +21,20 @@ bool Model::LoadFromFile(const std::string& filepath)
 	auto ext = boost::filesystem::extension(filepath);
 	std::transform(ext.begin(), ext.end(), ext.begin(), tolower);
 	if (ext == ".param") {
-		return SurfaceLoader::Load(*this, filepath);
+		return SurfaceLoader::Load(*dev, *this, filepath);
 	} else if (ext == ".obj") {
 //		return ObjLoader::Load(*this, filepath);
-		return AssimpHelper::Load(*this, filepath);
+		return AssimpHelper::Load(*dev, *this, filepath);
 	} else if (ext == ".m3d") {
-		return M3dLoader::Load(*this, filepath);
+		return M3dLoader::Load(*dev, *this, filepath);
 	} else if (ext == ".xml") {
-		return MaxLoader::Load(*this, filepath);
+		return MaxLoader::Load(*dev, *this, filepath);
 	} else if (ext == ".mdl") {
-		return MdlLoader::Load(*this, filepath);
+		return MdlLoader::Load(*dev, *this, filepath);
 	} else if (ext == ".bsp") {
-		return BspLoader::Load(*this, filepath);
+		return BspLoader::Load(*dev, *this, filepath);
     } else if (ext == ".map") {
-        return MapBuilder::Load(*this, filepath);
+        return MapBuilder::Load(*dev, *this, filepath);
     //} else if (ext == ".fbx") {
     //    return FbxLoader::Load(*this, filepath);
 	} else {
@@ -44,7 +44,7 @@ bool Model::LoadFromFile(const std::string& filepath)
         if (ext == ".fbx") {
             scale = 0.01f;
         }
-		bool ret = AssimpHelper::Load(*this, filepath, scale);
+		bool ret = AssimpHelper::Load(*dev, *this, filepath, scale);
 
         // load blendshape
         if (ext == ".fbx")

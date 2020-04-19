@@ -125,7 +125,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\gimg\src\gimg;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\quake\include;..\..\..\..\lexer\include;..\..\..\..\halfedge\include;..\..\..\..\polymesh3\include;..\..\..\..\meshlab\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;..\..\..\..\external\rapidxml\include;..\..\..\..\external\eigen\include;..\..\..\..\external\fbxsdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\gimg\src\gimg;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender2\include;..\..\..\..\quake\include;..\..\..\..\lexer\include;..\..\..\..\halfedge\include;..\..\..\..\polymesh3\include;..\..\..\..\meshlab\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;..\..\..\..\external\rapidxml\include;..\..\..\..\external\eigen\include;..\..\..\..\external\fbxsdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FBXSDK_SHARED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -139,7 +139,7 @@
     <ClCompile>
       <Optimization>MaxSpeed</Optimization>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\gimg\src\gimg;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender\include;..\..\..\..\quake\include;..\..\..\..\lexer\include;..\..\..\..\halfedge\include;..\..\..\..\polymesh3\include;..\..\..\..\meshlab\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;..\..\..\..\external\rapidxml\include;..\..\..\..\external\eigen\include;..\..\..\..\external\fbxsdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\cu\src;..\..\..\..\sm\src\sm;..\..\..\..\gimg\src\gimg;..\..\..\..\memmgr\include;..\..\..\..\guard\include;..\..\..\..\unirender2\include;..\..\..\..\quake\include;..\..\..\..\lexer\include;..\..\..\..\halfedge\include;..\..\..\..\polymesh3\include;..\..\..\..\meshlab\include;..\..\..\..\external\boost\include;..\..\..\..\external\tinyobjloader\include;..\..\..\..\external\rapidjson\include;..\..\..\..\external\assimp\include;..\..\..\..\external\rapidxml\include;..\..\..\..\external\eigen\include;..\..\..\..\external\fbxsdk\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;FBXSDK_SHARED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>

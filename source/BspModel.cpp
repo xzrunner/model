@@ -1,8 +1,7 @@
 #include "model/BspModel.h"
 
-#include <unirender/RenderContext.h>
-#include <unirender/Blackboard.h>
 #include <quake/Lightmaps.h>
+#include <unirender2/Texture.h>
 
 namespace
 {
@@ -16,7 +15,7 @@ unsigned blocklights[quake::Lightmaps::BLOCK_WIDTH * quake::Lightmaps::BLOCK_HEI
 namespace model
 {
 
-void BspModel::CreateSurfaceLightmap()
+void BspModel::CreateSurfaceLightmap(const ur2::Device& dev)
 {
 	for (auto& s : surfaces)
 	{
@@ -27,7 +26,7 @@ void BspModel::CreateSurfaceLightmap()
 		BuildLightMap(s, data, quake::Lightmaps::BLOCK_WIDTH * quake::Lightmaps::BPP);
 	}
 
-	quake::Lightmaps::Instance()->CreatetTextures();
+	quake::Lightmaps::Instance()->CreatetTextures(dev);
 }
 
 void BspModel::BuildSurfaceDisplayList()
@@ -69,9 +68,9 @@ void BspModel::BuildSurfaceDisplayList()
 			if (tex)
 			{
 				float s = sm::vec3(vec->point).Dot(sm::vec3(ti.vecs[0])) + ti.vecs[0][3];
-				s /= tex->Width();
+				s /= tex->GetWidth();
 				float t = sm::vec3(vec->point).Dot(sm::vec3(ti.vecs[1])) + ti.vecs[1][3];
-				t /= tex->Height();
+				t /= tex->GetHeight();
 				poly->verts[i][3] = s;
 				poly->verts[i][4] = t;
 			}

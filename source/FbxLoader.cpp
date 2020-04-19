@@ -3,8 +3,11 @@
 #include "model/Model.h"
 #include "model/typedef.h"
 
-#include <unirender/RenderContext.h>
-#include <unirender/Blackboard.h>
+#include <unirender2/Device.h>
+#include <unirender2/VertexArray.h>
+#include <unirender2/IndexBuffer.h>
+#include <unirender2/VertexBuffer.h>
+#include <unirender2/VertexBufferAttribute.h>
 
 #include <fbxsdk.h>
 
@@ -89,7 +92,8 @@ struct SubMesh
 namespace model
 {
 
-bool FbxLoader::Load(Model& model, const std::string& filepath, float scale)
+bool FbxLoader::Load(const ur2::Device& dev, Model& model,
+                     const std::string& filepath, float scale)
 {
     FbxManager* lSdkManager = NULL;
     FbxScene* lScene = NULL;
@@ -108,7 +112,7 @@ bool FbxLoader::Load(Model& model, const std::string& filepath, float scale)
 
     // mesh
     sm::cube aabb;
-    LoadMeshesRecursive(lScene->GetRootNode(), model, aabb, scale);
+    LoadMeshesRecursive(dev, lScene->GetRootNode(), model, aabb, scale);
 
     model.aabb.Combine(aabb);
 
@@ -652,7 +656,8 @@ void FbxLoader::LoadMaterialsRecursive(fbxsdk::FbxNode* node, Model& model)
     }
 }
 
-void FbxLoader::LoadMeshesRecursive(fbxsdk::FbxNode* pNode, Model& model, sm::cube& aabb, float scale)
+void FbxLoader::LoadMeshesRecursive(const ur2::Device& dev, fbxsdk::FbxNode* pNode,
+                                    Model& model, sm::cube& aabb, float scale)
 {
     FbxNodeAttribute* lNodeAttribute = pNode->GetNodeAttribute();
     if (lNodeAttribute)
@@ -665,7 +670,7 @@ void FbxLoader::LoadMeshesRecursive(fbxsdk::FbxNode* pNode, Model& model, sm::cu
             if (pNode->GetMesh())
             {
                 auto mesh = std::make_unique<Model::Mesh>();
-                LoadMesh(*mesh, *pNode, aabb, scale);
+                LoadMesh(dev, *mesh, *pNode, aabb, scale);
                 if (!pNode->GetUserDataPtr()) {
                     pNode->SetUserDataPtr(mesh.get());
                 }
@@ -676,11 +681,12 @@ void FbxLoader::LoadMeshesRecursive(fbxsdk::FbxNode* pNode, Model& model, sm::cu
 
     const int lChildCount = pNode->GetChildCount();
     for (int lChildIndex = 0; lChildIndex < lChildCount; ++lChildIndex) {
-        LoadMeshesRecursive(pNode->GetChild(lChildIndex), model, aabb, scale);
+        LoadMeshesRecursive(dev, pNode->GetChild(lChildIndex), model, aabb, scale);
     }
 }
 
-void FbxLoader::LoadMesh(Model::Mesh& dst, fbxsdk::FbxNode& src, sm::cube& aabb, float scale)
+void FbxLoader::LoadMesh(const ur2::Device& dev, Model::Mesh& dst,
+                         fbxsdk::FbxNode& src, sm::cube& aabb, float scale)
 {
     dst.name = src.GetName();
     FbxMesh* lMesh = src.GetMesh();
@@ -1013,13 +1019,19 @@ void FbxLoader::LoadMesh(Model::Mesh& dst, fbxsdk::FbxNode& src, sm::cube& aabb,
 		}
 	}
 
-	ur::RenderContext::VertexInfo vi;
+    auto va = dev.CreateVertexArray();
 
-	vi.vn = controlPointCount;
-	vi.vertices = buf;
-	vi.stride = floats_per_vertex * sizeof(float);
-	vi.in = indices.size();
-	vi.indices = &indices[0];
+    auto ibuf_sz = sizeof(uint16_t) * indices.size();
+    auto ibuf = dev.CreateIndexBuffer(ur2::BufferUsageHint::StaticDraw, ibuf_sz);
+    ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
+    va->SetIndexBuffer(ibuf);
+
+    auto vbuf_sz = sizeof(float) * floats_per_vertex * controlPointCount;
+    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+    vbuf->ReadFromMemory(buf, vbuf_sz, 0);
+    va->SetVertexBuffer(vbuf);
+
+    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs;
 
 	int stride = 0;
 	// pos
@@ -1043,38 +1055,48 @@ void FbxLoader::LoadMesh(Model::Mesh& dst, fbxsdk::FbxNode& src, sm::cube& aabb,
 
 	int offset = 0;
 	// pos
-	vi.va_list.push_back(ur::VertexAttrib("pos", 3, 4, stride, offset));
+    vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 3, offset, stride));
 	offset += 4 * 3;
 	// normal
 	if (has_normal)
 	{
 		dst.geometry.vertex_type |= VERTEX_FLAG_NORMALS;
-		vi.va_list.push_back(ur::VertexAttrib("normal", 3, 4, stride, offset));
+        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
+            ur2::ComponentDataType::Float, 3, offset, stride));
 		offset += 4 * 3;
 	}
 	// texcoord
 	if (has_texcoord)
 	{
 		dst.geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
-		vi.va_list.push_back(ur::VertexAttrib("texcoord", 2, 4, stride, offset));
+        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
+            ur2::ComponentDataType::Float, 2, offset, stride));
 		offset += 4 * 2;
 	}
 	// color
 	if (has_color)
 	{
 		dst.geometry.vertex_type |= VERTEX_FLAG_COLOR;
-		vi.va_list.push_back(ur::VertexAttrib("color", 4, 1, stride, offset));
+        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
+            ur2::ComponentDataType::Byte, 4, offset, stride));
 		offset += 4;
 	}
 	// skinned
 	if (has_skinned)
 	{
 		dst.geometry.vertex_type |= VERTEX_FLAG_SKINNED;
-		vi.va_list.push_back(ur::VertexAttrib("blend_indices", 4, 1, stride, offset));
+        // blend_indices
+        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
+            ur2::ComponentDataType::Byte, 4, offset, stride));
 		offset += 4;
-		vi.va_list.push_back(ur::VertexAttrib("blend_weights", 4, 1, stride, offset));
+        // blend_weights
+        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
+            ur2::ComponentDataType::Byte, 4, offset, stride));
 		offset += 4;
 	}
+
+    va->SetVertexBufferAttrs(vbuf_attrs);
 
     // update the meshes offsets and indices counts //
     for( size_t i = 0; i < subMeshes.size(); i++ ) {
@@ -1103,8 +1125,7 @@ void FbxLoader::LoadMesh(Model::Mesh& dst, fbxsdk::FbxNode& src, sm::cube& aabb,
         toffset += subMeshes[i].totalIndices;
     }
 
-	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
-		vi, dst.geometry.vao, dst.geometry.vbo, dst.geometry.ebo);
+    dst.geometry.vertex_array = va;
     for (auto& sub : subMeshes)
     {
         dst.geometry.sub_geometries.push_back(

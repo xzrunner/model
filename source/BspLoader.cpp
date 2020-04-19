@@ -4,9 +4,12 @@
 #include "model/Model.h"
 #include "model/typedef.h"
 
-#include <unirender/Blackboard.h>
-#include <unirender/RenderContext.h>
-#include <unirender/typedef.h>
+#include <unirender2/Device.h>
+#include <unirender2/IndexBuffer.h>
+#include <unirender2/VertexBuffer.h>
+#include <unirender2/VertexBufferAttribute.h>
+#include <unirender2/VertexArray.h>
+#include <unirender2/Bitmap.h>
 #include <quake/Palette.h>
 
 #include <fstream>
@@ -16,7 +19,7 @@
 namespace model
 {
 
-bool BspLoader::Load(Model& model, const std::string& filepath)
+bool BspLoader::Load(const ur2::Device& dev, Model& model, const std::string& filepath)
 {
 	std::ifstream fin(filepath, std::ios::binary);
 	if (fin.fail()) {
@@ -41,7 +44,7 @@ bool BspLoader::Load(Model& model, const std::string& filepath)
 	LoadVertices(fin, header.lumps[LUMP_VERTEXES], bsp->vertices);
 	LoadEdges(fin, header.lumps[LUMP_EDGES], bsp->edges);
 	LoadSurfaceEdges(fin, header.lumps[LUMP_SURFEDGES], bsp->surface_edges);
-	LoadTextures(fin, header.lumps[LUMP_TEXTURES], bsp->textures);
+	LoadTextures(fin, header.lumps[LUMP_TEXTURES], bsp->textures, dev);
 	bsp->lightdata = LoadLighting(fin, header.lumps[LUMP_LIGHTING]);
 	LoadPlanes(fin, header.lumps[LUMP_PLANES], bsp->planes);
 	LoadTexInfo(fin, header.lumps[LUMP_TEXINFO], bsp->tex_info, bsp->textures);
@@ -53,7 +56,7 @@ bool BspLoader::Load(Model& model, const std::string& filepath)
 	bsp->entities = LoadEntities(fin, header.lumps[LUMP_ENTITIES]);
 	LoadSubmodels(fin, header.lumps[LUMP_MODELS], bsp->submodels);
 
-	bsp->CreateSurfaceLightmap();
+	bsp->CreateSurfaceLightmap(dev);
 	bsp->BuildSurfaceDisplayList();
 
 	ChainSurfaceByTexture(*bsp);
@@ -63,13 +66,12 @@ bool BspLoader::Load(Model& model, const std::string& filepath)
 
 	// mesh
 	auto mesh = std::make_unique<Model::Mesh>();
-	mesh->geometry.vbo = BuildModelVertexBuffer(*bsp);
-	mesh->geometry.ebo = BuildModelIndexBuffer(*bsp);
 
-	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("position",       3, 4, 28, 0));
-	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("texcoord",       2, 4, 28, 12));
-	mesh->geometry.vertex_layout.push_back(ur::VertexAttrib("texcoord_light", 2, 4, 28, 20));
+    auto va = dev.CreateVertexArray();
+    BuildModelIndexBuffer(dev, *bsp, *va);
+    BuildModelVertexBuffer(dev, *bsp, *va);
 
+    mesh->geometry.vertex_array = va;
 	int vertices_n = 0;
 	for (auto& s : bsp->surfaces) {
 		vertices_n += 3 * (s.numedges - 2);
@@ -116,12 +118,11 @@ void BspLoader::LoadSurfaceEdges(std::ifstream& fin, const BspFileLump& lump,
 }
 
 void BspLoader::LoadTextures(std::ifstream& fin, const BspFileLump& lump,
-	                         std::vector<BspModel::Texture>& textures)
+	                         std::vector<BspModel::Texture>& textures, const ur2::Device& dev)
 {
 	BspMipTexLump* m = nullptr;
 
 	quake::Palette palette;
-	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
 
 	int num_mip_tex = 0;
 	if (lump.size != 0) {
@@ -154,34 +155,28 @@ void BspLoader::LoadTextures(std::ifstream& fin, const BspFileLump& lump,
 		} else {
 			// todo load texture from file
 
-			int tex_id = rc.CreateTextureID(mt.width, mt.height, ur::TEXTURE_RGB, MIPLEVELS);
-			uint32_t mip_w = mt.width;
-			uint32_t mip_h = mt.height;
-			for (int j = 0; j < MIPLEVELS; ++j)
-			{
-				size_t pixel_sz = mip_w * mip_h;
-				unsigned char* indexed = new unsigned char[pixel_sz];
-				fin.seekg(lump.offset + m->dataofs[i] + mt.offsets[j]);
-				fin.read((char*)indexed, pixel_sz);
+            size_t pixel_sz = mt.width * mt.height;
+            unsigned char* indexed = new unsigned char[pixel_sz];
+            fin.seekg(lump.offset + m->dataofs[i] + mt.offsets[0]);
+            fin.read((char*)indexed, pixel_sz);
 
-				size_t rgb_sz = pixel_sz * 3;
-				unsigned char* rgb = new unsigned char[rgb_sz];
-				palette.IndexedToRgb(indexed, pixel_sz, rgb);
-				delete[] indexed;
+            const int channels = 3;
+            size_t rgb_sz = mt.width * mt.height * channels;
+            unsigned char* pixels = new unsigned char[rgb_sz];
+            palette.IndexedToRgb(indexed, pixel_sz, pixels);
+            delete[] indexed;
 
-				rc.UpdateTexture(tex_id, rgb, mip_w, mip_h, 0, j);
-				delete[] rgb;
+            auto bmp = std::make_shared<ur2::Bitmap>(mt.width, mt.height, channels, pixels);
+            auto tex = dev.CreateTexture(*bmp, ur2::TextureFormat::RGB);
+            delete[] pixels;
 
-				mip_w /= 2;
-				mip_h /= 2;
-			}
-			textures[i].tex = std::make_unique<ur::Texture>(&rc, mt.width, mt.height, ur::TEXTURE_RGB, tex_id);
+            textures[i].tex = tex;
 			textures[i].surfaces_chain = nullptr;
 		}
 	}
-	textures[num_textures - 2].tex = std::make_unique<ur::Texture>();
+	textures[num_textures - 2].tex = nullptr;
 	textures[num_textures - 2].surfaces_chain = nullptr;
-	textures[num_textures - 1].tex = std::make_unique<ur::Texture>();
+	textures[num_textures - 1].tex = nullptr;
 	textures[num_textures - 1].surfaces_chain = nullptr;
 
 	delete[] m;
@@ -628,7 +623,7 @@ void BspLoader::ChainSurfaceByTexture(BspModel& model)
 	}
 }
 
-uint32_t BspLoader::BuildModelVertexBuffer(BspModel& model)
+void BspLoader::BuildModelVertexBuffer(const ur2::Device& dev, const BspModel& model, ur2::VertexArray& va)
 {
 	int numverts = 0;
 	for (auto& s : model.surfaces) {
@@ -640,19 +635,35 @@ uint32_t BspLoader::BuildModelVertexBuffer(BspModel& model)
 	int idx = 0;
 	for (auto& s : model.surfaces)
 	{
-		s.vbo_firstvert = idx;
+		const_cast<BspModel::Surface&>(s).vbo_firstvert = idx;
 		memcpy(&buf[VERTEXSIZE * idx], s.polys->verts, sizeof(float) * VERTEXSIZE * s.numedges);
 		idx += s.numedges;
 	}
 
-	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-	auto vbo = rc.CreateBuffer(ur::VERTEXBUFFER, buf, buf_sz);
-	delete[] buf;
+    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, buf_sz);
+    vbuf->ReadFromMemory(buf, buf_sz, 0);
+    va.SetVertexBuffer(vbuf);
 
-	return vbo;
+    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs;
+    vbuf_attrs.resize(3);
+    // position
+    vbuf_attrs[0] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 3, 0, 28
+    );
+    // texcoord
+    vbuf_attrs[1] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 2, 12, 28
+    );
+    // texcoord_light
+    vbuf_attrs[2] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 2, 20, 28
+    );
+    va.SetVertexBufferAttrs(vbuf_attrs);
+
+	delete[] buf;
 }
 
-uint32_t BspLoader::BuildModelIndexBuffer(BspModel& model)
+void BspLoader::BuildModelIndexBuffer(const ur2::Device& dev, const BspModel& model, ur2::VertexArray& va)
 {
 	int num = 0;
 	for (auto& s : model.surfaces) {
@@ -672,11 +683,12 @@ uint32_t BspLoader::BuildModelIndexBuffer(BspModel& model)
 		}
 	}
 
-	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-	auto ebo = rc.CreateBuffer(ur::INDEXBUFFER, buf, buf_sz);
-	delete[] buf;
+    auto ibuf_sz = sizeof(unsigned short) * num;
+    auto ibuf = dev.CreateIndexBuffer(ur2::BufferUsageHint::StaticDraw, ibuf_sz);
+    ibuf->ReadFromMemory(buf, ibuf_sz, 0);
+    va.SetIndexBuffer(ibuf);
 
-	return ebo;
+	delete[] buf;
 }
 
 }

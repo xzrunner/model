@@ -6,10 +6,12 @@
 #include "model/typedef.h"
 #include "model/TextureLoader.h"
 
-#include <unirender/RenderContext.h>
-#include <unirender/Blackboard.h>
-#include <unirender/VertexAttrib.h>
 #include <guard/check.h>
+#include <unirender2/Device.h>
+#include <unirender2/VertexArray.h>
+#include <unirender2/IndexBuffer.h>
+#include <unirender2/VertexBuffer.h>
+#include <unirender2/VertexBufferAttribute.h>
 
 #include <boost/filesystem.hpp>
 
@@ -25,7 +27,7 @@ const float MODEL_SCALE = 0.1f;
 namespace model
 {
 
-bool M3dLoader::Load(Model& model, const std::string& filepath)
+bool M3dLoader::Load(const ur2::Device& dev, Model& model, const std::string& filepath)
 {
 	auto dir = boost::filesystem::path(filepath).parent_path().string();
 
@@ -45,29 +47,45 @@ bool M3dLoader::Load(Model& model, const std::string& filepath)
 
 	const int stride = sizeof(M3dLoader::SkinnedVertex) / sizeof(float);
 
-	ur::RenderContext::VertexInfo vi;
+    auto va = dev.CreateVertexArray();
 
-	vi.vn = vertices.size();
-	vi.vertices = &vertices[0].Pos.xyz[0];
-	vi.stride = sizeof(M3dLoader::SkinnedVertex);
+    auto ibuf_sz = sizeof(uint16_t) * indices.size();
+    auto ibuf = dev.CreateIndexBuffer(ur2::BufferUsageHint::StaticDraw, ibuf_sz);
+    ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
+    va->SetIndexBuffer(ibuf);
 
-	vi.in = indices.size();
-	vi.indices = &indices[0];
+    auto vbuf_sz = sizeof(M3dLoader::SkinnedVertex) * vertices.size();
+    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+    vbuf->ReadFromMemory(&vertices[0].Pos.xyz[0], vbuf_sz, 0);
+    va->SetVertexBuffer(vbuf);
 
-	vi.va_list.push_back(ur::VertexAttrib("pos",          3, 4, 52, 0));  // pos
-	vi.va_list.push_back(ur::VertexAttrib("normal",       3, 4, 52, 12));  // normal
-	vi.va_list.push_back(ur::VertexAttrib("texcoord",     2, 4, 52, 24));  // texcoord
-	vi.va_list.push_back(ur::VertexAttrib("tangent",      3, 4, 52, 32));  // tangent
-	vi.va_list.push_back(ur::VertexAttrib("bone_weights", 4, 1, 52, 44)); // bone_weights
-	vi.va_list.push_back(ur::VertexAttrib("bone_indices", 4, 1, 52, 48)); // bone_indices
+    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs(6);
+    // pos
+    vbuf_attrs[0] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 3, 0, 52);
+    // normal
+    vbuf_attrs[1] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 3, 12, 52);
+    // texcoord
+    vbuf_attrs[2] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 2, 24, 52);
+    // tangent
+    vbuf_attrs[3] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 3, 32, 52);
+    // bone_weights
+    vbuf_attrs[4] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Byte, 1, 44, 52);
+    // bone_indices
+    vbuf_attrs[5] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Byte, 1, 48, 52);
+    va->SetVertexBufferAttrs(vbuf_attrs);
 
 	//// material
 	//model.materials.emplace_back(std::make_unique<Model::Material>());
 
 	// mesh
 	auto mesh = std::make_unique<Model::Mesh>();
-	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
-		vi, mesh->geometry.vao, mesh->geometry.vbo, mesh->geometry.ebo);
+    mesh->geometry.vertex_array = va;
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
 	mesh->material = 0;
@@ -97,7 +115,7 @@ bool M3dLoader::Load(Model& model, const std::string& filepath)
 		auto material = std::make_unique<Model::Material>();
 		material->diffuse_tex = model.textures.size();
 		auto img_path = boost::filesystem::absolute(mat_src.DiffuseMapName, dir);
-		auto tex = TextureLoader::LoadFromFile(img_path.string().c_str());
+		auto tex = TextureLoader::LoadFromFile(dev, img_path.string().c_str());
 		model.textures.push_back({ img_path.string(), std::move(tex) });
 		model.materials.push_back(std::move(material));
 

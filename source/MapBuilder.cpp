@@ -8,6 +8,8 @@
 #include <quake/WadFileLoader.h>
 #include <quake/Palette.h>
 #include <quake/TextureManager.h>
+#include <unirender2/Texture.h>
+#include <unirender2/TextureDescription.h>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -32,7 +34,8 @@ void FlushBrushDesc(model::BrushModel::BrushDesc& brush_desc,
 namespace model
 {
 
-std::shared_ptr<Model> MapBuilder::Create(const std::vector<sm::vec3>& polygon)
+std::shared_ptr<Model>
+MapBuilder::Create(const ur2::Device& dev, const std::vector<sm::vec3>& polygon)
 {
     auto brush_model = BrushBuilder::BrushFromPolygon(polygon);
     if (!brush_model) {
@@ -53,14 +56,14 @@ std::shared_ptr<Model> MapBuilder::Create(const std::vector<sm::vec3>& polygon)
     entity->brushes.push_back(brushes[0].impl);
 	map_entity->SetMapEntity(entity);
 
-    auto model = BrushBuilder::PolymeshFromBrushPN(*brush_model);
+    auto model = BrushBuilder::PolymeshFromBrushPN(dev, *brush_model);
     assert(model);
 	model->ext = std::move(map_entity);
 
 	return model;
 }
 
-void MapBuilder::Load(std::vector<std::shared_ptr<Model>>& models, const std::string& filepath)
+void MapBuilder::Load(const ur2::Device& dev, std::vector<std::shared_ptr<Model>>& models, const std::string& filepath)
 {
 	std::ifstream fin(filepath);
 	std::string str((std::istreambuf_iterator<char>(fin)),
@@ -80,21 +83,21 @@ void MapBuilder::Load(std::vector<std::shared_ptr<Model>>& models, const std::st
 	// load textures
 	auto world = parser.GetWorldEntity();
 	assert(world);
-	LoadTextures(*world, dir);
+	LoadTextures(dev, *world, dir);
 
 	// load models
 	models.clear();
 	models.reserve(parser.GetAllEntities().size());
 	for (auto& entity : parser.GetAllEntities())
 	{
-		auto model = std::make_shared<Model>();
-		if (LoadEntity(*model, entity)) {
+		auto model = std::make_shared<Model>(&dev);
+		if (LoadEntity(dev, *model, entity)) {
 			models.push_back(model);
 		}
 	}
 }
 
-bool MapBuilder::Load(Model& model, const std::string& filepath)
+bool MapBuilder::Load(const ur2::Device& dev, Model& model, const std::string& filepath)
 {
 	std::ifstream fin(filepath);
 	std::string str((std::istreambuf_iterator<char>(fin)),
@@ -120,15 +123,16 @@ bool MapBuilder::Load(Model& model, const std::string& filepath)
 	// load textures
 	auto world = parser.GetWorldEntity();
 	assert(world);
-	LoadTextures(*world, dir);
+	LoadTextures(dev, *world, dir);
 
 	// load model
-	LoadEntity(model, entities[0]);
+	LoadEntity(dev, model, entities[0]);
 
 	return true;
 }
 
-void MapBuilder::LoadTextures(const quake::MapEntity& world, const std::string& dir)
+void MapBuilder::LoadTextures(const ur2::Device& dev,
+                              const quake::MapEntity& world, const std::string& dir)
 {
 	std::string tex_path;
 	for (auto& attr : world.attributes)
@@ -151,11 +155,11 @@ void MapBuilder::LoadTextures(const quake::MapEntity& world, const std::string& 
 			continue;
 		}
 		auto full_path = boost::filesystem::absolute(path, dir);
-		loader.Load(full_path.string());
+		loader.Load(dev, full_path.string());
 	}
 }
 
-bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>& src)
+bool MapBuilder::LoadEntity(const ur2::Device& dev, Model& dst, const std::shared_ptr<quake::MapEntity>& src)
 {
 	if (src->brushes.empty()) {
 		return false;
@@ -197,7 +201,7 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 		std::vector<BrushBuilder::Vertex> border_vertices;
 		std::vector<unsigned short> border_indices;
 		std::string curr_tex_name;
-		ur::TexturePtr curr_tex = nullptr;
+		ur2::TexturePtr curr_tex = nullptr;
 		int face_idx = 0;
 		for (auto& f : faces)
 		{
@@ -205,7 +209,7 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 			if (f->tex_map.tex_name != curr_tex_name)
 			{
 				if (!vertices.empty()) {
-                    BrushBuilder::FlushVertices(BrushBuilder::VertexType::PosNormTex,
+                    BrushBuilder::FlushVertices(dev, BrushBuilder::VertexType::PosNormTex,
                         mesh, border_mesh, vertices, border_vertices, border_indices, dst);
 					FlushBrushDesc(brush_desc, mesh_desc, face_idx);
 				}
@@ -229,8 +233,8 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 
 			int tex_w = 0, tex_h = 0;
 			if (curr_tex) {
-				tex_w = curr_tex->Width();
-				tex_h = curr_tex->Height();
+				tex_w = curr_tex->GetWidth();
+				tex_h = curr_tex->GetHeight();
 			}
 			mesh_desc.tex_width  = tex_w;
 			mesh_desc.tex_height = tex_h;
@@ -268,7 +272,7 @@ bool MapBuilder::LoadEntity(Model& dst, const std::shared_ptr<quake::MapEntity>&
 		}
 
 		if (!vertices.empty()) {
-            BrushBuilder::FlushVertices(BrushBuilder::VertexType::PosNormTex,
+            BrushBuilder::FlushVertices(dev, BrushBuilder::VertexType::PosNormTex,
                 mesh, border_mesh, vertices, border_vertices, border_indices, dst);
 			FlushBrushDesc(brush_desc, mesh_desc, face_idx);
 		}

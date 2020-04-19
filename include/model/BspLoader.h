@@ -3,11 +3,11 @@
 #include "model/BspFile.h"
 #include "model/BspModel.h"
 
-#include <unirender/Texture.h>
-
 #include <string>
 #include <vector>
 #include <memory>
+
+namespace ur2 { class VertexArray; class Device; }
 
 namespace model
 {
@@ -17,7 +17,7 @@ struct Model;
 class BspLoader
 {
 public:
-	static bool Load(Model& model, const std::string& filepath);
+	static bool Load(const ur2::Device& dev, Model& model, const std::string& filepath);
 
 private:
 	static void LoadVertices(std::ifstream& fin, const BspFileLump& lump,
@@ -27,7 +27,7 @@ private:
 	static void LoadSurfaceEdges(std::ifstream& fin, const BspFileLump& lump,
 		std::vector<int>& surface_edges);
 	static void LoadTextures(std::ifstream& fin, const BspFileLump& lump,
-		std::vector<BspModel::Texture>& textures);
+		std::vector<BspModel::Texture>& textures, const ur2::Device& dev);
 	static uint8_t* LoadLighting(std::ifstream& fin, const BspFileLump& lump);
 	static void LoadPlanes(std::ifstream& fin, const BspFileLump& lump,
 		std::vector<BspModel::Plane>& planes);
@@ -48,8 +48,10 @@ private:
 
 	static void ChainSurfaceByTexture(BspModel& model);
 
-	static uint32_t BuildModelVertexBuffer(BspModel& model);
-	static uint32_t BuildModelIndexBuffer(BspModel& model);
+	static void BuildModelVertexBuffer(const ur2::Device& dev,
+        const BspModel& model, ur2::VertexArray& va);
+	static void BuildModelIndexBuffer(const ur2::Device& dev,
+        const BspModel& model, ur2::VertexArray& va);
 
 }; // BspLoader
 

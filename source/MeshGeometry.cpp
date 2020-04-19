@@ -1,25 +1,10 @@
 #include "model/MeshGeometry.h"
 
-#include <unirender/RenderContext.h>
-#include <unirender/Blackboard.h>
-
 namespace model
 {
 
 MeshGeometry::~MeshGeometry()
 {
-	auto& rc = ur::Blackboard::Instance()->GetRenderContext();
-	if (vao != 0) {
-		rc.ReleaseVAO(vao, vbo, ebo);
-	} else {
-        if (vbo != 0) {
-            rc.ReleaseBuffer(ur::VERTEXBUFFER, vbo);
-        }
-		if (ebo != 0) {
-			rc.ReleaseBuffer(ur::INDEXBUFFER, ebo);
-		}
-	}
-
     if (vert_buf) {
         delete[] vert_buf;
     }
@@ -80,7 +65,7 @@ void BlendShapeData::SetVertices(const std::vector<sm::vec3>& ori_verts,
 #else
     const float dt = (flt_max - flt_min) / 0xffff;
 #endif // BLENDSHAPE_COMPRESS_TO8
-    
+
     int ptr = -1;
     for (int i = 0, n = off_verts.size(); i < n; ++i)
     {

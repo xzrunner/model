@@ -3,11 +3,13 @@
 #include "model/Model.h"
 #include "model/TextureLoader.h"
 
-#include <unirender/RenderContext.h>
-#include <unirender/Blackboard.h>
-#include <unirender/VertexAttrib.h>
 #include <SM_Matrix.h>
 #include <SM_Cube.h>
+#include <unirender2/Device.h>
+#include <unirender2/VertexArray.h>
+#include <unirender2/IndexBuffer.h>
+#include <unirender2/VertexBuffer.h>
+#include <unirender2/VertexBufferAttribute.h>
 
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
@@ -97,7 +99,7 @@ namespace model
 bool     AssimpHelper::m_load_raw_data = false;
 uint32_t AssimpHelper::m_vert_color = 0;
 
-bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale)
+bool AssimpHelper::Load(const ur2::Device& dev, Model& model, const std::string& filepath, float scale)
 {
 	Assimp::Importer importer;
     importer.SetPropertyFloat(AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY, scale);
@@ -131,7 +133,7 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale)
 	for (size_t i = 0; i < ai_scene->mNumMaterials; ++i)
 	{
 		auto src = ai_scene->mMaterials[i];
-		model.materials.push_back(LoadMaterial(src, model, dir));
+		model.materials.push_back(LoadMaterial(dev, src, model, dir));
 	}
 
     ////
@@ -155,7 +157,7 @@ bool AssimpHelper::Load(Model& model, const std::string& filepath, float scale)
 	{
 		auto src = ai_scene->mMeshes[i];
 		sm::cube aabb;
-		model.meshes.push_back(LoadMesh(model.materials, src, aabb));
+		model.meshes.push_back(LoadMesh(dev, model.materials, src, aabb));
 		meshes_aabb.push_back(aabb);
 	}
 
@@ -320,9 +322,9 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
                     //if (model.meshes[mesh]->name != ai_node->mName.C_Str()) {
                     //    assert(0);
                     //}
-                    if (model.meshes[mesh]->name.find(ai_node->mName.C_Str()) == std::string::npos) {
-                        assert(0);
-                    }
+                    //if (model.meshes[mesh]->name.find(ai_node->mName.C_Str()) == std::string::npos) {
+                    //    assert(0);
+                    //}
                 }
 				CombineAABB(model.aabb, meshes_aabb[mesh], child_mat);
 			}
@@ -332,8 +334,9 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 	return node_id;
 }
 
-std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::unique_ptr<Model::Material>>& materials,
-	                                                const aiMesh* ai_mesh, sm::cube& aabb)
+std::unique_ptr<Model::Mesh>
+AssimpHelper::LoadMesh(const ur2::Device& dev, const std::vector<std::unique_ptr<Model::Material>>& materials,
+                       const aiMesh* ai_mesh, sm::cube& aabb)
 {
 	auto mesh = std::make_unique<Model::Mesh>();
 
@@ -457,13 +460,19 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 		}
 	}
 
-	ur::RenderContext::VertexInfo vi;
+    auto va = dev.CreateVertexArray();
 
-	vi.vn = ai_mesh->mNumVertices;
-	vi.vertices = buf;
-	vi.stride = floats_per_vertex * sizeof(float);
-	vi.in = indices.size();
-	vi.indices = &indices[0];
+    auto ibuf_sz = sizeof(uint16_t) * indices.size();
+    auto ibuf = dev.CreateIndexBuffer(ur2::BufferUsageHint::StaticDraw, ibuf_sz);
+    ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
+    va->SetIndexBuffer(ibuf);
+
+    auto vbuf_sz = sizeof(float) * floats_per_vertex * ai_mesh->mNumVertices;
+    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+    vbuf->ReadFromMemory(buf, vbuf_sz, 0);
+    va->SetVertexBuffer(vbuf);
+
+    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs;
 
 	int stride = 0;
 	// pos
@@ -487,43 +496,52 @@ std::unique_ptr<Model::Mesh> AssimpHelper::LoadMesh(const std::vector<std::uniqu
 
 	int offset = 0;
 	// pos
-	vi.va_list.push_back(ur::VertexAttrib("pos", 3, 4, stride, offset));
+    vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 3, offset, stride));
 	offset += 4 * 3;
 	// normal
 	if (has_normal)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
-		vi.va_list.push_back(ur::VertexAttrib("normal", 3, 4, stride, offset));
+        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
+            ur2::ComponentDataType::Float, 3, offset, stride));
 		offset += 4 * 3;
 	}
 	// texcoord
 	if (has_texcoord)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
-		vi.va_list.push_back(ur::VertexAttrib("texcoord", 2, 4, stride, offset));
+        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
+            ur2::ComponentDataType::Float, 2, offset, stride));
 		offset += 4 * 2;
 	}
 	// color
 	if (has_color)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_COLOR;
-		vi.va_list.push_back(ur::VertexAttrib("color", 4, 1, stride, offset));
+        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
+            ur2::ComponentDataType::Byte, 4, offset, stride));
 		offset += 4;
 	}
 	// skinned
 	if (has_skinned)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_SKINNED;
-		vi.va_list.push_back(ur::VertexAttrib("blend_indices", 4, 1, stride, offset));
+        // blend_indices
+        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
+            ur2::ComponentDataType::Byte, 4, offset, stride));
 		offset += 4;
-		vi.va_list.push_back(ur::VertexAttrib("blend_weights", 4, 1, stride, offset));
+        // blend_weights
+        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
+            ur2::ComponentDataType::Byte, 4, offset, stride));
 		offset += 4;
 	}
 
-	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
-		vi, mesh->geometry.vao, mesh->geometry.vbo, mesh->geometry.ebo);
+    va->SetVertexBufferAttrs(vbuf_attrs);
+
+    mesh->geometry.vertex_array = va;
 //	mesh->geometry.sub_geometries.insert({ "default", SubmeshGeometry(vi.in, 0) });
-	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(true, vi.in, 0));
+	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(true, indices.size(), 0));
 	mesh->geometry.sub_geometry_materials.push_back(0);
 
 	mesh->geometry.bones.reserve(ai_mesh->mNumBones);
@@ -597,8 +615,9 @@ std::unique_ptr<MeshRawData> AssimpHelper::LoadMeshRawData(const aiMesh* ai_mesh
 	return rd;
 }
 
-std::unique_ptr<Model::Material> AssimpHelper::LoadMaterial(const aiMaterial* ai_material,
-	                                                        Model& model, const std::string& dir)
+std::unique_ptr<Model::Material>
+AssimpHelper::LoadMaterial(const ur2::Device& dev, const aiMaterial* ai_material,
+                           Model& model, const std::string& dir)
 {
 	auto material = std::make_unique<Model::Material>();
 
@@ -640,14 +659,14 @@ std::unique_ptr<Model::Material> AssimpHelper::LoadMaterial(const aiMaterial* ai
 		if (aiGetMaterialString(ai_material, AI_MATKEY_TEXTURE_DIFFUSE(0), &path) == AI_SUCCESS)
 		{
 			auto img_path = boost::filesystem::absolute(path.data, dir);
-			material->diffuse_tex = LoadTexture(model, img_path.string());
+			material->diffuse_tex = LoadTexture(dev, model, img_path.string());
 		}
 	}
 
 	return material;
 }
 
-int AssimpHelper::LoadTexture(Model& model, const std::string& filepath)
+int AssimpHelper::LoadTexture(const ur2::Device& dev, Model& model, const std::string& filepath)
 {
 	int idx = 0;
 	for (auto& tex : model.textures)
@@ -658,7 +677,7 @@ int AssimpHelper::LoadTexture(Model& model, const std::string& filepath)
 		++idx;
 	}
 
-    auto tex = TextureLoader::LoadFromFile(filepath.c_str());
+    auto tex = TextureLoader::LoadFromFile(dev, filepath.c_str());
     if (!tex) {
         return -1;
     }

@@ -5,18 +5,25 @@
 
 #include <SM_Matrix.h>
 #include <SM_Cube.h>
-#include <unirender/Texture.h>
+#include <unirender2/typedef.h>
 
 #include <boost/noncopyable.hpp>
 
 #include <vector>
 #include <memory>
 
+namespace ur2 { class Device; }
+
 namespace model
 {
 
 struct Model : boost::noncopyable
 {
+    Model(const ur2::Device* dev)
+        : dev(dev)
+    {
+    }
+
 	// for ResPool
 	bool LoadFromFile(const std::string& filepath);
 
@@ -40,7 +47,7 @@ struct Model : boost::noncopyable
 
 	}; // Mesh
 
-	std::vector<std::pair<std::string, ur::TexturePtr>> textures;
+	std::vector<std::pair<std::string, ur2::TexturePtr>> textures;
 
 	std::vector<std::unique_ptr<Material>> materials;
 
@@ -54,6 +61,8 @@ struct Model : boost::noncopyable
 	float anim_speed = 1;
 
 	float scale = 1.0f;
+
+    const ur2::Device* dev = nullptr;
 
 }; // Model
 

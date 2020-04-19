@@ -3,8 +3,11 @@
 #include "model/typedef.h"
 
 #include <SM_Vector.h>
-#include <unirender/RenderContext.h>
-#include <unirender/Blackboard.h>
+#include <unirender2/Device.h>
+#include <unirender2/VertexArray.h>
+#include <unirender2/IndexBuffer.h>
+#include <unirender2/VertexBuffer.h>
+#include <unirender2/VertexBufferAttribute.h>
 
 #include <rapidxml_utils.hpp>
 
@@ -27,7 +30,7 @@ bool coordinate_system_dx = false;
 namespace model
 {
 
-bool MaxLoader::Load(Model& model, const std::string& filepath)
+bool MaxLoader::Load(const ur2::Device& dev, Model& model, const std::string& filepath)
 {
 	rapidxml::file<> xml_file(filepath.c_str());
 	rapidxml::xml_document<> doc;
@@ -44,13 +47,14 @@ bool MaxLoader::Load(Model& model, const std::string& filepath)
 	if (strcmp(node_type->value(), "Mesh") == 0)
 	{
 		auto mesh_info = node->first_node("Mesh");
-		LoadMesh(model, mesh_info);
+		LoadMesh(dev, model, mesh_info);
 	}
 
 	return true;
 }
 
-void MaxLoader::LoadMesh(Model& model, const rapidxml::xml_node<>* mesh_node)
+void MaxLoader::LoadMesh(const ur2::Device& dev, Model& model,
+                         const rapidxml::xml_node<>* mesh_node)
 {
 	MeshData data;
 	LoadMeshData(data, mesh_node);
@@ -89,27 +93,33 @@ void MaxLoader::LoadMesh(Model& model, const rapidxml::xml_node<>* mesh_node)
 
 	const int stride = sizeof(Vertex) / sizeof(float);
 
-	ur::RenderContext::VertexInfo vi;
 
-	vi.vn = vertices.size();
-	vi.vertices = &vertices[0].pos.x;
-	vi.stride = sizeof(Vertex);
+    auto va = dev.CreateVertexArray();
 
-	vi.in = 0;
-	vi.indices = nullptr;
+    auto vbuf_sz = sizeof(Vertex) * vertices.size();
+    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+    vbuf->ReadFromMemory(&vertices[0].pos.x, vbuf_sz, 0);
+    va->SetVertexBuffer(vbuf);
 
-	vi.va_list.push_back(ur::VertexAttrib("pos",          3, 4, 32, 0));  // pos
-	vi.va_list.push_back(ur::VertexAttrib("normal",       3, 4, 32, 12));  // normal
-	vi.va_list.push_back(ur::VertexAttrib("texcoord",     2, 4, 32, 24));  // texcoord
+    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs(3);
+    // pos
+    vbuf_attrs[0] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 3, 0, 32);
+    // normal
+    vbuf_attrs[1] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 3, 12, 32);
+    // texcoord
+    vbuf_attrs[2] = std::make_shared<ur2::VertexBufferAttribute>(
+        ur2::ComponentDataType::Float, 2, 24, 32);
+    va->SetVertexBufferAttrs(vbuf_attrs);
 
 	// material
 	model.materials.emplace_back(std::make_unique<Model::Material>());
 
 	// mesh
 	auto mesh = std::make_unique<Model::Mesh>();
-	ur::Blackboard::Instance()->GetRenderContext().CreateVAO(
-		vi, mesh->geometry.vao, mesh->geometry.vbo, mesh->geometry.ebo);
-	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(false, vi.vn, 0));
+    mesh->geometry.vertex_array = va;
+	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(false, vertices.size(), 0));
 	mesh->geometry.sub_geometry_materials.push_back(0);
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
 	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;

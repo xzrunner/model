@@ -9,6 +9,8 @@
 #include <vector>
 #include <unordered_map>
 
+namespace ur2 { class Device; }
+
 namespace model
 {
 
@@ -20,7 +22,7 @@ struct AnimationClip;
 class M3dLoader
 {
 public:
-	static bool Load(Model& model, const std::string& filepath);
+	static bool Load(const ur2::Device& dev, Model& model, const std::string& filepath);
 
 private:
 	struct Vertex

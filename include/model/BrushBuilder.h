@@ -9,6 +9,8 @@
 #include <memory>
 #include <vector>
 
+namespace ur2 { class Device; }
+
 namespace model
 {
 
@@ -26,32 +28,28 @@ public:
         PosNormTex,
         PosNormCol,
     };
-    static std::unique_ptr<Model> PolymeshFromBrushPN(const std::vector<std::shared_ptr<pm3::Polytope>>& brushes);
-    static std::unique_ptr<Model> PolymeshFromBrushPN(const model::BrushModel& brush_model);
-    static std::unique_ptr<Model> PolymeshFromBrushPNT(
-        const std::vector<std::shared_ptr<pm3::Polytope>>& brushes,
+    static std::unique_ptr<Model> PolymeshFromBrushPN(const ur2::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& brushes);
+    static std::unique_ptr<Model> PolymeshFromBrushPN(const ur2::Device& dev, const model::BrushModel& brush_model);
+    static std::unique_ptr<Model> PolymeshFromBrushPNT(const ur2::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& brushes,
         const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords
     );
-    static std::unique_ptr<Model> PolymeshFromBrushPNT(
-        const model::BrushModel& brush_model,
+    static std::unique_ptr<Model> PolymeshFromBrushPNT(const ur2::Device& dev, const model::BrushModel& brush_model,
         const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords
     );
-    static std::unique_ptr<Model> PolymeshFromBrushPNC(
-        const std::vector<std::shared_ptr<pm3::Polytope>>& brushes,
+    static std::unique_ptr<Model> PolymeshFromBrushPNC(const ur2::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& brushes,
         const std::vector<std::vector<std::vector<sm::vec3>>>& colors
     );
-    static std::unique_ptr<Model> PolymeshFromBrushPNC(
-        const model::BrushModel& brush_model,
+    static std::unique_ptr<Model> PolymeshFromBrushPNC(const ur2::Device& dev, const model::BrushModel& brush_model,
         const std::vector<std::vector<std::vector<sm::vec3>>>& colors
     );
 private:
     static std::unique_ptr<Model> PolymeshFromBrush(
-        VertexType type, const std::vector<std::shared_ptr<pm3::Polytope>>& brushes,
+        const ur2::Device& dev, VertexType type, const std::vector<std::shared_ptr<pm3::Polytope>>& brushes,
         const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords,
         const std::vector<std::vector<std::vector<sm::vec3>>>& colors
     );
     static std::unique_ptr<Model> PolymeshFromBrush(
-        VertexType type, const model::BrushModel& brush_model,
+        const ur2::Device& dev, VertexType type, const model::BrushModel& brush_model,
         const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords,
         const std::vector<std::vector<std::vector<sm::vec3>>>& colors
     );
@@ -60,7 +58,7 @@ public:
 
     // polygon -> polymesh
     static std::unique_ptr<Model>
-        PolymeshFromPolygon(const std::vector<sm::vec3>& polygon);
+        PolymeshFromPolygon(const ur2::Device& dev, const std::vector<sm::vec3>& polygon);
 
     static void UpdateVBO(Model& model, const BrushModel::Brush& brush);
     static void UpdateVBO(Model& model, const model::BrushModel& brush_model);
@@ -74,15 +72,13 @@ public:
         sm::vec3 color;
     };
 
-    static void CreateMeshRenderBuf(VertexType type, model::Model::Mesh& mesh,
-        const std::vector<Vertex>& vertices);
-    static void CreateBorderMeshRenderBuf(VertexType type, model::Model::Mesh& mesh,
-        const std::vector<Vertex>& vertices, const std::vector<unsigned short>& indices);
+    static void CreateMeshRenderBuf(const ur2::Device& dev, VertexType type, model::Model::Mesh& mesh, const std::vector<Vertex>& vertices);
+    static void CreateBorderMeshRenderBuf(const ur2::Device& dev, VertexType type, model::Model::Mesh& mesh, const std::vector<Vertex>& vertices, const std::vector<unsigned short>& indices);
 
     static Vertex CreateVertex(const pm3::Polytope::FacePtr& face, const sm::vec3& pos,
         int tex_w, int tex_h, const sm::vec3& color, sm::cube& aabb);
 
-    static void FlushVertices(VertexType type, std::unique_ptr<model::Model::Mesh>& mesh,
+    static void FlushVertices(const ur2::Device& dev, VertexType type, std::unique_ptr<model::Model::Mesh>& mesh,
         std::unique_ptr<model::Model::Mesh>& border_mesh,
         std::vector<Vertex>& vertices, std::vector<Vertex>& border_vertices,
         std::vector<unsigned short>& border_indices, model::Model& dst);
