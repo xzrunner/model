@@ -73,7 +73,12 @@ TextureLoader::LoadFromFile(const ur2::Device& dev, const char* filepath, int mi
 		GD_REPORT_ASSERT("unknown type.");
 	}
 
-    return dev.CreateTexture({ tf });
+    ur2::TextureDescription desc;
+    desc.target = ur2::TextureTarget::Texture2D;
+    desc.width  = w;
+    desc.height = h;
+    desc.format = tf;
+    return dev.CreateTexture(desc);
 }
 
 ur2::TexturePtr
@@ -94,7 +99,13 @@ TextureLoader::LoadFromMemory(const ur2::Device& dev, const unsigned char* pixel
 	default:
 		assert(0);
 	}
-    return dev.CreateTexture({ tf });
+
+    ur2::TextureDescription desc;
+    desc.target = ur2::TextureTarget::Texture2D;
+    desc.width  = width;
+    desc.height = height;
+    desc.format = tf;
+    return dev.CreateTexture(desc);
 }
 
 }
