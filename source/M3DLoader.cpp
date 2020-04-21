@@ -74,10 +74,10 @@ bool M3dLoader::Load(const ur2::Device& dev, Model& model, const std::string& fi
         ur2::ComponentDataType::Float, 3, 32, 52);
     // bone_weights
     vbuf_attrs[4] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Byte, 1, 44, 52);
+        ur2::ComponentDataType::UnsignedByte, 1, 44, 52);
     // bone_indices
     vbuf_attrs[5] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Byte, 1, 48, 52);
+        ur2::ComponentDataType::UnsignedByte, 1, 48, 52);
     va->SetVertexBufferAttrs(vbuf_attrs);
 
 	//// material

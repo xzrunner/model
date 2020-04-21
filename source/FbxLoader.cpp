@@ -1079,7 +1079,7 @@ void FbxLoader::LoadMesh(const ur2::Device& dev, Model::Mesh& dst,
 	{
 		dst.geometry.vertex_type |= VERTEX_FLAG_COLOR;
         vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::Byte, 4, offset, stride));
+            ur2::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
 	}
 	// skinned
@@ -1088,11 +1088,11 @@ void FbxLoader::LoadMesh(const ur2::Device& dev, Model::Mesh& dst,
 		dst.geometry.vertex_type |= VERTEX_FLAG_SKINNED;
         // blend_indices
         vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::Byte, 4, offset, stride));
+            ur2::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
         // blend_weights
         vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::Byte, 4, offset, stride));
+            ur2::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
 	}
 
