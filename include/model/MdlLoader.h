@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace ur2 { class Device; }
+namespace ur { class Device; }
 
 namespace model
 {
@@ -14,7 +14,7 @@ struct Model;
 class MdlLoader
 {
 public:
-	static bool Load(const ur2::Device& dev, Model& model, const std::string& filepath);
+	static bool Load(const ur::Device& dev, Model& model, const std::string& filepath);
 
 private:
 	struct MdlHeader
@@ -82,8 +82,8 @@ private:
 	};
 
 private:
-	static void LoadMaterial(const ur2::Device& dev, const MdlHeader& header, std::ifstream& fin, Model& model, const std::string& filepath);
-	static void LoadMesh(const ur2::Device& dev, const MdlHeader& header, std::ifstream& fin, Model& model);
+	static void LoadMaterial(const ur::Device& dev, const MdlHeader& header, std::ifstream& fin, Model& model, const std::string& filepath);
+	static void LoadMesh(const ur::Device& dev, const MdlHeader& header, std::ifstream& fin, Model& model);
 
 	static sm::vec3 TransVertex(const MdlVertex& vertex, const sm::vec3& scale, const sm::vec3& translate);
 

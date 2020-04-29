@@ -4,11 +4,11 @@
 #include "model/BspFile.h"
 
 #include <SM_Vector.h>
-#include <unirender2/typedef.h>
+#include <unirender/typedef.h>
 
 #include <vector>
 
-namespace ur2 { class Device; }
+namespace ur { class Device; }
 
 namespace model
 {
@@ -87,7 +87,7 @@ struct BspModel : public ModelExtend
 
 	struct Texture
 	{
-		ur2::TexturePtr tex;
+		ur::TexturePtr tex;
 		Surface*        surfaces_chain;
 	};
 
@@ -189,7 +189,7 @@ struct BspModel : public ModelExtend
     // todo
     virtual std::unique_ptr<ModelExtend> Clone() const override { return nullptr; }
 
-	void CreateSurfaceLightmap(const ur2::Device& dev);
+	void CreateSurfaceLightmap(const ur::Device& dev);
 	void BuildSurfaceDisplayList();
 
 	void BuildLightMap(Surface& surf, uint8_t* dest, int stride);

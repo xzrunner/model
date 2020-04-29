@@ -4,11 +4,11 @@
 #include <SM_Calc.h>
 #include <SM_Triangulation.h>
 #include <polymesh3/Polytope.h>
-#include <unirender2/Device.h>
-#include <unirender2/IndexBuffer.h>
-#include <unirender2/VertexBuffer.h>
-#include <unirender2/VertexBufferAttribute.h>
-#include <unirender2/VertexArray.h>
+#include <unirender/Device.h>
+#include <unirender/IndexBuffer.h>
+#include <unirender/VertexBuffer.h>
+#include <unirender/VertexBufferAttribute.h>
+#include <unirender/VertexArray.h>
 
 namespace
 {
@@ -65,50 +65,50 @@ void dump_vert_buf(model::BrushBuilder::VertexType type,
     }
 }
 
-void setup_vert_attr_list(model::BrushBuilder::VertexType type, const std::shared_ptr<ur2::VertexBuffer>& vbuf,
-                          std::vector<std::shared_ptr<ur2::VertexBufferAttribute>>& vbuf_attrs)
+void setup_vert_attr_list(model::BrushBuilder::VertexType type, const std::shared_ptr<ur::VertexBuffer>& vbuf,
+                          std::vector<std::shared_ptr<ur::VertexBufferAttribute>>& vbuf_attrs)
 {
     switch (type)
     {
     case model::BrushBuilder::VertexType::PosNorm:
         vbuf_attrs.resize(2);
         // pos
-        vbuf_attrs[0] = std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::Float, 3, 0, 24
+        vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
+            ur::ComponentDataType::Float, 3, 0, 24
         );
         // normal
-        vbuf_attrs[1] = std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::Float, 3, 12, 24
+        vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
+            ur::ComponentDataType::Float, 3, 12, 24
         );
         break;
     case model::BrushBuilder::VertexType::PosNormTex:
         vbuf_attrs.resize(3);
         // pos
-        vbuf_attrs[0] = std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::Float, 3, 0, 32
+        vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
+            ur::ComponentDataType::Float, 3, 0, 32
         );
         // normal
-        vbuf_attrs[1] = std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::Float, 3, 12, 32
+        vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
+            ur::ComponentDataType::Float, 3, 12, 32
         );
         // texcoord
-        vbuf_attrs[2] = std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::Float, 2, 24, 32
+        vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
+            ur::ComponentDataType::Float, 2, 24, 32
         );
         break;
     case model::BrushBuilder::VertexType::PosNormCol:
         vbuf_attrs.resize(3);
         // pos
-        vbuf_attrs[0] = std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::Float, 3, 0, 36
+        vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
+            ur::ComponentDataType::Float, 3, 0, 36
         );
         // normal
-        vbuf_attrs[1] = std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::Float, 3, 12, 36
+        vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
+            ur::ComponentDataType::Float, 3, 12, 36
         );
         // color
-        vbuf_attrs[2] = std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::Float, 3, 24, 36
+        vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
+            ur::ComponentDataType::Float, 3, 24, 36
         );
         break;
     default:
@@ -249,43 +249,43 @@ BrushBuilder::BrushFromPolygon(const std::vector<sm::vec3>& polygon)
 }
 
 std::unique_ptr<Model>
-BrushBuilder::PolymeshFromBrushPN(const ur2::Device& dev, const std::vector<pm3::PolytopePtr>& brushes)
+BrushBuilder::PolymeshFromBrushPN(const ur::Device& dev, const std::vector<pm3::PolytopePtr>& brushes)
 {
     return PolymeshFromBrush(dev, VertexType::PosNorm, brushes, std::vector<std::vector<std::vector<sm::vec2>>>(), std::vector<std::vector<std::vector<sm::vec3>>>());
 }
 
 std::unique_ptr<Model>
-BrushBuilder::PolymeshFromBrushPN(const ur2::Device& dev, const model::BrushModel& brush_model)
+BrushBuilder::PolymeshFromBrushPN(const ur::Device& dev, const model::BrushModel& brush_model)
 {
     return PolymeshFromBrush(dev, VertexType::PosNorm, brush_model, std::vector<std::vector<std::vector<sm::vec2>>>(), std::vector<std::vector<std::vector<sm::vec3>>>());
 }
 
 std::unique_ptr<Model>
-BrushBuilder::PolymeshFromBrushPNT(const ur2::Device& dev, const std::vector<pm3::PolytopePtr>& brushes, const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords)
+BrushBuilder::PolymeshFromBrushPNT(const ur::Device& dev, const std::vector<pm3::PolytopePtr>& brushes, const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords)
 {
     return PolymeshFromBrush(dev, VertexType::PosNormTex, brushes, texcoords, std::vector<std::vector<std::vector<sm::vec3>>>());
 }
 
 std::unique_ptr<Model>
-BrushBuilder::PolymeshFromBrushPNT(const ur2::Device& dev, const model::BrushModel& brush_model, const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords)
+BrushBuilder::PolymeshFromBrushPNT(const ur::Device& dev, const model::BrushModel& brush_model, const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords)
 {
     return PolymeshFromBrush(dev, VertexType::PosNormTex, brush_model, texcoords, std::vector<std::vector<std::vector<sm::vec3>>>());
 }
 
 std::unique_ptr<Model>
-BrushBuilder::PolymeshFromBrushPNC(const ur2::Device& dev, const std::vector<pm3::PolytopePtr>& brushes, const std::vector<std::vector<std::vector<sm::vec3>>>& colors)
+BrushBuilder::PolymeshFromBrushPNC(const ur::Device& dev, const std::vector<pm3::PolytopePtr>& brushes, const std::vector<std::vector<std::vector<sm::vec3>>>& colors)
 {
     return PolymeshFromBrush(dev, VertexType::PosNormCol, brushes, std::vector<std::vector<std::vector<sm::vec2>>>(), colors);
 }
 
 std::unique_ptr<Model>
-BrushBuilder::PolymeshFromBrushPNC(const ur2::Device& dev, const model::BrushModel& brush_model, const std::vector<std::vector<std::vector<sm::vec3>>>& colors)
+BrushBuilder::PolymeshFromBrushPNC(const ur::Device& dev, const model::BrushModel& brush_model, const std::vector<std::vector<std::vector<sm::vec3>>>& colors)
 {
     return PolymeshFromBrush(dev, VertexType::PosNormCol, brush_model, std::vector<std::vector<std::vector<sm::vec2>>>(), colors);
 }
 
 std::unique_ptr<Model>
-BrushBuilder::PolymeshFromBrush(const ur2::Device& dev, VertexType type, const std::vector<pm3::PolytopePtr>& brushes,
+BrushBuilder::PolymeshFromBrush(const ur::Device& dev, VertexType type, const std::vector<pm3::PolytopePtr>& brushes,
                                 const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords,
                                 const std::vector<std::vector<std::vector<sm::vec3>>>& colors)
 {
@@ -345,7 +345,7 @@ BrushBuilder::PolymeshFromBrush(const ur2::Device& dev, VertexType type, const s
 }
 
 std::unique_ptr<Model>
-BrushBuilder::PolymeshFromBrush(const ur2::Device& dev, VertexType type, const model::BrushModel& brush_model,
+BrushBuilder::PolymeshFromBrush(const ur::Device& dev, VertexType type, const model::BrushModel& brush_model,
                                 const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords,
                                 const std::vector<std::vector<std::vector<sm::vec3>>>& colors)
 {
@@ -359,7 +359,7 @@ BrushBuilder::PolymeshFromBrush(const ur2::Device& dev, VertexType type, const m
 }
 
 std::unique_ptr<Model>
-BrushBuilder::PolymeshFromPolygon(const ur2::Device& dev, const std::vector<sm::vec3>& polygon)
+BrushBuilder::PolymeshFromPolygon(const ur::Device& dev, const std::vector<sm::vec3>& polygon)
 {
     auto brush_model = model::BrushBuilder::BrushFromPolygon(polygon);
     auto& brushes = brush_model->GetBrushes();
@@ -429,7 +429,7 @@ void BrushBuilder::UpdateVBO(Model& model, const model::BrushModel& brush_model)
     }
 }
 
-void BrushBuilder::CreateMeshRenderBuf(const ur2::Device& dev, VertexType type, model::Model::Mesh& mesh,
+void BrushBuilder::CreateMeshRenderBuf(const ur::Device& dev, VertexType type, model::Model::Mesh& mesh,
                                        const std::vector<Vertex>& vertices)
 {
     auto va = dev.CreateVertexArray();
@@ -438,11 +438,11 @@ void BrushBuilder::CreateMeshRenderBuf(const ur2::Device& dev, VertexType type, 
     dump_vert_buf(type, vertices, buf);
 
     auto vbuf_sz = sizeof(float) * vertices.size();
-    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+    auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
     vbuf->ReadFromMemory(buf.data(), vbuf_sz, 0);
     va->SetVertexBuffer(vbuf);
 
-    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs;
+    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs;
     setup_vert_attr_list(type, vbuf, vbuf_attrs);
     va->SetVertexBufferAttrs(vbuf_attrs);
 
@@ -453,7 +453,7 @@ void BrushBuilder::CreateMeshRenderBuf(const ur2::Device& dev, VertexType type, 
     setup_geo_vert_type(type, mesh.geometry.vertex_type);
 }
 
-void BrushBuilder::CreateBorderMeshRenderBuf(const ur2::Device& dev, VertexType type, model::Model::Mesh& mesh,
+void BrushBuilder::CreateBorderMeshRenderBuf(const ur::Device& dev, VertexType type, model::Model::Mesh& mesh,
                                              const std::vector<Vertex>& vertices,
                                              const std::vector<unsigned short>& indices)
 {
@@ -462,7 +462,7 @@ void BrushBuilder::CreateBorderMeshRenderBuf(const ur2::Device& dev, VertexType 
     std::vector<float> buf;
     dump_vert_buf(type, vertices, buf);
 
-    auto usage = ur2::BufferUsageHint::StaticDraw;
+    auto usage = ur::BufferUsageHint::StaticDraw;
 
     auto ibuf_sz = sizeof(unsigned short) * indices.size();
     auto ibuf = dev.CreateIndexBuffer(usage, ibuf_sz);
@@ -470,11 +470,11 @@ void BrushBuilder::CreateBorderMeshRenderBuf(const ur2::Device& dev, VertexType 
     va->SetIndexBuffer(ibuf);
 
     auto vbuf_sz = sizeof(float) * vertices.size();
-    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+    auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
     vbuf->ReadFromMemory(buf.data(), vbuf_sz, 0);
     va->SetVertexBuffer(vbuf);
 
-    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs;
+    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs;
     setup_vert_attr_list(type, vbuf, vbuf_attrs);
     va->SetVertexBufferAttrs(vbuf_attrs);
 
@@ -508,7 +508,7 @@ BrushBuilder::CreateVertex(const pm3::Polytope::FacePtr& face, const sm::vec3& p
     return v;
 }
 
-void BrushBuilder::FlushVertices(const ur2::Device& dev, VertexType type,
+void BrushBuilder::FlushVertices(const ur::Device& dev, VertexType type,
                                  std::unique_ptr<model::Model::Mesh>& mesh,
                                  std::unique_ptr<model::Model::Mesh>& border_mesh,
                                  std::vector<Vertex>& vertices,

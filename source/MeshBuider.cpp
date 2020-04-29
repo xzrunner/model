@@ -1,16 +1,16 @@
 #include "model/MeshBuider.h"
 #include "model/typedef.h"
 
-#include <unirender2/Device.h>
-#include <unirender2/VertexBuffer.h>
-#include <unirender2/VertexBufferAttribute.h>
-#include <unirender2/VertexArray.h>
+#include <unirender/Device.h>
+#include <unirender/VertexBuffer.h>
+#include <unirender/VertexBufferAttribute.h>
+#include <unirender/VertexArray.h>
 
 namespace model
 {
 
 std::unique_ptr<Model::Mesh>
-MeshBuider::CreateCube(const ur2::Device& dev, const sm::vec3& half_extents)
+MeshBuider::CreateCube(const ur::Device& dev, const sm::vec3& half_extents)
 {
     auto& sz = half_extents;
     float vertices[] = {
@@ -61,20 +61,20 @@ MeshBuider::CreateCube(const ur2::Device& dev, const sm::vec3& half_extents)
     auto va = dev.CreateVertexArray();
 
     auto vbuf_sz = sizeof(vertices);
-    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+    auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
     vbuf->ReadFromMemory(vertices, vbuf_sz, 0);
     va->SetVertexBuffer(vbuf);
 
-    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs;
+    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs;
     vbuf_attrs.resize(3);
-    vbuf_attrs[0] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 3, 0, 32
+    vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 3, 0, 32
     );
-    vbuf_attrs[1] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 3, 12, 32
+    vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 3, 12, 32
     );
-    vbuf_attrs[2] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 2, 24, 32
+    vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 2, 24, 32
     );
     va->SetVertexBufferAttrs(vbuf_attrs);
 

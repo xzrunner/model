@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-namespace ur2 { class Device; }
+namespace ur { class Device; }
 
 namespace model
 {
@@ -15,7 +15,7 @@ struct Model;
 class MaxLoader
 {
 public:
-	static bool Load(const ur2::Device& dev, Model& model,
+	static bool Load(const ur::Device& dev, Model& model,
         const std::string& filepath);
 
 private:
@@ -44,7 +44,7 @@ private:
 	};
 
 private:
-	static void LoadMesh(const ur2::Device& dev, Model& model,
+	static void LoadMesh(const ur::Device& dev, Model& model,
         const rapidxml::xml_node<>* mesh_node);
 
 	static void LoadMeshData(MeshData& dst, const rapidxml::xml_node<>* src);

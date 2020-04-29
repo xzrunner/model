@@ -2,8 +2,8 @@
 #include "model/MeshGeometry.h"
 
 #include <meshlab/Sorkine04.h>
-#include <unirender2/VertexArray.h>
-#include <unirender2/VertexBuffer.h>
+#include <unirender/VertexArray.h>
+#include <unirender/VertexBuffer.h>
 
 namespace
 {

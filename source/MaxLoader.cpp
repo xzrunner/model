@@ -3,11 +3,11 @@
 #include "model/typedef.h"
 
 #include <SM_Vector.h>
-#include <unirender2/Device.h>
-#include <unirender2/VertexArray.h>
-#include <unirender2/IndexBuffer.h>
-#include <unirender2/VertexBuffer.h>
-#include <unirender2/VertexBufferAttribute.h>
+#include <unirender/Device.h>
+#include <unirender/VertexArray.h>
+#include <unirender/IndexBuffer.h>
+#include <unirender/VertexBuffer.h>
+#include <unirender/VertexBufferAttribute.h>
 
 #include <rapidxml_utils.hpp>
 
@@ -30,7 +30,7 @@ bool coordinate_system_dx = false;
 namespace model
 {
 
-bool MaxLoader::Load(const ur2::Device& dev, Model& model, const std::string& filepath)
+bool MaxLoader::Load(const ur::Device& dev, Model& model, const std::string& filepath)
 {
 	rapidxml::file<> xml_file(filepath.c_str());
 	rapidxml::xml_document<> doc;
@@ -53,7 +53,7 @@ bool MaxLoader::Load(const ur2::Device& dev, Model& model, const std::string& fi
 	return true;
 }
 
-void MaxLoader::LoadMesh(const ur2::Device& dev, Model& model,
+void MaxLoader::LoadMesh(const ur::Device& dev, Model& model,
                          const rapidxml::xml_node<>* mesh_node)
 {
 	MeshData data;
@@ -97,20 +97,20 @@ void MaxLoader::LoadMesh(const ur2::Device& dev, Model& model,
     auto va = dev.CreateVertexArray();
 
     auto vbuf_sz = sizeof(Vertex) * vertices.size();
-    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+    auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
     vbuf->ReadFromMemory(&vertices[0].pos.x, vbuf_sz, 0);
     va->SetVertexBuffer(vbuf);
 
-    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs(3);
+    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs(3);
     // pos
-    vbuf_attrs[0] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 3, 0, 32);
+    vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 3, 0, 32);
     // normal
-    vbuf_attrs[1] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 3, 12, 32);
+    vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 3, 12, 32);
     // texcoord
-    vbuf_attrs[2] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 2, 24, 32);
+    vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 2, 24, 32);
     va->SetVertexBufferAttrs(vbuf_attrs);
 
 	// material

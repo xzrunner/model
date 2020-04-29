@@ -9,9 +9,9 @@
 
 #include <quake/Palette.h>
 #include <SM_Cube.h>
-#include <unirender2/Device.h>
-#include <unirender2/VertexBuffer.h>
-#include <unirender2/VertexBufferAttribute.h>
+#include <unirender/Device.h>
+#include <unirender/VertexBuffer.h>
+#include <unirender/VertexBufferAttribute.h>
 
 #include <fstream>
 #include <memory>
@@ -32,7 +32,7 @@ const float SCALE = 0.1f;
 namespace model
 {
 
-bool MdlLoader::Load(const ur2::Device& dev, Model& model, const std::string& filepath)
+bool MdlLoader::Load(const ur::Device& dev, Model& model, const std::string& filepath)
 {
 	std::ifstream fin(filepath, std::ios::binary);
 	if (fin.fail()) {
@@ -52,7 +52,7 @@ bool MdlLoader::Load(const ur2::Device& dev, Model& model, const std::string& fi
 	return true;
 }
 
-void MdlLoader::LoadMaterial(const ur2::Device& dev, const MdlHeader& header, std::ifstream& fin,
+void MdlLoader::LoadMaterial(const ur::Device& dev, const MdlHeader& header, std::ifstream& fin,
 	                         Model& model, const std::string& filepath)
 {
 	quake::Palette palette;
@@ -81,7 +81,7 @@ void MdlLoader::LoadMaterial(const ur2::Device& dev, const MdlHeader& header, st
 	delete[] skins;
 }
 
-void MdlLoader::LoadMesh(const ur2::Device& dev, const MdlHeader& header,
+void MdlLoader::LoadMesh(const ur::Device& dev, const MdlHeader& header,
                          std::ifstream& fin, Model& model)
 {
 	MdlTexcoord* mdl_texcoords = new MdlTexcoord[header.num_verts];
@@ -176,23 +176,23 @@ void MdlLoader::LoadMesh(const ur2::Device& dev, const MdlHeader& header,
 	memcpy(buf + vt_sz, texcoords.data(), tc_sz);
 
     auto va = dev.CreateVertexArray();
-    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, buf_sz);
+    auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, buf_sz);
     vbuf->ReadFromMemory(buf, buf_sz, 0);
 	delete[] buf;
 
-    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs;
+    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs;
     vbuf_attrs.resize(5);
     // pose1_vert, pose2_vert
-    vbuf_attrs[0] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 3, 0, 24
+    vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 3, 0, 24
     );
     // pose1_normal, pose2_normal
-    vbuf_attrs[1] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 3, 12, 24
+    vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 3, 12, 24
     );
     // texcoord
-    vbuf_attrs[2] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 2, 20, 24
+    vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 2, 20, 24
     );
 
 	int vertices_n = header.num_tris * 3;

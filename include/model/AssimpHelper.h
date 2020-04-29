@@ -15,7 +15,7 @@ struct aiMaterial;
 struct aiAnimation;
 struct aiNodeAnim;
 
-namespace ur2 { class Device; }
+namespace ur { class Device; }
 
 namespace model
 {
@@ -27,7 +27,7 @@ struct Material;
 class AssimpHelper
 {
 public:
-	static bool Load(const ur2::Device& dev, Model& model, const std::string& filepath, float scale = 1.0f);
+	static bool Load(const ur::Device& dev, Model& model, const std::string& filepath, float scale = 1.0f);
     static bool Load(std::vector<std::unique_ptr<MeshRawData>>& meshes, const std::string& filepath);
 
     // config
@@ -38,14 +38,14 @@ private:
 		std::vector<std::unique_ptr<SkeletalAnim::Node>>& nodes,
 		const std::vector<sm::cube>& meshes_aabb, const sm::mat4& mat);
 
-	static std::unique_ptr<Model::Mesh> LoadMesh(const ur2::Device& dev,
+	static std::unique_ptr<Model::Mesh> LoadMesh(const ur::Device& dev,
         const std::vector<std::unique_ptr<Model::Material>>& materials, const aiMesh* ai_mesh, sm::cube& aabb);
 	static std::unique_ptr<MeshRawData> LoadMeshRawData(const aiMesh* ai_mesh);
 
 	static std::unique_ptr<Model::Material>
-        LoadMaterial(const ur2::Device& dev, const aiMaterial* ai_material, Model& model, const std::string& dir);
+        LoadMaterial(const ur::Device& dev, const aiMaterial* ai_material, Model& model, const std::string& dir);
 
-	static int LoadTexture(const ur2::Device& dev, Model& model, const std::string& filepath);
+	static int LoadTexture(const ur::Device& dev, Model& model, const std::string& filepath);
 
 	static std::unique_ptr<SkeletalAnim::ModelExtend> LoadAnimation(const aiAnimation* ai_anim);
 	static std::unique_ptr<SkeletalAnim::NodeAnim> LoadNodeAnim(const aiNodeAnim* ai_node);

@@ -8,8 +8,8 @@
 #include <quake/WadFileLoader.h>
 #include <quake/Palette.h>
 #include <quake/TextureManager.h>
-#include <unirender2/Texture.h>
-#include <unirender2/TextureDescription.h>
+#include <unirender/Texture.h>
+#include <unirender/TextureDescription.h>
 
 #include <boost/algorithm/string/split.hpp>
 #include <boost/algorithm/string/classification.hpp>
@@ -35,7 +35,7 @@ namespace model
 {
 
 std::shared_ptr<Model>
-MapBuilder::Create(const ur2::Device& dev, const std::vector<sm::vec3>& polygon)
+MapBuilder::Create(const ur::Device& dev, const std::vector<sm::vec3>& polygon)
 {
     auto brush_model = BrushBuilder::BrushFromPolygon(polygon);
     if (!brush_model) {
@@ -63,7 +63,7 @@ MapBuilder::Create(const ur2::Device& dev, const std::vector<sm::vec3>& polygon)
 	return model;
 }
 
-void MapBuilder::Load(const ur2::Device& dev, std::vector<std::shared_ptr<Model>>& models, const std::string& filepath)
+void MapBuilder::Load(const ur::Device& dev, std::vector<std::shared_ptr<Model>>& models, const std::string& filepath)
 {
 	std::ifstream fin(filepath);
 	std::string str((std::istreambuf_iterator<char>(fin)),
@@ -97,7 +97,7 @@ void MapBuilder::Load(const ur2::Device& dev, std::vector<std::shared_ptr<Model>
 	}
 }
 
-bool MapBuilder::Load(const ur2::Device& dev, Model& model, const std::string& filepath)
+bool MapBuilder::Load(const ur::Device& dev, Model& model, const std::string& filepath)
 {
 	std::ifstream fin(filepath);
 	std::string str((std::istreambuf_iterator<char>(fin)),
@@ -131,7 +131,7 @@ bool MapBuilder::Load(const ur2::Device& dev, Model& model, const std::string& f
 	return true;
 }
 
-void MapBuilder::LoadTextures(const ur2::Device& dev,
+void MapBuilder::LoadTextures(const ur::Device& dev,
                               const quake::MapEntity& world, const std::string& dir)
 {
 	std::string tex_path;
@@ -159,7 +159,7 @@ void MapBuilder::LoadTextures(const ur2::Device& dev,
 	}
 }
 
-bool MapBuilder::LoadEntity(const ur2::Device& dev, Model& dst, const std::shared_ptr<quake::MapEntity>& src)
+bool MapBuilder::LoadEntity(const ur::Device& dev, Model& dst, const std::shared_ptr<quake::MapEntity>& src)
 {
 	if (src->brushes.empty()) {
 		return false;
@@ -201,7 +201,7 @@ bool MapBuilder::LoadEntity(const ur2::Device& dev, Model& dst, const std::share
 		std::vector<BrushBuilder::Vertex> border_vertices;
 		std::vector<unsigned short> border_indices;
 		std::string curr_tex_name;
-		ur2::TexturePtr curr_tex = nullptr;
+		ur::TexturePtr curr_tex = nullptr;
 		int face_idx = 0;
 		for (auto& f : faces)
 		{

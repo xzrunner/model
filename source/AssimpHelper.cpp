@@ -5,11 +5,11 @@
 
 #include <SM_Matrix.h>
 #include <SM_Cube.h>
-#include <unirender2/Device.h>
-#include <unirender2/VertexArray.h>
-#include <unirender2/IndexBuffer.h>
-#include <unirender2/VertexBuffer.h>
-#include <unirender2/VertexBufferAttribute.h>
+#include <unirender/Device.h>
+#include <unirender/VertexArray.h>
+#include <unirender/IndexBuffer.h>
+#include <unirender/VertexBuffer.h>
+#include <unirender/VertexBufferAttribute.h>
 
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
@@ -99,7 +99,7 @@ namespace model
 bool     AssimpHelper::m_load_raw_data = false;
 uint32_t AssimpHelper::m_vert_color = 0;
 
-bool AssimpHelper::Load(const ur2::Device& dev, Model& model, const std::string& filepath, float scale)
+bool AssimpHelper::Load(const ur::Device& dev, Model& model, const std::string& filepath, float scale)
 {
 	Assimp::Importer importer;
     importer.SetPropertyFloat(AI_CONFIG_GLOBAL_SCALE_FACTOR_KEY, scale);
@@ -335,7 +335,7 @@ int AssimpHelper::LoadNode(const aiScene* ai_scene, const aiNode* ai_node, Model
 }
 
 std::unique_ptr<Model::Mesh>
-AssimpHelper::LoadMesh(const ur2::Device& dev, const std::vector<std::unique_ptr<Model::Material>>& materials,
+AssimpHelper::LoadMesh(const ur::Device& dev, const std::vector<std::unique_ptr<Model::Material>>& materials,
                        const aiMesh* ai_mesh, sm::cube& aabb)
 {
 	auto mesh = std::make_unique<Model::Mesh>();
@@ -463,16 +463,16 @@ AssimpHelper::LoadMesh(const ur2::Device& dev, const std::vector<std::unique_ptr
     auto va = dev.CreateVertexArray();
 
     auto ibuf_sz = sizeof(uint16_t) * indices.size();
-    auto ibuf = dev.CreateIndexBuffer(ur2::BufferUsageHint::StaticDraw, ibuf_sz);
+    auto ibuf = dev.CreateIndexBuffer(ur::BufferUsageHint::StaticDraw, ibuf_sz);
     ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
     va->SetIndexBuffer(ibuf);
 
     auto vbuf_sz = sizeof(float) * floats_per_vertex * ai_mesh->mNumVertices;
-    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+    auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
     vbuf->ReadFromMemory(buf, vbuf_sz, 0);
     va->SetVertexBuffer(vbuf);
 
-    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs;
+    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs;
 
 	int stride = 0;
 	// pos
@@ -496,31 +496,31 @@ AssimpHelper::LoadMesh(const ur2::Device& dev, const std::vector<std::unique_ptr
 
 	int offset = 0;
 	// pos
-    vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 3, offset, stride));
+    vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 3, offset, stride));
 	offset += 4 * 3;
 	// normal
 	if (has_normal)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
-        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::Float, 3, offset, stride));
+        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+            ur::ComponentDataType::Float, 3, offset, stride));
 		offset += 4 * 3;
 	}
 	// texcoord
 	if (has_texcoord)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
-        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::Float, 2, offset, stride));
+        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+            ur::ComponentDataType::Float, 2, offset, stride));
 		offset += 4 * 2;
 	}
 	// color
 	if (has_color)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_COLOR;
-        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::UnsignedByte, 4, offset, stride));
+        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+            ur::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
 	}
 	// skinned
@@ -528,12 +528,12 @@ AssimpHelper::LoadMesh(const ur2::Device& dev, const std::vector<std::unique_ptr
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_SKINNED;
         // blend_indices
-        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::UnsignedByte, 4, offset, stride));
+        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+            ur::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
         // blend_weights
-        vbuf_attrs.push_back(std::make_shared<ur2::VertexBufferAttribute>(
-            ur2::ComponentDataType::UnsignedByte, 4, offset, stride));
+        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+            ur::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
 	}
 
@@ -616,7 +616,7 @@ std::unique_ptr<MeshRawData> AssimpHelper::LoadMeshRawData(const aiMesh* ai_mesh
 }
 
 std::unique_ptr<Model::Material>
-AssimpHelper::LoadMaterial(const ur2::Device& dev, const aiMaterial* ai_material,
+AssimpHelper::LoadMaterial(const ur::Device& dev, const aiMaterial* ai_material,
                            Model& model, const std::string& dir)
 {
 	auto material = std::make_unique<Model::Material>();
@@ -666,7 +666,7 @@ AssimpHelper::LoadMaterial(const ur2::Device& dev, const aiMaterial* ai_material
 	return material;
 }
 
-int AssimpHelper::LoadTexture(const ur2::Device& dev, Model& model, const std::string& filepath)
+int AssimpHelper::LoadTexture(const ur::Device& dev, Model& model, const std::string& filepath)
 {
 	int idx = 0;
 	for (auto& tex : model.textures)

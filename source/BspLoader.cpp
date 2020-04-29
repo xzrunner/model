@@ -4,12 +4,12 @@
 #include "model/Model.h"
 #include "model/typedef.h"
 
-#include <unirender2/Device.h>
-#include <unirender2/IndexBuffer.h>
-#include <unirender2/VertexBuffer.h>
-#include <unirender2/VertexBufferAttribute.h>
-#include <unirender2/VertexArray.h>
-#include <unirender2/Bitmap.h>
+#include <unirender/Device.h>
+#include <unirender/IndexBuffer.h>
+#include <unirender/VertexBuffer.h>
+#include <unirender/VertexBufferAttribute.h>
+#include <unirender/VertexArray.h>
+#include <unirender/Bitmap.h>
 #include <quake/Palette.h>
 
 #include <fstream>
@@ -19,7 +19,7 @@
 namespace model
 {
 
-bool BspLoader::Load(const ur2::Device& dev, Model& model, const std::string& filepath)
+bool BspLoader::Load(const ur::Device& dev, Model& model, const std::string& filepath)
 {
 	std::ifstream fin(filepath, std::ios::binary);
 	if (fin.fail()) {
@@ -118,7 +118,7 @@ void BspLoader::LoadSurfaceEdges(std::ifstream& fin, const BspFileLump& lump,
 }
 
 void BspLoader::LoadTextures(std::ifstream& fin, const BspFileLump& lump,
-	                         std::vector<BspModel::Texture>& textures, const ur2::Device& dev)
+	                         std::vector<BspModel::Texture>& textures, const ur::Device& dev)
 {
 	BspMipTexLump* m = nullptr;
 
@@ -166,8 +166,8 @@ void BspLoader::LoadTextures(std::ifstream& fin, const BspFileLump& lump,
             palette.IndexedToRgb(indexed, pixel_sz, pixels);
             delete[] indexed;
 
-            auto bmp = std::make_shared<ur2::Bitmap>(mt.width, mt.height, channels, pixels);
-            auto tex = dev.CreateTexture(*bmp, ur2::TextureFormat::RGB);
+            auto bmp = std::make_shared<ur::Bitmap>(mt.width, mt.height, channels, pixels);
+            auto tex = dev.CreateTexture(*bmp, ur::TextureFormat::RGB);
             delete[] pixels;
 
             textures[i].tex = tex;
@@ -623,7 +623,7 @@ void BspLoader::ChainSurfaceByTexture(BspModel& model)
 	}
 }
 
-void BspLoader::BuildModelVertexBuffer(const ur2::Device& dev, const BspModel& model, ur2::VertexArray& va)
+void BspLoader::BuildModelVertexBuffer(const ur::Device& dev, const BspModel& model, ur::VertexArray& va)
 {
 	int numverts = 0;
 	for (auto& s : model.surfaces) {
@@ -640,30 +640,30 @@ void BspLoader::BuildModelVertexBuffer(const ur2::Device& dev, const BspModel& m
 		idx += s.numedges;
 	}
 
-    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, buf_sz);
+    auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, buf_sz);
     vbuf->ReadFromMemory(buf, buf_sz, 0);
     va.SetVertexBuffer(vbuf);
 
-    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs;
+    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs;
     vbuf_attrs.resize(3);
     // position
-    vbuf_attrs[0] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 3, 0, 28
+    vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 3, 0, 28
     );
     // texcoord
-    vbuf_attrs[1] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 2, 12, 28
+    vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 2, 12, 28
     );
     // texcoord_light
-    vbuf_attrs[2] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 2, 20, 28
+    vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 2, 20, 28
     );
     va.SetVertexBufferAttrs(vbuf_attrs);
 
 	delete[] buf;
 }
 
-void BspLoader::BuildModelIndexBuffer(const ur2::Device& dev, const BspModel& model, ur2::VertexArray& va)
+void BspLoader::BuildModelIndexBuffer(const ur::Device& dev, const BspModel& model, ur::VertexArray& va)
 {
 	int num = 0;
 	for (auto& s : model.surfaces) {
@@ -684,7 +684,7 @@ void BspLoader::BuildModelIndexBuffer(const ur2::Device& dev, const BspModel& mo
 	}
 
     auto ibuf_sz = sizeof(unsigned short) * num;
-    auto ibuf = dev.CreateIndexBuffer(ur2::BufferUsageHint::StaticDraw, ibuf_sz);
+    auto ibuf = dev.CreateIndexBuffer(ur::BufferUsageHint::StaticDraw, ibuf_sz);
     ibuf->ReadFromMemory(buf, ibuf_sz, 0);
     va.SetIndexBuffer(ibuf);
 

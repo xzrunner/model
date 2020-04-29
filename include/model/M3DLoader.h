@@ -9,7 +9,7 @@
 #include <vector>
 #include <unordered_map>
 
-namespace ur2 { class Device; }
+namespace ur { class Device; }
 
 namespace model
 {
@@ -22,7 +22,7 @@ struct AnimationClip;
 class M3dLoader
 {
 public:
-	static bool Load(const ur2::Device& dev, Model& model, const std::string& filepath);
+	static bool Load(const ur::Device& dev, Model& model, const std::string& filepath);
 
 private:
 	struct Vertex

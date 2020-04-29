@@ -1,7 +1,7 @@
 #include "model/BspModel.h"
 
 #include <quake/Lightmaps.h>
-#include <unirender2/Texture.h>
+#include <unirender/Texture.h>
 
 namespace
 {
@@ -15,7 +15,7 @@ unsigned blocklights[quake::Lightmaps::BLOCK_WIDTH * quake::Lightmaps::BLOCK_HEI
 namespace model
 {
 
-void BspModel::CreateSurfaceLightmap(const ur2::Device& dev)
+void BspModel::CreateSurfaceLightmap(const ur::Device& dev)
 {
 	for (auto& s : surfaces)
 	{

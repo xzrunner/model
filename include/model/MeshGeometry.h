@@ -10,7 +10,7 @@
 //#define BLENDSHAPE_COMPRESS_FLOAT
 //#define BLENDSHAPE_COMPRESS_TO8
 
-namespace ur2 { class VertexArray; }
+namespace ur { class VertexArray; }
 
 namespace model
 {
@@ -73,7 +73,7 @@ struct MeshGeometry : boost::noncopyable
 {
 	~MeshGeometry();
 
-    std::shared_ptr<ur2::VertexArray> vertex_array = nullptr;
+    std::shared_ptr<ur::VertexArray> vertex_array = nullptr;
 
 //	std::unordered_map<std::string, SubmeshGeometry> sub_geometries;
 	std::vector<SubmeshGeometry> sub_geometries;

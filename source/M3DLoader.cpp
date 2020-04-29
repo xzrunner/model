@@ -7,11 +7,11 @@
 #include "model/TextureLoader.h"
 
 #include <guard/check.h>
-#include <unirender2/Device.h>
-#include <unirender2/VertexArray.h>
-#include <unirender2/IndexBuffer.h>
-#include <unirender2/VertexBuffer.h>
-#include <unirender2/VertexBufferAttribute.h>
+#include <unirender/Device.h>
+#include <unirender/VertexArray.h>
+#include <unirender/IndexBuffer.h>
+#include <unirender/VertexBuffer.h>
+#include <unirender/VertexBufferAttribute.h>
 
 #include <boost/filesystem.hpp>
 
@@ -27,7 +27,7 @@ const float MODEL_SCALE = 0.1f;
 namespace model
 {
 
-bool M3dLoader::Load(const ur2::Device& dev, Model& model, const std::string& filepath)
+bool M3dLoader::Load(const ur::Device& dev, Model& model, const std::string& filepath)
 {
 	auto dir = boost::filesystem::path(filepath).parent_path().string();
 
@@ -50,34 +50,34 @@ bool M3dLoader::Load(const ur2::Device& dev, Model& model, const std::string& fi
     auto va = dev.CreateVertexArray();
 
     auto ibuf_sz = sizeof(uint16_t) * indices.size();
-    auto ibuf = dev.CreateIndexBuffer(ur2::BufferUsageHint::StaticDraw, ibuf_sz);
+    auto ibuf = dev.CreateIndexBuffer(ur::BufferUsageHint::StaticDraw, ibuf_sz);
     ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
     va->SetIndexBuffer(ibuf);
 
     auto vbuf_sz = sizeof(M3dLoader::SkinnedVertex) * vertices.size();
-    auto vbuf = dev.CreateVertexBuffer(ur2::BufferUsageHint::StaticDraw, vbuf_sz);
+    auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
     vbuf->ReadFromMemory(&vertices[0].Pos.xyz[0], vbuf_sz, 0);
     va->SetVertexBuffer(vbuf);
 
-    std::vector<std::shared_ptr<ur2::VertexBufferAttribute>> vbuf_attrs(6);
+    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs(6);
     // pos
-    vbuf_attrs[0] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 3, 0, 52);
+    vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 3, 0, 52);
     // normal
-    vbuf_attrs[1] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 3, 12, 52);
+    vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 3, 12, 52);
     // texcoord
-    vbuf_attrs[2] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 2, 24, 52);
+    vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 2, 24, 52);
     // tangent
-    vbuf_attrs[3] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::Float, 3, 32, 52);
+    vbuf_attrs[3] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::Float, 3, 32, 52);
     // bone_weights
-    vbuf_attrs[4] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::UnsignedByte, 1, 44, 52);
+    vbuf_attrs[4] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::UnsignedByte, 1, 44, 52);
     // bone_indices
-    vbuf_attrs[5] = std::make_shared<ur2::VertexBufferAttribute>(
-        ur2::ComponentDataType::UnsignedByte, 1, 48, 52);
+    vbuf_attrs[5] = std::make_shared<ur::VertexBufferAttribute>(
+        ur::ComponentDataType::UnsignedByte, 1, 48, 52);
     va->SetVertexBufferAttrs(vbuf_attrs);
 
 	//// material
