@@ -61,10 +61,10 @@ SurfaceLoader::CreateMesh(const ur::Device& dev, const std::string& name, sm::cu
     std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs(2);
     // pos
     vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 3, 0, 24);
+        0, ur::ComponentDataType::Float, 3, 0, 24);
     // normal
     vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 3, 12, 24);
+        1, ur::ComponentDataType::Float, 3, 12, 24);
     va->SetVertexBufferAttrs(vbuf_attrs);
 
 	// mesh

@@ -74,41 +74,41 @@ void setup_vert_attr_list(model::BrushBuilder::VertexType type, const std::share
         vbuf_attrs.resize(2);
         // pos
         vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
-            ur::ComponentDataType::Float, 3, 0, 24
+            0, ur::ComponentDataType::Float, 3, 0, 24
         );
         // normal
         vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
-            ur::ComponentDataType::Float, 3, 12, 24
+            1, ur::ComponentDataType::Float, 3, 12, 24
         );
         break;
     case model::BrushBuilder::VertexType::PosNormTex:
         vbuf_attrs.resize(3);
         // pos
         vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
-            ur::ComponentDataType::Float, 3, 0, 32
+            0, ur::ComponentDataType::Float, 3, 0, 32
         );
         // normal
         vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
-            ur::ComponentDataType::Float, 3, 12, 32
+            1, ur::ComponentDataType::Float, 3, 12, 32
         );
         // texcoord
         vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
-            ur::ComponentDataType::Float, 2, 24, 32
+            2, ur::ComponentDataType::Float, 2, 24, 32
         );
         break;
     case model::BrushBuilder::VertexType::PosNormCol:
         vbuf_attrs.resize(3);
         // pos
         vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
-            ur::ComponentDataType::Float, 3, 0, 36
+            0, ur::ComponentDataType::Float, 3, 0, 36
         );
         // normal
         vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
-            ur::ComponentDataType::Float, 3, 12, 36
+            1, ur::ComponentDataType::Float, 3, 12, 36
         );
         // color
         vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
-            ur::ComponentDataType::Float, 3, 24, 36
+            2, ur::ComponentDataType::Float, 3, 24, 36
         );
         break;
     default:

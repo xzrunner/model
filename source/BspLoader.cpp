@@ -648,15 +648,15 @@ void BspLoader::BuildModelVertexBuffer(const ur::Device& dev, const BspModel& mo
     vbuf_attrs.resize(3);
     // position
     vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 3, 0, 28
+        0, ur::ComponentDataType::Float, 3, 0, 28
     );
     // texcoord
     vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 2, 12, 28
+        1, ur::ComponentDataType::Float, 2, 12, 28
     );
     // texcoord_light
     vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 2, 20, 28
+        2, ur::ComponentDataType::Float, 2, 20, 28
     );
     va.SetVertexBufferAttrs(vbuf_attrs);
 

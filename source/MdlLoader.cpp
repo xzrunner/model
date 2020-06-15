@@ -184,15 +184,15 @@ void MdlLoader::LoadMesh(const ur::Device& dev, const MdlHeader& header,
     vbuf_attrs.resize(5);
     // pose1_vert, pose2_vert
     vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 3, 0, 24
+        0, ur::ComponentDataType::Float, 3, 0, 24
     );
     // pose1_normal, pose2_normal
     vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 3, 12, 24
+        1, ur::ComponentDataType::Float, 3, 12, 24
     );
     // texcoord
     vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 2, 20, 24
+        2, ur::ComponentDataType::Float, 2, 20, 24
     );
 
 	int vertices_n = header.num_tris * 3;

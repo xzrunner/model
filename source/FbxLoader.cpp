@@ -1053,17 +1053,18 @@ void FbxLoader::LoadMesh(const ur::Device& dev, Model::Mesh& dst,
 		stride += 4 + 4;
 	}
 
+    int attr_loc = 0;
 	int offset = 0;
 	// pos
     vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 3, offset, stride));
+        attr_loc++, ur::ComponentDataType::Float, 3, offset, stride));
 	offset += 4 * 3;
 	// normal
 	if (has_normal)
 	{
 		dst.geometry.vertex_type |= VERTEX_FLAG_NORMALS;
         vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
-            ur::ComponentDataType::Float, 3, offset, stride));
+            attr_loc++, ur::ComponentDataType::Float, 3, offset, stride));
 		offset += 4 * 3;
 	}
 	// texcoord
@@ -1071,7 +1072,7 @@ void FbxLoader::LoadMesh(const ur::Device& dev, Model::Mesh& dst,
 	{
 		dst.geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
         vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
-            ur::ComponentDataType::Float, 2, offset, stride));
+            attr_loc++, ur::ComponentDataType::Float, 2, offset, stride));
 		offset += 4 * 2;
 	}
 	// color
@@ -1079,7 +1080,7 @@ void FbxLoader::LoadMesh(const ur::Device& dev, Model::Mesh& dst,
 	{
 		dst.geometry.vertex_type |= VERTEX_FLAG_COLOR;
         vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
-            ur::ComponentDataType::UnsignedByte, 4, offset, stride));
+            attr_loc++, ur::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
 	}
 	// skinned
@@ -1088,11 +1089,11 @@ void FbxLoader::LoadMesh(const ur::Device& dev, Model::Mesh& dst,
 		dst.geometry.vertex_type |= VERTEX_FLAG_SKINNED;
         // blend_indices
         vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
-            ur::ComponentDataType::UnsignedByte, 4, offset, stride));
+            attr_loc++, ur::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
         // blend_weights
         vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
-            ur::ComponentDataType::UnsignedByte, 4, offset, stride));
+            attr_loc++, ur::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
 	}
 

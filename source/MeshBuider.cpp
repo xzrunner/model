@@ -68,13 +68,13 @@ MeshBuider::CreateCube(const ur::Device& dev, const sm::vec3& half_extents)
     std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs;
     vbuf_attrs.resize(3);
     vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 3, 0, 32
+        0, ur::ComponentDataType::Float, 3, 0, 32
     );
     vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 3, 12, 32
+        1, ur::ComponentDataType::Float, 3, 12, 32
     );
     vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 2, 24, 32
+        2, ur::ComponentDataType::Float, 2, 24, 32
     );
     va->SetVertexBufferAttrs(vbuf_attrs);
 

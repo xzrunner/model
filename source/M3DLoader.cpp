@@ -62,22 +62,22 @@ bool M3dLoader::Load(const ur::Device& dev, Model& model, const std::string& fil
     std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs(6);
     // pos
     vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 3, 0, 52);
+        0, ur::ComponentDataType::Float, 3, 0, 52);
     // normal
     vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 3, 12, 52);
+        1, ur::ComponentDataType::Float, 3, 12, 52);
     // texcoord
     vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 2, 24, 52);
+        2, ur::ComponentDataType::Float, 2, 24, 52);
     // tangent
     vbuf_attrs[3] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::Float, 3, 32, 52);
+        3, ur::ComponentDataType::Float, 3, 32, 52);
     // bone_weights
     vbuf_attrs[4] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::UnsignedByte, 1, 44, 52);
+        4, ur::ComponentDataType::UnsignedByte, 1, 44, 52);
     // bone_indices
     vbuf_attrs[5] = std::make_shared<ur::VertexBufferAttribute>(
-        ur::ComponentDataType::UnsignedByte, 1, 48, 52);
+        5, ur::ComponentDataType::UnsignedByte, 1, 48, 52);
     va->SetVertexBufferAttrs(vbuf_attrs);
 
 	//// material
