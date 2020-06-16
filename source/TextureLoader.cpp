@@ -78,7 +78,7 @@ TextureLoader::LoadFromFile(const ur::Device& dev, const char* filepath, int mip
     desc.width  = w;
     desc.height = h;
     desc.format = tf;
-    return dev.CreateTexture(desc);
+    return dev.CreateTexture(desc, pixels);
 }
 
 ur::TexturePtr
@@ -105,7 +105,7 @@ TextureLoader::LoadFromMemory(const ur::Device& dev, const unsigned char* pixels
     desc.width  = width;
     desc.height = height;
     desc.format = tf;
-    return dev.CreateTexture(desc);
+    return dev.CreateTexture(desc, pixels);
 }
 
 }
