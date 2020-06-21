@@ -114,10 +114,10 @@ bool AssimpHelper::Load(const ur::Device& dev, Model& model, const std::string& 
         //aiProcess_SplitByBoneCount |
 
         aiProcess_Triangulate |
-
+		aiProcess_FlipUVs |
         aiProcess_GlobalScale |
         aiProcess_GenSmoothNormals |
-        aiProcess_ConvertToLeftHanded |
+        //aiProcess_ConvertToLeftHanded |
         aiProcess_JoinIdenticalVertices |
         aiProcess_ValidateDataStructure
 
@@ -223,9 +223,10 @@ bool AssimpHelper::Load(std::vector<std::unique_ptr<MeshRawData>>& meshes, const
 	Assimp::Importer importer;
 	const aiScene* ai_scene = importer.ReadFile(filepath.c_str(),
         aiProcess_Triangulate |
+		aiProcess_FlipUVs |
         aiProcess_GlobalScale |
         aiProcess_GenSmoothNormals |
-        aiProcess_ConvertToLeftHanded |
+        //aiProcess_ConvertToLeftHanded |
         aiProcess_JoinIdenticalVertices |
         aiProcess_ValidateDataStructure
 	);
@@ -415,7 +416,7 @@ AssimpHelper::LoadMesh(const ur::Device& dev, const std::vector<std::unique_ptr<
             }
 			memcpy(ptr, &x, sizeof(float));
 			ptr += sizeof(float);
-			float y = 1 - t.y;
+			float y = t.y;
             if (y > 1) {
                 y -= std::floor(y);
             }
