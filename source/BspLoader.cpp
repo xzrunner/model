@@ -9,7 +9,6 @@
 #include <unirender/VertexBuffer.h>
 #include <unirender/VertexBufferAttribute.h>
 #include <unirender/VertexArray.h>
-#include <unirender/Bitmap.h>
 #include <quake/Palette.h>
 
 #include <fstream>
@@ -166,8 +165,7 @@ void BspLoader::LoadTextures(std::ifstream& fin, const BspFileLump& lump,
             palette.IndexedToRgb(indexed, pixel_sz, pixels);
             delete[] indexed;
 
-            auto bmp = std::make_shared<ur::Bitmap>(mt.width, mt.height, channels, pixels);
-            auto tex = dev.CreateTexture(*bmp, ur::TextureFormat::RGB);
+            auto tex = dev.CreateTexture(mt.width, mt.height, ur::TextureFormat::RGB, pixels, mt.width * mt.height * channels);
             delete[] pixels;
 
             textures[i].tex = tex;
