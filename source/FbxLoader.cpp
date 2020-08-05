@@ -7,7 +7,7 @@
 #include <unirender/VertexArray.h>
 #include <unirender/IndexBuffer.h>
 #include <unirender/VertexBuffer.h>
-#include <unirender/VertexBufferAttribute.h>
+#include <unirender/VertexInputAttribute.h>
 
 #include <fbxsdk.h>
 
@@ -1031,7 +1031,7 @@ void FbxLoader::LoadMesh(const ur::Device& dev, Model::Mesh& dst,
     vbuf->ReadFromMemory(buf, vbuf_sz, 0);
     va->SetVertexBuffer(vbuf);
 
-    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs;
+    std::vector<std::shared_ptr<ur::VertexInputAttribute>> vbuf_attrs;
 
 	int stride = 0;
 	// pos
@@ -1056,14 +1056,14 @@ void FbxLoader::LoadMesh(const ur::Device& dev, Model::Mesh& dst,
     int attr_loc = 0;
 	int offset = 0;
 	// pos
-    vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+    vbuf_attrs.push_back(std::make_shared<ur::VertexInputAttribute>(
         attr_loc++, ur::ComponentDataType::Float, 3, offset, stride));
 	offset += 4 * 3;
 	// normal
 	if (has_normal)
 	{
 		dst.geometry.vertex_type |= VERTEX_FLAG_NORMALS;
-        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs.push_back(std::make_shared<ur::VertexInputAttribute>(
             attr_loc++, ur::ComponentDataType::Float, 3, offset, stride));
 		offset += 4 * 3;
 	}
@@ -1071,7 +1071,7 @@ void FbxLoader::LoadMesh(const ur::Device& dev, Model::Mesh& dst,
 	if (has_texcoord)
 	{
 		dst.geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
-        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs.push_back(std::make_shared<ur::VertexInputAttribute>(
             attr_loc++, ur::ComponentDataType::Float, 2, offset, stride));
 		offset += 4 * 2;
 	}
@@ -1079,7 +1079,7 @@ void FbxLoader::LoadMesh(const ur::Device& dev, Model::Mesh& dst,
 	if (has_color)
 	{
 		dst.geometry.vertex_type |= VERTEX_FLAG_COLOR;
-        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs.push_back(std::make_shared<ur::VertexInputAttribute>(
             attr_loc++, ur::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
 	}
@@ -1088,11 +1088,11 @@ void FbxLoader::LoadMesh(const ur::Device& dev, Model::Mesh& dst,
 	{
 		dst.geometry.vertex_type |= VERTEX_FLAG_SKINNED;
         // blend_indices
-        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs.push_back(std::make_shared<ur::VertexInputAttribute>(
             attr_loc++, ur::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
         // blend_weights
-        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs.push_back(std::make_shared<ur::VertexInputAttribute>(
             attr_loc++, ur::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
 	}

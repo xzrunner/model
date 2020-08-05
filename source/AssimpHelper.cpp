@@ -9,7 +9,7 @@
 #include <unirender/VertexArray.h>
 #include <unirender/IndexBuffer.h>
 #include <unirender/VertexBuffer.h>
-#include <unirender/VertexBufferAttribute.h>
+#include <unirender/VertexInputAttribute.h>
 
 #include <assimp/Importer.hpp>      // C++ importer interface
 #include <assimp/scene.h>           // Output data structure
@@ -473,7 +473,7 @@ AssimpHelper::LoadMesh(const ur::Device& dev, const std::vector<std::unique_ptr<
     vbuf->ReadFromMemory(buf, vbuf_sz, 0);
     va->SetVertexBuffer(vbuf);
 
-    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs;
+    std::vector<std::shared_ptr<ur::VertexInputAttribute>> vbuf_attrs;
 
 	int stride = 0;
 	// pos
@@ -498,14 +498,14 @@ AssimpHelper::LoadMesh(const ur::Device& dev, const std::vector<std::unique_ptr<
 	int offset = 0;
 	int attr_loc = 0;
 	// pos
-    vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+    vbuf_attrs.push_back(std::make_shared<ur::VertexInputAttribute>(
 		attr_loc++, ur::ComponentDataType::Float, 3, offset, stride));
 	offset += 4 * 3;
 	// normal
 	if (has_normal)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
-        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs.push_back(std::make_shared<ur::VertexInputAttribute>(
 			attr_loc++, ur::ComponentDataType::Float, 3, offset, stride));
 		offset += 4 * 3;
 	}
@@ -513,7 +513,7 @@ AssimpHelper::LoadMesh(const ur::Device& dev, const std::vector<std::unique_ptr<
 	if (has_texcoord)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
-        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs.push_back(std::make_shared<ur::VertexInputAttribute>(
 			attr_loc++, ur::ComponentDataType::Float, 2, offset, stride));
 		offset += 4 * 2;
 	}
@@ -521,7 +521,7 @@ AssimpHelper::LoadMesh(const ur::Device& dev, const std::vector<std::unique_ptr<
 	if (has_color)
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_COLOR;
-        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs.push_back(std::make_shared<ur::VertexInputAttribute>(
 			attr_loc++, ur::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
 	}
@@ -530,11 +530,11 @@ AssimpHelper::LoadMesh(const ur::Device& dev, const std::vector<std::unique_ptr<
 	{
 		mesh->geometry.vertex_type |= VERTEX_FLAG_SKINNED;
         // blend_indices
-        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs.push_back(std::make_shared<ur::VertexInputAttribute>(
 			attr_loc++, ur::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
         // blend_weights
-        vbuf_attrs.push_back(std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs.push_back(std::make_shared<ur::VertexInputAttribute>(
 			attr_loc++, ur::ComponentDataType::UnsignedByte, 4, offset, stride));
 		offset += 4;
 	}

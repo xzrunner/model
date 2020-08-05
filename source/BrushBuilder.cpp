@@ -7,7 +7,7 @@
 #include <unirender/Device.h>
 #include <unirender/IndexBuffer.h>
 #include <unirender/VertexBuffer.h>
-#include <unirender/VertexBufferAttribute.h>
+#include <unirender/VertexInputAttribute.h>
 #include <unirender/VertexArray.h>
 
 namespace
@@ -66,48 +66,48 @@ void dump_vert_buf(model::BrushBuilder::VertexType type,
 }
 
 void setup_vert_attr_list(model::BrushBuilder::VertexType type, const std::shared_ptr<ur::VertexBuffer>& vbuf,
-                          std::vector<std::shared_ptr<ur::VertexBufferAttribute>>& vbuf_attrs)
+                          std::vector<std::shared_ptr<ur::VertexInputAttribute>>& vbuf_attrs)
 {
     switch (type)
     {
     case model::BrushBuilder::VertexType::PosNorm:
         vbuf_attrs.resize(2);
         // pos
-        vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs[0] = std::make_shared<ur::VertexInputAttribute>(
             0, ur::ComponentDataType::Float, 3, 0, 24
         );
         // normal
-        vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs[1] = std::make_shared<ur::VertexInputAttribute>(
             1, ur::ComponentDataType::Float, 3, 12, 24
         );
         break;
     case model::BrushBuilder::VertexType::PosNormTex:
         vbuf_attrs.resize(3);
         // pos
-        vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs[0] = std::make_shared<ur::VertexInputAttribute>(
             0, ur::ComponentDataType::Float, 3, 0, 32
         );
         // normal
-        vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs[1] = std::make_shared<ur::VertexInputAttribute>(
             1, ur::ComponentDataType::Float, 3, 12, 32
         );
         // texcoord
-        vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs[2] = std::make_shared<ur::VertexInputAttribute>(
             2, ur::ComponentDataType::Float, 2, 24, 32
         );
         break;
     case model::BrushBuilder::VertexType::PosNormCol:
         vbuf_attrs.resize(3);
         // pos
-        vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs[0] = std::make_shared<ur::VertexInputAttribute>(
             0, ur::ComponentDataType::Float, 3, 0, 36
         );
         // normal
-        vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs[1] = std::make_shared<ur::VertexInputAttribute>(
             1, ur::ComponentDataType::Float, 3, 12, 36
         );
         // color
-        vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
+        vbuf_attrs[2] = std::make_shared<ur::VertexInputAttribute>(
             2, ur::ComponentDataType::Float, 3, 24, 36
         );
         break;
@@ -442,7 +442,7 @@ void BrushBuilder::CreateMeshRenderBuf(const ur::Device& dev, VertexType type, m
     vbuf->ReadFromMemory(buf.data(), vbuf_sz, 0);
     va->SetVertexBuffer(vbuf);
 
-    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs;
+    std::vector<std::shared_ptr<ur::VertexInputAttribute>> vbuf_attrs;
     setup_vert_attr_list(type, vbuf, vbuf_attrs);
     va->SetVertexBufferAttrs(vbuf_attrs);
 
@@ -474,7 +474,7 @@ void BrushBuilder::CreateBorderMeshRenderBuf(const ur::Device& dev, VertexType t
     vbuf->ReadFromMemory(buf.data(), vbuf_sz, 0);
     va->SetVertexBuffer(vbuf);
 
-    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs;
+    std::vector<std::shared_ptr<ur::VertexInputAttribute>> vbuf_attrs;
     setup_vert_attr_list(type, vbuf, vbuf_attrs);
     va->SetVertexBufferAttrs(vbuf_attrs);
 

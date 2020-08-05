@@ -8,7 +8,7 @@
 #include <unirender/VertexArray.h>
 #include <unirender/IndexBuffer.h>
 #include <unirender/VertexBuffer.h>
-#include <unirender/VertexBufferAttribute.h>
+#include <unirender/VertexInputAttribute.h>
 
 #include <boost/filesystem.hpp>
 
@@ -58,12 +58,12 @@ SurfaceLoader::CreateMesh(const ur::Device& dev, const std::string& name, sm::cu
     vbuf->ReadFromMemory(vertices.data(), vbuf_sz, 0);
     va->SetVertexBuffer(vbuf);
 
-    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs(2);
+    std::vector<std::shared_ptr<ur::VertexInputAttribute>> vbuf_attrs(2);
     // pos
-    vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
+    vbuf_attrs[0] = std::make_shared<ur::VertexInputAttribute>(
         0, ur::ComponentDataType::Float, 3, 0, 24);
     // normal
-    vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
+    vbuf_attrs[1] = std::make_shared<ur::VertexInputAttribute>(
         1, ur::ComponentDataType::Float, 3, 12, 24);
     va->SetVertexBufferAttrs(vbuf_attrs);
 

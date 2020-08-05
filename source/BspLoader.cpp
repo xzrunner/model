@@ -7,7 +7,7 @@
 #include <unirender/Device.h>
 #include <unirender/IndexBuffer.h>
 #include <unirender/VertexBuffer.h>
-#include <unirender/VertexBufferAttribute.h>
+#include <unirender/VertexInputAttribute.h>
 #include <unirender/VertexArray.h>
 #include <quake/Palette.h>
 
@@ -642,18 +642,18 @@ void BspLoader::BuildModelVertexBuffer(const ur::Device& dev, const BspModel& mo
     vbuf->ReadFromMemory(buf, buf_sz, 0);
     va.SetVertexBuffer(vbuf);
 
-    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs;
+    std::vector<std::shared_ptr<ur::VertexInputAttribute>> vbuf_attrs;
     vbuf_attrs.resize(3);
     // position
-    vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
+    vbuf_attrs[0] = std::make_shared<ur::VertexInputAttribute>(
         0, ur::ComponentDataType::Float, 3, 0, 28
     );
     // texcoord
-    vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
+    vbuf_attrs[1] = std::make_shared<ur::VertexInputAttribute>(
         1, ur::ComponentDataType::Float, 2, 12, 28
     );
     // texcoord_light
-    vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
+    vbuf_attrs[2] = std::make_shared<ur::VertexInputAttribute>(
         2, ur::ComponentDataType::Float, 2, 20, 28
     );
     va.SetVertexBufferAttrs(vbuf_attrs);

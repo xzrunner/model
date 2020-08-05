@@ -11,7 +11,7 @@
 #include <unirender/VertexArray.h>
 #include <unirender/IndexBuffer.h>
 #include <unirender/VertexBuffer.h>
-#include <unirender/VertexBufferAttribute.h>
+#include <unirender/VertexInputAttribute.h>
 
 #include <boost/filesystem.hpp>
 
@@ -59,24 +59,24 @@ bool M3dLoader::Load(const ur::Device& dev, Model& model, const std::string& fil
     vbuf->ReadFromMemory(&vertices[0].Pos.xyz[0], vbuf_sz, 0);
     va->SetVertexBuffer(vbuf);
 
-    std::vector<std::shared_ptr<ur::VertexBufferAttribute>> vbuf_attrs(6);
+    std::vector<std::shared_ptr<ur::VertexInputAttribute>> vbuf_attrs(6);
     // pos
-    vbuf_attrs[0] = std::make_shared<ur::VertexBufferAttribute>(
+    vbuf_attrs[0] = std::make_shared<ur::VertexInputAttribute>(
         0, ur::ComponentDataType::Float, 3, 0, 52);
     // normal
-    vbuf_attrs[1] = std::make_shared<ur::VertexBufferAttribute>(
+    vbuf_attrs[1] = std::make_shared<ur::VertexInputAttribute>(
         1, ur::ComponentDataType::Float, 3, 12, 52);
     // texcoord
-    vbuf_attrs[2] = std::make_shared<ur::VertexBufferAttribute>(
+    vbuf_attrs[2] = std::make_shared<ur::VertexInputAttribute>(
         2, ur::ComponentDataType::Float, 2, 24, 52);
     // tangent
-    vbuf_attrs[3] = std::make_shared<ur::VertexBufferAttribute>(
+    vbuf_attrs[3] = std::make_shared<ur::VertexInputAttribute>(
         3, ur::ComponentDataType::Float, 3, 32, 52);
     // bone_weights
-    vbuf_attrs[4] = std::make_shared<ur::VertexBufferAttribute>(
+    vbuf_attrs[4] = std::make_shared<ur::VertexInputAttribute>(
         4, ur::ComponentDataType::UnsignedByte, 1, 44, 52);
     // bone_indices
-    vbuf_attrs[5] = std::make_shared<ur::VertexBufferAttribute>(
+    vbuf_attrs[5] = std::make_shared<ur::VertexInputAttribute>(
         5, ur::ComponentDataType::UnsignedByte, 1, 48, 52);
     va->SetVertexBufferAttrs(vbuf_attrs);
 
