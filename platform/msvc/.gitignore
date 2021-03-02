@@ -1,5 +1,5 @@
 model/
 projects/*
 
-!projects/model.vcxproj
-!projects/model.vcxproj.filters
+!projects/*.vcxproj
+!projects/*.vcxproj.filters

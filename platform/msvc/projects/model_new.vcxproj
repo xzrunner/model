@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\source\AnimIK.cpp" />
+    <ClCompile Include="..\..\..\source\AssimpExporter.cpp" />
+    <ClCompile Include="..\..\..\source\AssimpHelper.cpp" />
+    <ClCompile Include="..\..\..\source\BlendShapeLoader.cpp" />
+    <ClCompile Include="..\..\..\source\BrushBuilder.cpp" />
+    <ClCompile Include="..\..\..\source\BrushModel.cpp" />
+    <ClCompile Include="..\..\..\source\BspLoader.cpp" />
+    <ClCompile Include="..\..\..\source\BspModel.cpp" />
+    <ClCompile Include="..\..\..\source\FbxLoader.cpp" />
+    <ClCompile Include="..\..\..\source\GlobalClock.cpp" />
+    <ClCompile Include="..\..\..\source\M3dLoader.cpp" />
+    <ClCompile Include="..\..\..\source\MapBuilder.cpp" />
+    <ClCompile Include="..\..\..\source\MaxLoader.cpp" />
+    <ClCompile Include="..\..\..\source\MdlLoader.cpp" />
+    <ClCompile Include="..\..\..\source\MeshBuider.cpp" />
+    <ClCompile Include="..\..\..\source\MeshGeometry.cpp" />
+    <ClCompile Include="..\..\..\source\MeshIK.cpp" />
+    <ClCompile Include="..\..\..\source\Model.cpp" />
+    <ClCompile Include="..\..\..\source\ModelInstance.cpp" />
+    <ClCompile Include="..\..\..\source\MorphTargetAnim.cpp" />
+    <ClCompile Include="..\..\..\source\ObjLoader.cpp" />
+    <ClCompile Include="..\..\..\source\ParametricEquations.cpp" />
+    <ClCompile Include="..\..\..\source\ParametricSurface.cpp" />
+    <ClCompile Include="..\..\..\source\QuakeMapEntity.cpp" />
+    <ClCompile Include="..\..\..\source\SkeletalAnim.cpp" />
+    <ClCompile Include="..\..\..\source\SkinnedData.cpp" />
+    <ClCompile Include="..\..\..\source\SurfaceFactory.cpp" />
+    <ClCompile Include="..\..\..\source\SurfaceLoader.cpp" />
+    <ClCompile Include="..\..\..\source\TextureLoader.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\include\model\AnimIK.h" />
+    <ClInclude Include="..\..\..\include\model\AssimpExporter.h" />
+    <ClInclude Include="..\..\..\include\model\BlendShapeLoader.h" />
+    <ClInclude Include="..\..\..\include\model\BrushBuilder.h" />
+    <ClInclude Include="..\..\..\include\model\BrushModel.h" />
+    <ClInclude Include="..\..\..\include\model\FbxLoader.h" />
+    <ClInclude Include="..\..\..\include\model\MeshBuider.h" />
+    <ClInclude Include="..\..\..\include\model\MeshIK.h" />
+    <ClInclude Include="..\..\..\include\model\QuakeMapEntity.h" />
+    <ClInclude Include="..\..\..\include\model\MapBuilder.h" />
+    <ClInclude Include="..\..\..\include\model\ModelExtend.h" />
+    <ClInclude Include="..\..\..\include\model\ModelExtendType.h" />
+    <ClInclude Include="..\..\..\include\model\AssimpHelper.h" />
+    <ClInclude Include="..\..\..\include\model\BspFile.h" />
+    <ClInclude Include="..\..\..\include\model\BspLoader.h" />
+    <ClInclude Include="..\..\..\include\model\BspModel.h" />
+    <ClInclude Include="..\..\..\include\model\GlobalClock.h" />
+    <ClInclude Include="..\..\..\include\model\M3dLoader.h" />
+    <ClInclude Include="..\..\..\include\model\MaxLoader.h" />
+    <ClInclude Include="..\..\..\include\model\MdlLoader.h" />
+    <ClInclude Include="..\..\..\include\model\MeshGeometry.h" />
+    <ClInclude Include="..\..\..\include\model\Model.h" />
+    <ClInclude Include="..\..\..\include\model\ModelInstance.h" />
+    <ClInclude Include="..\..\..\include\model\MorphTargetAnim.h" />
+    <ClInclude Include="..\..\..\include\model\NormalMap.h" />
+    <ClInclude Include="..\..\..\include\model\SkeletalAnim.h" />
+    <ClInclude Include="..\..\..\include\model\SkinnedModel.h" />
+    <ClInclude Include="..\..\..\include\model\ObjLoader.h" />
+    <ClInclude Include="..\..\..\include\model\ParametricEquations.h" />
+    <ClInclude Include="..\..\..\include\model\ParametricSurface.h" />
+    <ClInclude Include="..\..\..\include\model\SkinnedData.h" />
+    <ClInclude Include="..\..\..\include\model\Surface.h" />
+    <ClInclude Include="..\..\..\include\model\SurfaceFactory.h" />
+    <ClInclude Include="..\..\..\include\model\SurfaceLoader.h" />
+    <ClInclude Include="..\..\..\include\model\TextureLoader.h" />
+    <ClInclude Include="..\..\..\include\model\typedef.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\include\model\MaxLoader.inl" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>model</ProjectName>
+    <ProjectGuid>{248A1E4A-87EB-45CF-A10F-BAB452C0098F}</ProjectGuid>
+    <RootNamespace>model</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PlatformToolset>v142</PlatformToolset>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PlatformToolset>v142</PlatformToolset>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>15.0.26730.12</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\model\x86\Debug\</OutDir>
+    <IntDir>..\model\x86\Debug\obj\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\model\x86\Release\</OutDir>
+    <IntDir>..\model\x86\Release\obj\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../../include;../../../../glslang;../../../../SPIRV-Cross;../../../../DirectXShaderCompiler/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;__STDC_LIMIT_MACROS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>../../../include;../../../../glslang;../../../../SPIRV-Cross;../../../../DirectXShaderCompiler/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;__STDC_LIMIT_MACROS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\sm;..\..\..\..\gimg;..\..\..\..\rapidxml;..\..\..\..\tinyobjloader;..\..\..\..\unirender\include;..\..\..\..\guard\include;..\..\..\..\assimp\include;..\..\..\..\polymesh3\include;..\..\..\..\halfedge\include;..\..\..\..\fbxsdk\include</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <Optimization>Disabled</Optimization>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <PreprocessorDefinitions>_DEBUG;NO_BOOST;NO_QUAKE;NO_MESHLAB</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\sm;..\..\..\..\gimg;..\..\..\..\rapidxml;..\..\..\..\tinyobjloader;..\..\..\..\unirender\include;..\..\..\..\guard\include;..\..\..\..\assimp\include;..\..\..\..\polymesh3\include;..\..\..\..\halfedge\include;..\..\..\..\fbxsdk\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NDEBUG;NO_BOOST;NO_QUAKE;NO_MESHLAB</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
