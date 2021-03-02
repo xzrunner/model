@@ -6,8 +6,7 @@
 #include <SM_Matrix.h>
 #include <SM_Cube.h>
 #include <unirender/typedef.h>
-
-#include <boost/noncopyable.hpp>
+#include <unirender/noncopyable.h>
 
 #include <vector>
 #include <memory>
@@ -17,7 +16,7 @@ namespace ur { class Device; }
 namespace model
 {
 
-struct Model : boost::noncopyable
+struct Model : ur::noncopyable
 {
     Model(const ur::Device* dev)
         : dev(dev)

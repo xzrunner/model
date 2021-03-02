@@ -3,9 +3,8 @@
 #define TINYOBJLOADER_IMPLEMENTATION
 #include <tiny_obj_loader.h>
 
-#include <boost/filesystem.hpp>
-
 #include <iostream>
+#include <filesystem>
 
 namespace
 {
@@ -28,9 +27,9 @@ bool ObjLoader::Load(Model& model, const std::string& filepath)
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
 
-	std::string err;
-	auto dir = boost::filesystem::path(filepath).parent_path().string() + "/";
-	bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &err, filepath.c_str(), dir.c_str(), false);
+	std::string warn, err;
+	auto dir = std::filesystem::path(filepath).parent_path().string() + "/";
+	bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filepath.c_str(), dir.c_str(), false);
 
 	if (!err.empty()) {
 		std::cerr << err << std::endl;

@@ -11,8 +11,6 @@
 
 #include <rapidxml_utils.hpp>
 
-#include <boost/algorithm/string.hpp>
-
 namespace
 {
 

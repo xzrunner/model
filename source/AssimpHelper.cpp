@@ -15,7 +15,7 @@
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 namespace
 {
@@ -128,7 +128,7 @@ bool AssimpHelper::Load(const ur::Device& dev, Model& model, const std::string& 
 	}
 
 	// material
-	auto dir = boost::filesystem::path(filepath).parent_path().string();
+	auto dir = std::filesystem::path(filepath).parent_path().string();
 	model.materials.reserve(ai_scene->mNumMaterials);
 	for (size_t i = 0; i < ai_scene->mNumMaterials; ++i)
 	{
@@ -209,7 +209,7 @@ bool AssimpHelper::Load(const ur::Device& dev, Model& model, const std::string& 
 	// todo: load lights and cameras
 
 	// todo
-	if (boost::filesystem::extension(filepath) == ".X") {
+	if (std::filesystem::path(filepath).extension() == ".X") {
 		model.anim_speed = 100;
 	}
 
@@ -660,7 +660,8 @@ AssimpHelper::LoadMaterial(const ur::Device& dev, const aiMaterial* ai_material,
 		aiString path;
 		if (aiGetMaterialString(ai_material, AI_MATKEY_TEXTURE_DIFFUSE(0), &path) == AI_SUCCESS)
 		{
-			auto img_path = boost::filesystem::absolute(path.data, dir);
+			std::filesystem::current_path(dir);
+			auto img_path = std::filesystem::absolute(path.data);
 			material->diffuse_tex = LoadTexture(dev, model, img_path.string());
 		}
 	}

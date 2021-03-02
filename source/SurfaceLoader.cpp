@@ -10,14 +10,14 @@
 #include <unirender/VertexBuffer.h>
 #include <unirender/VertexInputAttribute.h>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 namespace model
 {
 
 bool SurfaceLoader::Load(const ur::Device& dev, Model& model, const std::string& filepath)
 {
-    auto name = boost::filesystem::path(filepath).stem().string();
+    auto name = std::filesystem::path(filepath).stem().string();
     sm::cube aabb;
     auto mesh = CreateMesh(dev, name, aabb);
     if (!mesh) {

@@ -13,8 +13,7 @@
 #include <unirender/VertexBuffer.h>
 #include <unirender/VertexInputAttribute.h>
 
-#include <boost/filesystem.hpp>
-
+#include <filesystem>
 #include <fstream>
 
 namespace
@@ -29,7 +28,7 @@ namespace model
 
 bool M3dLoader::Load(const ur::Device& dev, Model& model, const std::string& filepath)
 {
-	auto dir = boost::filesystem::path(filepath).parent_path().string();
+	auto dir = std::filesystem::path(filepath).parent_path().string();
 
 	std::vector<M3dLoader::SkinnedVertex> vertices;
 	std::vector<uint16_t> indices;
@@ -114,7 +113,8 @@ bool M3dLoader::Load(const ur::Device& dev, Model& model, const std::string& fil
 
 		auto material = std::make_unique<Model::Material>();
 		material->diffuse_tex = model.textures.size();
-		auto img_path = boost::filesystem::absolute(mat_src.DiffuseMapName, dir);
+		std::filesystem::current_path(dir);
+		auto img_path = std::filesystem::absolute(mat_src.DiffuseMapName);
 		auto tex = TextureLoader::LoadFromFile(dev, img_path.string().c_str());
 		model.textures.push_back({ img_path.string(), std::move(tex) });
 		model.materials.push_back(std::move(material));

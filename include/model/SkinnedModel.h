@@ -5,8 +5,7 @@
 #include "model/SkinnedData.h"
 
 #include <SM_Matrix.h>
-
-#include <boost/noncopyable.hpp>
+#include <unirender/noncopyable.h>
 
 #include <vector>
 
@@ -14,7 +13,7 @@ namespace model
 {
 
 class SkinnedData;
-struct SkinnedModelInstance : boost::noncopyable
+struct SkinnedModelInstance : ur::noncopyable
 {
 	SkinnedData* SkinnedInfo = nullptr;
 	std::vector<sm::mat4> FinalTransforms;
@@ -32,7 +31,7 @@ struct SkinnedModelInstance : boost::noncopyable
 	}
 };
 
-struct RenderItem : boost::noncopyable
+struct RenderItem : ur::noncopyable
 {
 	struct MeshMaterial
 	{

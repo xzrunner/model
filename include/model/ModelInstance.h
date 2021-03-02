@@ -1,8 +1,7 @@
 #pragma once
 
 #include <SM_Matrix.h>
-
-#include <boost/noncopyable.hpp>
+#include <unirender/noncopyable.h>
 
 #include <vector>
 #include <memory>
@@ -13,7 +12,7 @@ namespace model{
 struct Model;
 class ModelExtend;
 
-class ModelInstance : boost::noncopyable
+class ModelInstance : ur::noncopyable
 {
 public:
 	ModelInstance(const std::shared_ptr<Model>& model, int anim_idx = 0);

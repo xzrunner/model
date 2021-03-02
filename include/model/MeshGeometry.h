@@ -1,11 +1,10 @@
 #pragma once
 
 #include <SM_Matrix.h>
+#include <unirender/noncopyable.h>
 
 #include <unordered_map>
 #include <memory>
-
-#include <boost/noncopyable.hpp>
 
 //#define BLENDSHAPE_COMPRESS_FLOAT
 //#define BLENDSHAPE_COMPRESS_TO8
@@ -69,7 +68,7 @@ struct BlendShapeData
 
 };
 
-struct MeshGeometry : boost::noncopyable
+struct MeshGeometry : ur::noncopyable
 {
 	~MeshGeometry();
 

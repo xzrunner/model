@@ -8,7 +8,7 @@
 #include <unirender/TextureFormat.h>
 #include <unirender/TextureDescription.h>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 namespace model
 {
@@ -16,7 +16,7 @@ namespace model
 ur::TexturePtr
 TextureLoader::LoadFromFile(const ur::Device& dev, const char* filepath, int mipmap_levels)
 {
-	if (!boost::filesystem::is_regular_file(filepath)) {
+	if (!std::filesystem::is_regular_file(filepath)) {
 		return false;
 	}
 
@@ -97,7 +97,7 @@ TextureLoader::LoadFromMemory(const ur::Device& dev, const unsigned char* pixels
         tf = ur::TextureFormat::RED;
 		break;
 	default:
-		assert(0);
+		GD_REPORT_ASSERT("unknown format.");
 	}
 
     ur::TextureDescription desc;

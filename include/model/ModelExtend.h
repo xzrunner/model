@@ -2,14 +2,14 @@
 
 #include "model/ModelExtendType.h"
 
-#include <boost/noncopyable.hpp>
+#include <unirender/noncopyable.h>
 
 #include <memory>
 
 namespace model
 {
 
-class ModelExtend : boost::noncopyable
+class ModelExtend : ur::noncopyable
 {
 public:
 	virtual ~ModelExtend() {}

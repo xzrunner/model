@@ -11,14 +11,14 @@
 
 #include <guard/check.h>
 
-#include <boost/filesystem.hpp>
+#include <filesystem>
 
 namespace model
 {
 
 bool Model::LoadFromFile(const std::string& filepath)
 {
-	auto ext = boost::filesystem::extension(filepath);
+	auto ext = std::filesystem::path(filepath).extension().string();
 	std::transform(ext.begin(), ext.end(), ext.begin(), tolower);
 	if (ext == ".param") {
 		return SurfaceLoader::Load(*dev, *this, filepath);
