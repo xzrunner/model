@@ -3,7 +3,15 @@
 namespace model
 {
 
-CU_SINGLETON_DEFINITION(GlobalClock)
+GlobalClock* GlobalClock::m_instance = nullptr;
+
+GlobalClock* GlobalClock::Instance() 
+{ 
+	if (!m_instance) { 
+		m_instance = new (GlobalClock)(); 
+	} 
+	return m_instance; 
+}
 
 GlobalClock::GlobalClock()
 	: last_time(0)

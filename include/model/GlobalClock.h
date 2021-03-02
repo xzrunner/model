@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cu/cu_macro.h>
-
 namespace model
 {
 
@@ -12,10 +10,16 @@ public:
 
 	float GetTime() const { return last_time; }
 
+	static GlobalClock* Instance();
+
+private:
+	GlobalClock();
+	~GlobalClock();
+	
 private:
 	float last_time;
 
-	CU_SINGLETON_DECLARATION(GlobalClock)
+	static GlobalClock* m_instance;
 
 }; // GlobalClock
 
