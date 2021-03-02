@@ -6,6 +6,7 @@
 
 #include <string>
 #include <vector>
+#include <memory>
 
 namespace quake { struct MapEntity; }
 namespace ur { class Device; }
