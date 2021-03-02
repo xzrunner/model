@@ -1,3 +1,5 @@
+#ifndef NO_QUAKE
+
 #pragma once
 
 #include "model/ModelExtend.h"
@@ -197,3 +199,5 @@ struct BspModel : public ModelExtend
 }; // BspModel
 
 }
+
+#endif // NO_QUAKE

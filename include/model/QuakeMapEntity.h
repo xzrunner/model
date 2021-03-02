@@ -1,3 +1,5 @@
+#ifndef NO_QUAKE
+
 #pragma once
 
 #include "model/BrushModel.h"
@@ -31,3 +33,5 @@ private:
 }; // QuakeMapEntity
 
 }
+
+#endif // NO_QUAKE

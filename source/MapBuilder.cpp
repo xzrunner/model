@@ -1,3 +1,5 @@
+#ifndef NO_QUAKE
+
 #include "model/MapBuilder.h"
 #include "model/QuakeMapEntity.h"
 #include "model/BrushBuilder.h"
@@ -294,3 +296,5 @@ bool MapBuilder::LoadEntity(const ur::Device& dev, Model& dst, const std::shared
 }
 
 }
+
+#endif // NO_QUAKE

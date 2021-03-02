@@ -1,3 +1,5 @@
+#ifndef NO_QUAKE
+
 #include "model/QuakeMapEntity.h"
 
 #include <polymesh3/Polytope.h>
@@ -25,3 +27,5 @@ std::unique_ptr<ModelExtend> QuakeMapEntity::Clone() const
 }
 
 }
+
+#endif // NO_QUAKE

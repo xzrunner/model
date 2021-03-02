@@ -1,3 +1,5 @@
+#ifndef NO_QUAKE
+
 #pragma once
 
 #include "model/BspFile.h"
@@ -56,3 +58,5 @@ private:
 }; // BspLoader
 
 }
+
+#endif // NO_QUAKE

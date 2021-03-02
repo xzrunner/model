@@ -29,7 +29,9 @@ bool Model::LoadFromFile(const std::string& filepath)
 		return M3dLoader::Load(*dev, *this, filepath);
 	} else if (ext == ".xml") {
 		return MaxLoader::Load(*dev, *this, filepath);
-	} else if (ext == ".mdl") {
+	}
+#ifndef NO_QUAKE
+	else if (ext == ".mdl") {
 		return MdlLoader::Load(*dev, *this, filepath);
 	} else if (ext == ".bsp") {
 		return BspLoader::Load(*dev, *this, filepath);
@@ -37,7 +39,9 @@ bool Model::LoadFromFile(const std::string& filepath)
         return MapBuilder::Load(*dev, *this, filepath);
     //} else if (ext == ".fbx") {
     //    return FbxLoader::Load(*this, filepath);
-	} else {
+	} 
+#endif // NO_QUAKE
+	else {
 //		return AssimpHelper::Load(*this, filepath, 1, true, 0xffffffff);
 
         float scale = 1.0f;

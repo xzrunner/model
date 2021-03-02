@@ -1,3 +1,5 @@
+#ifndef NO_MESHLAB
+
 #include "model/MeshIK.h"
 #include "model/MeshGeometry.h"
 
@@ -191,3 +193,5 @@ void MeshIK::Deform(const sm::vec3& translate)
 }
 
 }
+
+#endif // NO_MESHLAB

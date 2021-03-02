@@ -1,3 +1,5 @@
+#ifndef NO_QUAKE
+
 #pragma once
 
 #include <SM_Vector.h>
@@ -90,3 +92,5 @@ private:
 }; // MdlLoader
 
 }
+
+#endif // NO_QUAKE

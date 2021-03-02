@@ -1,3 +1,5 @@
+#ifndef NO_QUAKE
+
 #include "model/BspLoader.h"
 #include "model/TextureLoader.h"
 #include "model/BspModel.h"
@@ -690,3 +692,5 @@ void BspLoader::BuildModelIndexBuffer(const ur::Device& dev, const BspModel& mod
 }
 
 }
+
+#endif // NO_QUAKE

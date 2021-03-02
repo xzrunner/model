@@ -1,3 +1,5 @@
+#ifndef NO_MESHLAB
+
 #pragma once
 
 #include <SM_Vector.h>
@@ -36,3 +38,5 @@ private:
 }; // MeshIK
 
 }
+
+#endif // NO_MESHLAB

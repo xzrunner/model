@@ -1,3 +1,5 @@
+#ifndef NO_QUAKE
+
 // code from http://tfc.duke.free.fr/coding/mdl-specs-en.html
 
 #include "model/MdlLoader.h"
@@ -218,3 +220,5 @@ sm::vec3 MdlLoader::TransVertex(const MdlVertex& vertex, const sm::vec3& scale, 
 }
 
 }
+
+#endif // NO_QUAKE

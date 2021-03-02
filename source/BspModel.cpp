@@ -1,3 +1,5 @@
+#ifndef NO_QUAKE
+
 #include "model/BspModel.h"
 
 #include <quake/Lightmaps.h>
@@ -177,3 +179,5 @@ void BspModel::BuildLightMap(Surface& surf, uint8_t* dest, int stride)
 }
 
 }
+
+#endif // NO_QUAKE

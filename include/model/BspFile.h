@@ -1,3 +1,5 @@
+#ifndef NO_QUAKE
+
 #pragma once
 
 #include <cstdint>
@@ -159,3 +161,5 @@ struct BspClipnode
 };
 
 }
+
+#endif // NO_QUAKE

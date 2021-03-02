@@ -1,3 +1,5 @@
+#ifndef NO_QUAKE
+
 #pragma once
 
 #include <SM_Vector.h>
@@ -33,3 +35,5 @@ private:
 }; // MapBuilder
 
 }
+
+#endif // NO_QUAKE
