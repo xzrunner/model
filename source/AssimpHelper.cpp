@@ -660,9 +660,8 @@ AssimpHelper::LoadMaterial(const ur::Device& dev, const aiMaterial* ai_material,
 		aiString path;
 		if (aiGetMaterialString(ai_material, AI_MATKEY_TEXTURE_DIFFUSE(0), &path) == AI_SUCCESS)
 		{
-			std::filesystem::current_path(dir);
-			auto img_path = std::filesystem::absolute(path.data);
-			material->diffuse_tex = LoadTexture(dev, model, img_path.string());
+			auto img_path = std::filesystem::canonical(std::filesystem::path(dir) / std::filesystem::path(path.C_Str())).string();
+			material->diffuse_tex = LoadTexture(dev, model, img_path);
 		}
 	}
 

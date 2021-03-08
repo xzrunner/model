@@ -113,10 +113,9 @@ bool M3dLoader::Load(const ur::Device& dev, Model& model, const std::string& fil
 
 		auto material = std::make_unique<Model::Material>();
 		material->diffuse_tex = model.textures.size();
-		std::filesystem::current_path(dir);
-		auto img_path = std::filesystem::absolute(mat_src.DiffuseMapName);
-		auto tex = TextureLoader::LoadFromFile(dev, img_path.string().c_str());
-		model.textures.push_back({ img_path.string(), std::move(tex) });
+		auto img_path = std::filesystem::canonical(std::filesystem::path(dir) / mat_src.DiffuseMapName).string();
+		auto tex = TextureLoader::LoadFromFile(dev, img_path.c_str());
+		model.textures.push_back({ img_path, std::move(tex) });
 		model.materials.push_back(std::move(material));
 
 		mesh->geometry.sub_geometry_materials.push_back(idx);
