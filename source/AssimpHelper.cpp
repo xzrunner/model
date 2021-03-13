@@ -544,7 +544,7 @@ AssimpHelper::LoadMesh(const ur::Device& dev, const std::vector<std::unique_ptr<
     mesh->geometry.vertex_array = va;
 //	mesh->geometry.sub_geometries.insert({ "default", SubmeshGeometry(vi.in, 0) });
 	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(true, indices.size(), 0));
-	mesh->geometry.sub_geometry_materials.push_back(0);
+	mesh->geometry.sub_geometry_materials.push_back(ai_mesh->mMaterialIndex);
 
 	mesh->geometry.bones.reserve(ai_mesh->mNumBones);
 	for (size_t i = 0; i < ai_mesh->mNumBones; ++i)
