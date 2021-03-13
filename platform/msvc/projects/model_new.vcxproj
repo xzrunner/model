@@ -170,14 +170,14 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <PreprocessorDefinitions>_DEBUG;NO_BOOST;NO_QUAKE;NO_MESHLAB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;NO_BOOST;NO_QUAKE;NO_MESHLAB;FBXSDK_SHARED</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\sm;..\..\..\..\gimg;..\..\..\..\rapidxml;..\..\..\..\tinyobjloader;..\..\..\..\unirender\include;..\..\..\..\guard\include;..\..\..\..\assimp\include;..\..\..\..\polymesh3\include;..\..\..\..\halfedge\include;..\..\..\..\fbxsdk\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>NDEBUG;NO_BOOST;NO_QUAKE;NO_MESHLAB</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;NO_BOOST;NO_QUAKE;NO_MESHLAB;FBXSDK_SHARED</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
   </ItemDefinitionGroup>
