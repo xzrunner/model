@@ -39,6 +39,9 @@ TextureLoader::LoadFromFile(const ur::Device& dev, const char* filepath, int mip
     case GPF_RED:
         tf = ur::TextureFormat::RED;
         break;
+	case GPF_R16:
+		tf = ur::TextureFormat::R16;
+		break;
 	case GPF_RGB:
 		tf = ur::TextureFormat::RGB;
 		break;
