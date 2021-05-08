@@ -29,6 +29,7 @@
     <ClCompile Include="..\..\..\source\BspModel.cpp" />
     <ClCompile Include="..\..\..\source\FbxLoader.cpp" />
     <ClCompile Include="..\..\..\source\GlobalClock.cpp" />
+    <ClCompile Include="..\..\..\source\GltfLoader.cpp" />
     <ClCompile Include="..\..\..\source\M3dLoader.cpp" />
     <ClCompile Include="..\..\..\source\MapBuilder.cpp" />
     <ClCompile Include="..\..\..\source\MaxLoader.cpp" />
@@ -56,6 +57,7 @@
     <ClInclude Include="..\..\..\include\model\BrushBuilder.h" />
     <ClInclude Include="..\..\..\include\model\BrushModel.h" />
     <ClInclude Include="..\..\..\include\model\FbxLoader.h" />
+    <ClInclude Include="..\..\..\include\model\GltfLoader.h" />
     <ClInclude Include="..\..\..\include\model\MeshBuider.h" />
     <ClInclude Include="..\..\..\include\model\MeshIK.h" />
     <ClInclude Include="..\..\..\include\model\QuakeMapEntity.h" />
@@ -166,7 +168,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\sm;..\..\..\..\gimg;..\..\..\..\rapidxml;..\..\..\..\tinyobjloader;..\..\..\..\unirender\include;..\..\..\..\guard\include;..\..\..\..\assimp\include;..\..\..\..\polymesh3\include;..\..\..\..\halfedge\include;..\..\..\..\fbxsdk\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\external\tinygltf;..\..\..\..\sm;..\..\..\..\gimg;..\..\..\..\rapidxml;..\..\..\..\tinyobjloader;..\..\..\..\unirender\include;..\..\..\..\guard\include;..\..\..\..\assimp\include;..\..\..\..\polymesh3\include;..\..\..\..\halfedge\include;..\..\..\..\fbxsdk\include</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <Optimization>Disabled</Optimization>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
@@ -176,7 +178,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\..\sm;..\..\..\..\gimg;..\..\..\..\rapidxml;..\..\..\..\tinyobjloader;..\..\..\..\unirender\include;..\..\..\..\guard\include;..\..\..\..\assimp\include;..\..\..\..\polymesh3\include;..\..\..\..\halfedge\include;..\..\..\..\fbxsdk\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\..\..\include;..\..\..\external\tinygltf;..\..\..\..\sm;..\..\..\..\gimg;..\..\..\..\rapidxml;..\..\..\..\tinyobjloader;..\..\..\..\unirender\include;..\..\..\..\guard\include;..\..\..\..\assimp\include;..\..\..\..\polymesh3\include;..\..\..\..\halfedge\include;..\..\..\..\fbxsdk\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>NDEBUG;NO_BOOST;NO_QUAKE;NO_MESHLAB;FBXSDK_SHARED</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>

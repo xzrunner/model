@@ -46,6 +46,13 @@ struct Model : ur::noncopyable
 
 	}; // Mesh
 
+	struct Node
+	{
+		sm::mat4 mat;
+
+		int mesh = -1;
+	};
+
 	std::vector<std::pair<std::string, ur::TexturePtr>> textures;
 
 	std::vector<std::unique_ptr<Material>> materials;
@@ -54,6 +61,8 @@ struct Model : ur::noncopyable
 	std::vector<std::unique_ptr<Mesh>> border_meshes;
 
 	std::unique_ptr<ModelExtend> ext = nullptr;
+
+	std::vector<std::unique_ptr<Node>> nodes;
 
 	sm::cube aabb;
 

@@ -129,6 +129,9 @@
     <ClCompile Include="..\..\..\source\QuakeMapEntity.cpp">
       <Filter>dataset\extend\quake</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\source\GltfLoader.cpp">
+      <Filter>loader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\model\ParametricEquations.h">
@@ -238,6 +241,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\BrushBuilder.h">
       <Filter>loader\geo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\GltfLoader.h">
+      <Filter>loader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -8,6 +8,7 @@
 #include "model/BspLoader.h"
 #include "model/MapBuilder.h"
 #include "model/FbxLoader.h"
+#include "model/GltfLoader.h"
 
 #include <guard/check.h>
 
@@ -29,6 +30,8 @@ bool Model::LoadFromFile(const std::string& filepath)
 		return M3dLoader::Load(*dev, *this, filepath);
 	} else if (ext == ".xml") {
 		return MaxLoader::Load(*dev, *this, filepath);
+	} else if (ext == ".gltf") {
+		return GltfLoader::Load(*dev, *this, filepath);
 	}
 #ifndef NO_QUAKE
 	else if (ext == ".mdl") {
