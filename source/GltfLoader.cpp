@@ -202,7 +202,6 @@ void GltfLoader::LoadMeshes(const ur::Device& dev, Model& dst, const tinygltf::M
 					if (y > 1) {
 						y -= std::floor(y);
 					}
-					y = 1.0f - y;
 					memcpy(ptr, &y, sizeof(float));
 					ptr += sizeof(float);
 				}
