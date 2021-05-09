@@ -34,6 +34,10 @@ struct Model : ur::noncopyable
 		float    shininess = 50;
 
 		int diffuse_tex = -1;
+		int metallic_roughness_tex = -1;
+		int emissive_tex = -1;
+		int occlusion_tex = -1;
+		int normal_tex = -1;
 	};
 
 	struct Mesh

@@ -81,13 +81,11 @@ void GltfLoader::LoadMaterials(const ur::Device& dev, Model& dst, const tinygltf
 	{
 		auto d_mtl = std::make_unique<Model::Material>();
 
-		int albedo = src.textures[mtl.pbrMetallicRoughness.baseColorTexture.index].source;
-		int roughness = src.textures[mtl.pbrMetallicRoughness.metallicRoughnessTexture.index].source;
-		int emissive = src.textures[mtl.emissiveTexture.index].source;
-		int oa = src.textures[mtl.occlusionTexture.index].source;
-		int normal = src.textures[mtl.normalTexture.index].source;
-
-		d_mtl->diffuse_tex = albedo;
+		d_mtl->diffuse_tex   = src.textures[mtl.pbrMetallicRoughness.baseColorTexture.index].source;
+		d_mtl->metallic_roughness_tex = src.textures[mtl.pbrMetallicRoughness.metallicRoughnessTexture.index].source;
+		d_mtl->emissive_tex  = src.textures[mtl.emissiveTexture.index].source;
+		d_mtl->occlusion_tex = src.textures[mtl.occlusionTexture.index].source;
+		d_mtl->normal_tex    = src.textures[mtl.normalTexture.index].source;
 
 		dst.materials.push_back(std::move(d_mtl));
 	}
