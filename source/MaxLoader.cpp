@@ -120,7 +120,7 @@ void MaxLoader::LoadMesh(const ur::Device& dev, Model& model,
 	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(false, vertices.size(), 0));
 	mesh->geometry.sub_geometry_materials.push_back(0);
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
-	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
+	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS0;
 	mesh->material = 0;
 	model.meshes.push_back(std::move(mesh));
 }

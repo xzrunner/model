@@ -84,7 +84,7 @@ MeshBuider::CreateCube(const ur::Device& dev, const sm::vec3& half_extents)
 	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(false, v_num, 0));
 	mesh->geometry.sub_geometry_materials.push_back(0);
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
-	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
+	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS0;
 	mesh->material = 0;
 
     return mesh;

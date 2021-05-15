@@ -27,7 +27,7 @@ int Box::GetTriangleIndexCount() const
 
 void Box::GenerateVertices(int vertex_type, std::vector<float>& vertices) const
 {
-    if ((vertex_type & VERTEX_FLAG_NORMALS) && (vertex_type & VERTEX_FLAG_TEXCOORDS))
+    if ((vertex_type & VERTEX_FLAG_NORMALS) && (vertex_type & VERTEX_FLAG_TEXCOORDS0))
     {
         vertices = {
             // back face
@@ -74,7 +74,7 @@ void Box::GenerateVertices(int vertex_type, std::vector<float>& vertices) const
             -1.0f,  1.0f,  1.0f,  0.0f,  1.0f,  0.0f, 0.0f, 0.0f  // bottom-left
         };
     }
-    else if (vertex_type & VERTEX_FLAG_TEXCOORDS)
+    else if (vertex_type & VERTEX_FLAG_TEXCOORDS0)
     {
         vertices = {
             // back face

@@ -121,7 +121,7 @@ void setup_geo_vert_type(model::BrushBuilder::VertexType type, unsigned int& ver
     switch (type)
     {
     case model::BrushBuilder::VertexType::PosNormTex:
-        vertex_type |= model::VERTEX_FLAG_TEXCOORDS;
+        vertex_type |= model::VERTEX_FLAG_TEXCOORDS0;
         break;
     case model::BrushBuilder::VertexType::PosNormCol:
         vertex_type |= model::VERTEX_FLAG_COLOR;

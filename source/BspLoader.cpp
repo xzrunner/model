@@ -80,7 +80,7 @@ bool BspLoader::Load(const ur::Device& dev, Model& model, const std::string& fil
 	int offset = 0;
 	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(false, vertices_n, 0));
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
-	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
+	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS0;
 	mesh->material = 0;
 	model.meshes.push_back(std::move(mesh));
 

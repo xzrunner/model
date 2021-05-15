@@ -1070,7 +1070,7 @@ void FbxLoader::LoadMesh(const ur::Device& dev, Model::Mesh& dst,
 	// texcoord
 	if (has_texcoord)
 	{
-		dst.geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
+		dst.geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS0;
         vbuf_attrs.push_back(std::make_shared<ur::VertexInputAttribute>(
             attr_loc++, ur::ComponentDataType::Float, 2, offset, stride));
 		offset += 4 * 2;

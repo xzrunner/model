@@ -201,7 +201,7 @@ void MdlLoader::LoadMesh(const ur::Device& dev, const MdlHeader& header,
 	int offset = 0;
 	mesh->geometry.sub_geometries.push_back(SubmeshGeometry(false, vertices_n, 0));
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
-	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
+	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS0;
 	mesh->material = 0;
 	model.meshes.push_back(std::move(mesh));
 

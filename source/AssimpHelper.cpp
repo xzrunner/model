@@ -512,7 +512,7 @@ AssimpHelper::LoadMesh(const ur::Device& dev, const std::vector<std::unique_ptr<
 	// texcoord
 	if (has_texcoord)
 	{
-		mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
+		mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS0;
         vbuf_attrs.push_back(std::make_shared<ur::VertexInputAttribute>(
 			attr_loc++, ur::ComponentDataType::Float, 2, offset, stride));
 		offset += 4 * 2;

@@ -86,7 +86,7 @@ bool M3dLoader::Load(const ur::Device& dev, Model& model, const std::string& fil
 	auto mesh = std::make_unique<Model::Mesh>();
     mesh->geometry.vertex_array = va;
 	mesh->geometry.vertex_type |= VERTEX_FLAG_NORMALS;
-	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS;
+	mesh->geometry.vertex_type |= VERTEX_FLAG_TEXCOORDS0;
 	mesh->material = 0;
 	int idx = 0;
 	GD_ASSERT(subsets.size() == mats.size(), "err material");
