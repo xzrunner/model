@@ -58,6 +58,7 @@
     <ClInclude Include="..\..\..\include\model\BrushModel.h" />
     <ClInclude Include="..\..\..\include\model\FbxLoader.h" />
     <ClInclude Include="..\..\..\include\model\GltfLoader.h" />
+    <ClInclude Include="..\..\..\include\model\gltf\Model.h" />
     <ClInclude Include="..\..\..\include\model\MeshBuider.h" />
     <ClInclude Include="..\..\..\include\model\MeshIK.h" />
     <ClInclude Include="..\..\..\include\model\QuakeMapEntity.h" />

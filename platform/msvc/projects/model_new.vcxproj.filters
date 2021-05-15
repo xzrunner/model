@@ -40,6 +40,9 @@
     <Filter Include="loader\geo">
       <UniqueIdentifier>{36b837f3-76ef-4c32-bfad-a93df21c9e2d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="dataset\gltf">
+      <UniqueIdentifier>{91284deb-4866-4237-9bc8-32a0cbf4e3ba}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\source\ParametricEquations.cpp">
@@ -244,6 +247,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\GltfLoader.h">
       <Filter>loader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\gltf\Model.h">
+      <Filter>dataset\gltf</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
