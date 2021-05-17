@@ -31,9 +31,6 @@ void load_texcoords(const tinygltf::Model& model, const tinygltf::Accessor& acce
 	for (size_t i = 0; i < accessor.count; ++i) {
 		for (int j = 0; j < 2; ++j) {
 			float v = src_texcoords[i * 2 + j];
-			if (v > 1) {
-				v -= std::floor(v);
-			}			
 			texcoords[i].xy[j] = v;
 		}
 	}
