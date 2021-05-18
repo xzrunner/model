@@ -595,7 +595,9 @@ GltfLoader::LoadNodes(const ur::Device& dev, const tinygltf::Model& model, const
 		auto dst = std::make_shared<gltf::Node>();
 
 		dst->name = src.name;
-		dst->mesh = meshes[src.mesh];
+		if (src.mesh >= 0) {
+			dst->mesh = meshes[src.mesh];
+		}
 		if (!src.translation.empty()) {
 			for (int i = 0; i < 3; ++i) {
 				dst->translation.xyz[i] = src.translation[i];
