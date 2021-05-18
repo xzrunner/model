@@ -247,23 +247,48 @@ GltfLoader::LoadVertexArray(const ur::Device& dev, const tinygltf::Model& model,
 	auto va = dev.CreateVertexArray();
 
 	// indices
-	std::vector<unsigned short> indices;
+	int indices_num = 0;
 	{
 		const tinygltf::Accessor& accessor = model.accessors[prim.indices];
 		const tinygltf::BufferView& buffer_view = model.bufferViews[accessor.bufferView];
 		const tinygltf::Buffer& buffer = model.buffers[buffer_view.buffer];
 
 		const tinygltf::Buffer& idx_buffer = model.buffers[buffer_view.buffer];
-		assert(accessor.type == TINYGLTF_TYPE_SCALAR && accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT);
-		const unsigned short* src_indices = reinterpret_cast<const unsigned short*>(&buffer.data[buffer_view.byteOffset + accessor.byteOffset]);
-		indices.resize(accessor.count);
-		for (size_t i = 0; i < accessor.count; ++i) {
-			indices[i] = src_indices[i];
+		assert(accessor.type == TINYGLTF_TYPE_SCALAR);
+		if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT)
+		{
+			std::vector<unsigned short> indices;
+			const unsigned short* src_indices = reinterpret_cast<const unsigned short*>(&buffer.data[buffer_view.byteOffset + accessor.byteOffset]);
+			indices.resize(accessor.count);
+			for (size_t i = 0; i < accessor.count; ++i) {
+				indices[i] = src_indices[i];
+			}
+			auto ibuf_sz = sizeof(uint16_t) * indices.size();
+			auto ibuf = dev.CreateIndexBuffer(ur::BufferUsageHint::StaticDraw, ibuf_sz);
+			ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
+			ibuf->SetDataType(ur::IndexBufferDataType::UnsignedShort);
+			va->SetIndexBuffer(ibuf);
+			indices_num = indices.size();
 		}
-		auto ibuf_sz = sizeof(uint16_t) * indices.size();
-		auto ibuf = dev.CreateIndexBuffer(ur::BufferUsageHint::StaticDraw, ibuf_sz);
-		ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
-		va->SetIndexBuffer(ibuf);
+		else if (accessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT)
+		{
+			std::vector<unsigned int> indices;
+			const unsigned int* src_indices = reinterpret_cast<const unsigned int*>(&buffer.data[buffer_view.byteOffset + accessor.byteOffset]);
+			indices.resize(accessor.count);
+			for (size_t i = 0; i < accessor.count; ++i) {
+				indices[i] = src_indices[i];
+			}
+			auto ibuf_sz = sizeof(uint32_t) * indices.size();
+			auto ibuf = dev.CreateIndexBuffer(ur::BufferUsageHint::StaticDraw, ibuf_sz);
+			ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
+			ibuf->SetDataType(ur::IndexBufferDataType::UnsignedInt);
+			va->SetIndexBuffer(ibuf);
+			indices_num = indices.size();
+		}
+		else
+		{
+			assert(0);
+		}
 
 		auto vbuf_sz = sizeof(float) * floats_per_vertex * positions.size();
 		auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
@@ -320,7 +345,7 @@ GltfLoader::LoadVertexArray(const ur::Device& dev, const tinygltf::Model& model,
 
 	va->SetVertexBufferAttrs(vbuf_attrs);
 
-	va->GetIndexBuffer()->SetCount(indices.size());
+	va->GetIndexBuffer()->SetCount(indices_num);
 
 	delete[] buf;
 
