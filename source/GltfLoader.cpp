@@ -515,7 +515,9 @@ GltfLoader::LoadTextures(const ur::Device& dev, const tinygltf::Model& model, co
 	{
 		auto dst = std::make_shared<gltf::Texture>();
 		dst->image = images[src.source];
-		dst->sampler = samplers[src.sampler];
+		if (src.sampler >= 0) {
+			dst->sampler = samplers[src.sampler];
+		}
 		ret.push_back(dst);
 	}
 	return ret;
