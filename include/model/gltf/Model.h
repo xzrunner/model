@@ -84,7 +84,8 @@ struct Node
 	std::string name;
 	std::shared_ptr<Mesh> mesh = nullptr;
 	sm::vec3 translation = sm::vec3(0, 0, 0);
-	sm::vec4 rotation = sm::vec4(0, 0, 0, 1);
+	sm::vec4 rotation    = sm::vec4(0, 0, 0, 1);
+	sm::vec3 scale       = sm::vec3(1, 1, 1);
 };
 
 struct Scene

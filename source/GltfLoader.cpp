@@ -606,6 +606,11 @@ GltfLoader::LoadNodes(const ur::Device& dev, const tinygltf::Model& model, const
 				dst->rotation.xyzw[i] = src.rotation[i];
 			}
 		}
+		if (!src.scale.empty()) {
+			for (int i = 0; i < 3; ++i) {
+				dst->scale.xyz[i] = src.scale[i];
+			}
+		}
 
 		ret.push_back(dst);
 	}
