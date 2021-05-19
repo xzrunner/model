@@ -533,55 +533,52 @@ GltfLoader::LoadMaterials(const ur::Device& dev, const tinygltf::Model& model, c
 
 		dst->name = src.name;
 
+		// emissive
+		dst->emissive = std::make_shared<gltf::Material::Emissive>();
+		for (int i = 0; i < 3; ++i) {
+			dst->emissive->factor.xyz[i] = src.emissiveFactor[i];
+		}
 		if (src.emissiveTexture.index >= 0)
 		{
-			dst->emissive = std::make_shared<gltf::Material::Emissive>();
-
 			dst->emissive->texture = textures[src.emissiveTexture.index];
 			dst->emissive->tex_coord = src.emissiveTexture.texCoord;
-
-			for (int i = 0; i < 3; ++i) {
-				dst->emissive->factor.xyz[i] = src.emissiveFactor[i];
-			}
 		}
 
+		// normal
+		dst->normal = std::make_shared<gltf::Material::Normal>();
 		if (src.normalTexture.index >= 0)
 		{
-			dst->normal = std::make_shared<gltf::Material::Normal>();
-
 			dst->normal->texture = textures[src.normalTexture.index];
 			dst->normal->tex_coord = src.normalTexture.texCoord;
 		}
 
+		// occlusion
+		dst->occlusion = std::make_shared<gltf::Material::Occlusion>();
 		if (src.occlusionTexture.index >= 0)
 		{
-			dst->occlusion = std::make_shared<gltf::Material::Occlusion>();
-
 			dst->occlusion->texture = textures[src.occlusionTexture.index];
 			dst->occlusion->tex_coord = src.occlusionTexture.texCoord;
 		}
 
+		// metallic_roughness
+		dst->metallic_roughness = std::make_shared<gltf::Material::MetallicRoughness>();
+		dst->metallic_roughness->metallic_factor = src.pbrMetallicRoughness.metallicFactor;
+		dst->metallic_roughness->roughness_factor = src.pbrMetallicRoughness.roughnessFactor;
 		if (src.pbrMetallicRoughness.metallicRoughnessTexture.index >= 0)
 		{
-			dst->metallic_roughness = std::make_shared<gltf::Material::MetallicRoughness>();
-
 			dst->metallic_roughness->texture = textures[src.pbrMetallicRoughness.metallicRoughnessTexture.index];
-			dst->metallic_roughness->tex_coord = src.pbrMetallicRoughness.metallicRoughnessTexture.texCoord;
-			
-			dst->metallic_roughness->metallic_factor = src.pbrMetallicRoughness.metallicFactor;
-			dst->metallic_roughness->roughness_factor = src.pbrMetallicRoughness.roughnessFactor;
+			dst->metallic_roughness->tex_coord = src.pbrMetallicRoughness.metallicRoughnessTexture.texCoord;			
 		}
 
+		// base_color
+		dst->base_color = std::make_shared<gltf::Material::BaseColor>();
+		for (int i = 0; i < 4; ++i) {
+			dst->base_color->factor.xyzw[i] = src.pbrMetallicRoughness.baseColorFactor[i];
+		}
 		if (src.pbrMetallicRoughness.baseColorTexture.index >= 0)
 		{
-			dst->base_color = std::make_shared<gltf::Material::BaseColor>();
-
 			dst->base_color->texture = textures[src.pbrMetallicRoughness.baseColorTexture.index];
 			dst->base_color->tex_coord = src.pbrMetallicRoughness.baseColorTexture.texCoord;
-
-			for (int i = 0; i < 4; ++i) {
-				dst->base_color->factor.xyzw[i] = src.pbrMetallicRoughness.baseColorFactor[i];
-			}
 		}
 
 		ret.push_back(dst);
