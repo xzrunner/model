@@ -5,9 +5,10 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <map>
 
 namespace ur { class Device; class TextureSampler; class Texture; class VertexArray; }
-namespace tinygltf { class Model; struct Image; struct Primitive; }
+namespace tinygltf { class Model; struct Image; struct Primitive; class Value; }
 
 namespace model
 {
@@ -49,6 +50,8 @@ private:
 	static std::vector<std::shared_ptr<gltf::Scene>> LoadScenes(
 		const ur::Device& dev, const tinygltf::Model& model, const std::vector<std::shared_ptr<gltf::Node>>& nodes
 	);
+	static void LoadTextureTransform(gltf::Texture& dst, const tinygltf::Value& src);
+	static void LoadTextureTransform(gltf::Texture& dst, const std::map<std::string, tinygltf::Value>& src);
 
 }; // GltfLoader
 

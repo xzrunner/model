@@ -119,6 +119,10 @@ std::shared_ptr<ur::Texture> GltfLoader::LoadTexture(const ur::Device& dev, cons
 	{
 		tf = ur::TextureFormat::RGBA8;
 	}
+	else if (img.component == 4 && img.bits == 16 && img.pixel_type == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT)
+	{
+		tf = ur::TextureFormat::RGBA16;
+	}
 	else
 	{
 		assert(0);
@@ -542,6 +546,7 @@ GltfLoader::LoadMaterials(const ur::Device& dev, const tinygltf::Model& model, c
 		{
 			dst->emissive->texture = textures[src.emissiveTexture.index];
 			dst->emissive->tex_coord = src.emissiveTexture.texCoord;
+			LoadTextureTransform(*dst->emissive->texture, src.emissiveTexture.extensions);
 		}
 
 		// normal
@@ -550,6 +555,7 @@ GltfLoader::LoadMaterials(const ur::Device& dev, const tinygltf::Model& model, c
 		{
 			dst->normal->texture = textures[src.normalTexture.index];
 			dst->normal->tex_coord = src.normalTexture.texCoord;
+			LoadTextureTransform(*dst->normal->texture, src.normalTexture.extensions);
 		}
 
 		// occlusion
@@ -558,6 +564,7 @@ GltfLoader::LoadMaterials(const ur::Device& dev, const tinygltf::Model& model, c
 		{
 			dst->occlusion->texture = textures[src.occlusionTexture.index];
 			dst->occlusion->tex_coord = src.occlusionTexture.texCoord;
+			LoadTextureTransform(*dst->occlusion->texture, src.occlusionTexture.extensions);
 		}
 
 		// metallic_roughness
@@ -567,7 +574,8 @@ GltfLoader::LoadMaterials(const ur::Device& dev, const tinygltf::Model& model, c
 		if (src.pbrMetallicRoughness.metallicRoughnessTexture.index >= 0)
 		{
 			dst->metallic_roughness->texture = textures[src.pbrMetallicRoughness.metallicRoughnessTexture.index];
-			dst->metallic_roughness->tex_coord = src.pbrMetallicRoughness.metallicRoughnessTexture.texCoord;			
+			dst->metallic_roughness->tex_coord = src.pbrMetallicRoughness.metallicRoughnessTexture.texCoord;	
+			LoadTextureTransform(*dst->metallic_roughness->texture, src.pbrMetallicRoughness.metallicRoughnessTexture.extensions);
 		}
 
 		// base_color
@@ -579,6 +587,49 @@ GltfLoader::LoadMaterials(const ur::Device& dev, const tinygltf::Model& model, c
 		{
 			dst->base_color->texture = textures[src.pbrMetallicRoughness.baseColorTexture.index];
 			dst->base_color->tex_coord = src.pbrMetallicRoughness.baseColorTexture.texCoord;
+			LoadTextureTransform(*dst->base_color->texture, src.pbrMetallicRoughness.baseColorTexture.extensions);
+		}
+
+		// sheen
+		auto itr_sheen = src.extensions.find("KHR_materials_sheen");
+		if (itr_sheen != src.extensions.end())
+		{
+			dst->sheen = std::make_shared<gltf::Material::Sheen>();
+			if (itr_sheen->second.Has("sheenColorFactor")) {
+				auto factor = itr_sheen->second.Get("sheenColorFactor");
+				for (uint32_t i = 0; i < factor.ArrayLen(); i++) {
+					auto val = factor.Get(i);
+					dst->sheen->color_factor.xyz[i] = val.IsNumber() ? (float)val.Get<double>() : (float)val.Get<int>();
+				}
+			}
+			if (itr_sheen->second.Has("sheenColorTexture")) 
+			{
+				auto v_tex = itr_sheen->second.Get("sheenColorTexture");
+				auto index = v_tex.Get("index");
+				dst->sheen->color_texture = textures[index.Get<int>()];
+				if (v_tex.Has("extensions")) {
+					auto v_ext = v_tex.Get("extensions");
+					if (v_ext.Has("KHR_texture_transform")) {
+						LoadTextureTransform(*dst->sheen->color_texture, v_ext.Get("KHR_texture_transform"));
+					}					
+				}
+			}
+			if (itr_sheen->second.Has("sheenRoughnessFactor")) {
+				auto factor = itr_sheen->second.Get("sheenRoughnessFactor");
+				dst->sheen->roughness_factor = factor.IsNumber() ? (float)factor.Get<double>() : (float)factor.Get<int>();
+			}
+			if (itr_sheen->second.Has("sheenRoughnessTexture")) 
+			{
+				auto v_tex = itr_sheen->second.Get("sheenRoughnessTexture");
+				auto index = v_tex.Get("index");
+				dst->sheen->roughness_texture = textures[index.Get<int>()];
+				if (v_tex.Has("extensions")) {
+					auto v_ext = v_tex.Get("extensions");
+					if (v_ext.Has("KHR_texture_transform")) {
+						LoadTextureTransform(*dst->sheen->roughness_texture, v_ext.Get("KHR_texture_transform"));
+					}
+				}
+			}
 		}
 
 		ret.push_back(dst);
@@ -660,6 +711,37 @@ GltfLoader::LoadScenes(const ur::Device& dev, const tinygltf::Model& model, cons
 		ret.push_back(dst);
 	}
 	return ret;
+}
+
+void GltfLoader::LoadTextureTransform(gltf::Texture& dst, const tinygltf::Value& src)
+{
+	dst.transform = std::make_shared<gltf::Texture::Transform>();
+
+	if (src.Has("offset"))
+	{
+		auto v_offset = src.Get("offset");
+		dst.transform->offset.x = v_offset.Get(0).Get<double>();
+		dst.transform->offset.y = v_offset.Get(1).Get<double>();
+	}
+	if (src.Has("rotation")) {
+		dst.transform->rotation = src.Get("rotation").Get<double>();
+	}
+	if (src.Has("scale"))
+	{
+		auto v_scale = src.Get("scale");
+		dst.transform->scale.x = v_scale.Get(0).Get<double>();
+		dst.transform->scale.y = v_scale.Get(1).Get<double>();
+	}
+}
+
+void GltfLoader::LoadTextureTransform(gltf::Texture& dst, const std::map<std::string, tinygltf::Value>& src)
+{
+	auto itr_trans = src.find("KHR_texture_transform");
+	if (itr_trans == src.end()) {
+		return;
+	}
+
+	LoadTextureTransform(dst, itr_trans->second);
 }
 
 }

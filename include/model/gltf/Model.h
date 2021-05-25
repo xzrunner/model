@@ -17,6 +17,14 @@ struct Texture
 {
 	std::shared_ptr<ur::Texture> image = nullptr;
 	std::shared_ptr<ur::TextureSampler> sampler = nullptr;
+
+	struct Transform
+	{
+		sm::vec2 offset = sm::vec2(0, 0);
+		float rotation = 0;
+		sm::vec2 scale = sm::vec2(1, 1);
+	};
+	std::shared_ptr<Transform> transform = nullptr;
 };
 
 struct Material
@@ -58,6 +66,16 @@ struct Material
 		int tex_coord = 0;
 	};
 
+	// KHR_materials_sheen
+	struct Sheen
+	{
+		sm::vec3 color_factor = sm::vec3(0, 0, 0);
+		std::shared_ptr<Texture> color_texture = nullptr;
+
+		float roughness_factor = 0.0f;
+		std::shared_ptr<Texture> roughness_texture = nullptr;
+	};
+
 	std::string name;
 
 	std::shared_ptr<Emissive> emissive = nullptr;
@@ -65,6 +83,9 @@ struct Material
 	std::shared_ptr<Occlusion> occlusion = nullptr;
 	std::shared_ptr<MetallicRoughness> metallic_roughness = nullptr;
 	std::shared_ptr<BaseColor> base_color = nullptr;
+
+	// extensions
+	std::shared_ptr<Sheen> sheen = nullptr;
 };
 
 struct Primitive
