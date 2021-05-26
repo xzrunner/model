@@ -76,6 +76,19 @@ struct Material
 		std::shared_ptr<Texture> roughness_texture = nullptr;
 	};
 
+	// KHR_materials_clearcoat
+	struct Clearcoat
+	{
+		float factor = 0.0f;
+		std::shared_ptr<Texture> texture = nullptr;
+		int tex_coord = 0;
+
+		float roughness_factor = 0.0f;
+		std::shared_ptr<Texture> roughness_texture = nullptr;
+
+		std::shared_ptr<Texture> normal_texture = nullptr;
+	};
+
 	std::string name;
 
 	std::shared_ptr<Emissive> emissive = nullptr;
@@ -86,6 +99,7 @@ struct Material
 
 	// extensions
 	std::shared_ptr<Sheen> sheen = nullptr;
+	std::shared_ptr<Clearcoat> clearcoat = nullptr;
 };
 
 struct Primitive

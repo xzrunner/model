@@ -632,6 +632,32 @@ GltfLoader::LoadMaterials(const ur::Device& dev, const tinygltf::Model& model, c
 			}
 		}
 
+		// clearcoat
+		auto itr_clearcoat = src.extensions.find("KHR_materials_clearcoat");
+		if (itr_clearcoat != src.extensions.end())
+		{
+			dst->clearcoat = std::make_shared<gltf::Material::Clearcoat>();
+			if (itr_clearcoat->second.Has("clearcoatFactor")) {
+				auto factor = itr_clearcoat->second.Get("clearcoatFactor");
+				dst->clearcoat->factor = factor.IsNumber() ? (float)factor.Get<double>() : (float)factor.Get<int>();
+			}
+			if (itr_clearcoat->second.Has("clearcoatTexture"))
+			{
+				auto v_tex = itr_clearcoat->second.Get("clearcoatTexture");
+				auto index = v_tex.Get("index");
+				dst->clearcoat->texture = textures[index.Get<int>()];
+				if (v_tex.Has("texCoord")) {
+					dst->clearcoat->tex_coord = v_tex.Get("v_tex").Get<int>();
+				}
+				if (v_tex.Has("extensions")) {
+					auto v_ext = v_tex.Get("extensions");
+					if (v_ext.Has("KHR_texture_transform")) {
+						LoadTextureTransform(*dst->clearcoat->texture, v_ext.Get("KHR_texture_transform"));
+					}
+				}
+			}
+		}
+
 		ret.push_back(dst);
 	}
 	return ret;
