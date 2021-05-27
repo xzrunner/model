@@ -11,6 +11,7 @@
 #include <unirender/IndexBuffer.h>
 #include <unirender/TextureDescription.h>
 #include <unirender/TextureSampler.h>
+#include <unirender/Texture.h>
 
 #define TINYGLTF_IMPLEMENTATION
 #define STB_IMAGE_WRITE_IMPLEMENTATION
@@ -501,6 +502,11 @@ GltfLoader::LoadSamplers(const ur::Device& dev, const tinygltf::Model& model)
 			wrap_t = ur::TextureWrap::Repeat;
 		}
 
+		// fixme
+		if (min_filter == ur::TextureMinificationFilter::LinearMipmapLinear) {
+			min_filter = ur::TextureMinificationFilter::Linear;
+		}
+
 		ret.push_back(dev.CreateTextureSampler(min_filter, mag_filter, wrap_s, wrap_t));
 	}
 	return ret;
@@ -521,6 +527,9 @@ GltfLoader::LoadTextures(const ur::Device& dev, const tinygltf::Model& model, co
 		dst->image = images[src.source];
 		if (src.sampler >= 0) {
 			dst->sampler = samplers[src.sampler];
+		}
+		if (dst->sampler) {
+			dst->image->ApplySampler(dst->sampler);
 		}
 		ret.push_back(dst);
 	}
