@@ -89,6 +89,13 @@ struct Material
 		std::shared_ptr<Texture> normal_texture = nullptr;
 	};
 
+	enum class AlphaMode
+	{
+		Opaque,
+		Mask,
+		Blend,
+	};
+
 	std::string name;
 
 	std::shared_ptr<Emissive> emissive = nullptr;
@@ -97,6 +104,11 @@ struct Material
 	std::shared_ptr<MetallicRoughness> metallic_roughness = nullptr;
 	std::shared_ptr<BaseColor> base_color = nullptr;
 
+	bool double_sided = false;
+
+	AlphaMode alpha_mode = AlphaMode::Opaque;
+	float alpha_cutoff = 0.5f;
+	
 	// extensions
 	std::shared_ptr<Sheen> sheen = nullptr;
 	std::shared_ptr<Clearcoat> clearcoat = nullptr;

@@ -546,6 +546,17 @@ GltfLoader::LoadMaterials(const ur::Device& dev, const tinygltf::Model& model, c
 
 		dst->name = src.name;
 
+		dst->double_sided = src.doubleSided;
+
+		if (src.alphaMode == "OPAQUE") {
+			dst->alpha_mode = gltf::Material::AlphaMode::Opaque;
+		} else if (src.alphaMode == "MASK") {
+			dst->alpha_mode = gltf::Material::AlphaMode::Mask;
+		} else if (src.alphaMode == "Blend") {
+			dst->alpha_mode = gltf::Material::AlphaMode::Blend;
+		}
+		dst->alpha_cutoff = src.alphaCutoff;
+
 		// emissive
 		dst->emissive = std::make_shared<gltf::Material::Emissive>();
 		for (int i = 0; i < 3; ++i) {
