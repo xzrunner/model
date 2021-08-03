@@ -550,7 +550,7 @@ void BrushBuilder::CreateMeshRenderBuf(const ur::Device& dev, VertexType type, m
     std::vector<float> buf;
     dump_vert_buf(type, vertices, buf);
 
-    auto vbuf_sz = sizeof(float) * vertices.size();
+    auto vbuf_sz = sizeof(float) * buf.size();
     auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
     vbuf->ReadFromMemory(buf.data(), vbuf_sz, 0);
     va->SetVertexBuffer(vbuf);
