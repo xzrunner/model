@@ -14,6 +14,8 @@ namespace ur { class Device; }
 namespace model
 {
 
+namespace gltf { struct Model; }
+
 class BrushBuilder
 {
 public:
@@ -26,6 +28,7 @@ public:
     {
         PosNorm,
         PosNormTex,
+        PosNormTex2,
         PosNormCol,
     };
     static std::unique_ptr<Model> PolymeshFromBrushPN(const ur::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& brushes);
@@ -42,6 +45,9 @@ public:
     static std::unique_ptr<Model> PolymeshFromBrushPNC(const ur::Device& dev, const model::BrushModel& brush_model,
         const std::vector<std::vector<std::vector<sm::vec3>>>& colors
     );
+
+    static void PolymeshFromBrush(const ur::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& src, gltf::Model& dst);
+
 private:
     static std::unique_ptr<Model> PolymeshFromBrush(
         const ur::Device& dev, VertexType type, const std::vector<std::shared_ptr<pm3::Polytope>>& brushes,
@@ -68,7 +74,7 @@ public:
     {
         sm::vec3 pos;
         sm::vec3 normal;
-        sm::vec2 texcoord;
+        sm::vec2 texcoord, texcoord2;
         sm::vec3 color;
     };
 

@@ -1,5 +1,6 @@
 #include "model/BrushBuilder.h"
 #include "model/typedef.h"
+#include "model/gltf/Model.h"
 
 #include <SM_Calc.h>
 #include <SM_Triangulation.h>
@@ -43,6 +44,23 @@ void dump_vert_buf(model::BrushBuilder::VertexType type,
             }
             for (int i = 0; i < 2; ++i) {
                 dst.push_back(p.texcoord.xy[i]);
+            }
+        }
+        break;
+    case model::BrushBuilder::VertexType::PosNormTex2:
+        for (auto& p : src)
+        {
+            for (int i = 0; i < 3; ++i) {
+                dst.push_back(p.pos.xyz[i]);
+            }
+            for (int i = 0; i < 3; ++i) {
+                dst.push_back(p.normal.xyz[i]);
+            }
+            for (int i = 0; i < 2; ++i) {
+                dst.push_back(p.texcoord.xy[i]);
+            }
+            for (int i = 0; i < 2; ++i) {
+                dst.push_back(p.texcoord2.xy[i]);
             }
         }
         break;
@@ -96,6 +114,26 @@ void setup_vert_attr_list(model::BrushBuilder::VertexType type, const std::share
             2, ur::ComponentDataType::Float, 2, 24, 32
         );
         break;
+    case model::BrushBuilder::VertexType::PosNormTex2:
+        vbuf_attrs.resize(4);
+        // pos
+        vbuf_attrs[0] = std::make_shared<ur::VertexInputAttribute>(
+            0, ur::ComponentDataType::Float, 3, 0, 40
+        );
+        // normal
+        vbuf_attrs[1] = std::make_shared<ur::VertexInputAttribute>(
+            1, ur::ComponentDataType::Float, 3, 12, 40
+        );
+        // texcoord
+        vbuf_attrs[2] = std::make_shared<ur::VertexInputAttribute>(
+            2, ur::ComponentDataType::Float, 2, 24, 40
+        );
+        // texcoord2
+        vbuf_attrs[3] = std::make_shared<ur::VertexInputAttribute>(
+            3, ur::ComponentDataType::Float, 2, 32, 40
+        );
+
+        break;
     case model::BrushBuilder::VertexType::PosNormCol:
         vbuf_attrs.resize(3);
         // pos
@@ -123,6 +161,10 @@ void setup_geo_vert_type(model::BrushBuilder::VertexType type, unsigned int& ver
     case model::BrushBuilder::VertexType::PosNormTex:
         vertex_type |= model::VERTEX_FLAG_TEXCOORDS0;
         break;
+    case model::BrushBuilder::VertexType::PosNormTex2:
+        vertex_type |= model::VERTEX_FLAG_TEXCOORDS0;
+        vertex_type |= model::VERTEX_FLAG_TEXCOORDS1;
+        break;
     case model::BrushBuilder::VertexType::PosNormCol:
         vertex_type |= model::VERTEX_FLAG_COLOR;
         break;
@@ -140,6 +182,11 @@ size_t calc_strid(model::BrushBuilder::VertexType type)
         return sizeof(model::BrushBuilder::Vertex::pos)
              + sizeof(model::BrushBuilder::Vertex::normal)
              + sizeof(model::BrushBuilder::Vertex::texcoord);
+    case model::BrushBuilder::VertexType::PosNormTex2:
+        return sizeof(model::BrushBuilder::Vertex::pos)
+             + sizeof(model::BrushBuilder::Vertex::normal)
+             + sizeof(model::BrushBuilder::Vertex::texcoord)
+             + sizeof(model::BrushBuilder::Vertex::texcoord2);
     case model::BrushBuilder::VertexType::PosNormCol:
         return sizeof(model::BrushBuilder::Vertex::pos)
              + sizeof(model::BrushBuilder::Vertex::normal)
@@ -282,6 +329,72 @@ std::unique_ptr<Model>
 BrushBuilder::PolymeshFromBrushPNC(const ur::Device& dev, const model::BrushModel& brush_model, const std::vector<std::vector<std::vector<sm::vec3>>>& colors)
 {
     return PolymeshFromBrush(dev, VertexType::PosNormCol, brush_model, std::vector<std::vector<std::vector<sm::vec2>>>(), colors);
+}
+
+void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& src, gltf::Model& dst)
+{
+    auto model = std::make_unique<Model>(&dev);
+
+	std::unique_ptr<Model::Mesh> mesh = nullptr;
+
+	mesh = std::make_unique<Model::Mesh>();
+
+	auto mat = std::make_unique<Model::Material>();
+	int mat_idx = model->materials.size();
+	mesh->material = mat_idx;
+	mat->diffuse_tex = -1;
+	model->materials.push_back(std::move(mat));
+
+	std::vector<Vertex> vertices;
+
+	sm::cube aabb;
+	int start_idx = 0;
+    for (int i = 0, n = src.size(); i < n; ++i)
+    {
+        auto& b = src[i];
+        auto& faces  = b->Faces();
+        auto& points = b->Points();
+        for (int j = 0, m = faces.size(); j < m; ++j)
+	    {
+            auto& f = faces[j];
+            auto& norm = f->plane.normal;
+            auto tris_idx = Triangulation(points, f->border, f->holes);
+            for (auto& idx : tris_idx) {
+                vertices.push_back(create_vertex(points[idx]->pos, norm, {}, {}, i, j, idx, aabb));
+            }
+		    start_idx += f->border.size();
+	    }
+    }
+    if (vertices.empty()) {
+        return;
+    }
+
+    auto va = dev.CreateVertexArray();
+
+    std::vector<float> buf;
+    dump_vert_buf(VertexType::PosNormTex2, vertices, buf);
+
+    auto vbuf_sz = sizeof(float) * buf.size();
+    auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
+    vbuf->ReadFromMemory(buf.data(), vbuf_sz, 0);
+    va->SetVertexBuffer(vbuf);
+
+    std::vector<std::shared_ptr<ur::VertexInputAttribute>> vbuf_attrs;
+    setup_vert_attr_list(VertexType::PosNormTex2, vbuf, vbuf_attrs);
+    va->SetVertexBufferAttrs(vbuf_attrs);
+
+    auto d_prim = std::make_shared<gltf::Primitive>();
+    d_prim->va = va;
+    d_prim->material = std::make_shared<gltf::Material>();
+    auto d_mesh = std::make_shared<gltf::Mesh>();
+    d_mesh->primitives.push_back(d_prim);
+    auto d_node = std::make_shared<gltf::Node>();
+    d_node->mesh = d_mesh;
+    auto d_scene = std::make_shared<gltf::Scene>();
+    d_scene->nodes.push_back(d_node);
+    dst.scenes.push_back(d_scene);
+
+    dst.scene = d_scene;
 }
 
 std::unique_ptr<Model>
