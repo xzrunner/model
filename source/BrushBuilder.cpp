@@ -357,7 +357,14 @@ void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<st
         for (int j = 0, m = faces.size(); j < m; ++j)
 	    {
             auto& f = faces[j];
-            auto& norm = f->plane.normal;
+
+            std::vector<sm::vec3> border;
+            border.reserve(f->border.size());
+            for (auto i : f->border) {
+                border.push_back(points[i]->pos);
+            }
+            auto norm = sm::calc_face_normal(border);
+
             auto tris_idx = Triangulation(points, f->border, f->holes);
             for (auto& idx : tris_idx) {
                 vertices.push_back(create_vertex(points[idx]->pos, norm, {}, {}, i, j, idx, aabb));
