@@ -118,6 +118,7 @@ struct Primitive
 {
 	std::shared_ptr<Material> material = nullptr;
 	std::shared_ptr<ur::VertexArray> va = nullptr;
+	sm::vec3 size;
 };
 
 struct Mesh

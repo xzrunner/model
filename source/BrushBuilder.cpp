@@ -392,6 +392,7 @@ void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<st
 
     auto d_prim = std::make_shared<gltf::Primitive>();
     d_prim->va = va;
+    d_prim->size = aabb.Size();
     d_prim->material = std::make_shared<gltf::Material>();
     auto d_mesh = std::make_shared<gltf::Mesh>();
     d_mesh->primitives.push_back(d_prim);
