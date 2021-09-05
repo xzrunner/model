@@ -22,6 +22,14 @@ void dump_vert_buf(model::BrushBuilder::VertexType type,
 
     switch (type)
     {
+    case model::BrushBuilder::VertexType::Pos:
+        for (auto& p : src)
+        {
+            for (int i = 0; i < 3; ++i) {
+                dst.push_back(p.pos.xyz[i]);
+            }
+        }
+        break;
     case model::BrushBuilder::VertexType::PosNorm:
         for (auto& p : src)
         {
@@ -88,6 +96,13 @@ void setup_vert_attr_list(model::BrushBuilder::VertexType type, const std::share
 {
     switch (type)
     {
+    case model::BrushBuilder::VertexType::Pos:
+        vbuf_attrs.resize(2);
+        // pos
+        vbuf_attrs[0] = std::make_shared<ur::VertexInputAttribute>(
+            0, ur::ComponentDataType::Float, 3, 0, 12
+            );
+        break;
     case model::BrushBuilder::VertexType::PosNorm:
         vbuf_attrs.resize(2);
         // pos
@@ -346,31 +361,29 @@ void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<st
 	model->materials.push_back(std::move(mat));
 
 	std::vector<Vertex> vertices;
+    std::vector<unsigned short> indices;
 
 	sm::cube aabb;
 	int start_idx = 0;
     for (int i = 0, n = src.size(); i < n; ++i)
     {
         auto& b = src[i];
-        auto& faces  = b->Faces();
+
         auto& points = b->Points();
-        for (int j = 0, m = faces.size(); j < m; ++j)
-	    {
-            auto& f = faces[j];
+        for (auto& p : points) {
+            auto vert = create_vertex(p->pos, sm::vec3(), {}, {}, 0, 0, 0, aabb);
+            vertices.push_back(vert);
+        }
 
-            std::vector<sm::vec3> border;
-            border.reserve(f->border.size());
-            for (auto i : f->border) {
-                border.push_back(points[i]->pos);
-            }
-            auto norm = sm::calc_face_normal(border);
-
+        auto& faces  = b->Faces();
+        for (auto& f : faces) {
             auto tris_idx = Triangulation(points, f->border, f->holes);
             for (auto& idx : tris_idx) {
-                vertices.push_back(create_vertex(points[idx]->pos, norm, {}, {}, i, j, idx, aabb));
+                indices.push_back(start_idx + idx);
             }
-		    start_idx += f->border.size();
-	    }
+        }
+
+        start_idx += points.size();
     }
     if (vertices.empty()) {
         return;
@@ -379,15 +392,23 @@ void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<st
     auto va = dev.CreateVertexArray();
 
     std::vector<float> buf;
-    dump_vert_buf(VertexType::PosNormTex2, vertices, buf);
+    dump_vert_buf(VertexType::Pos, vertices, buf);
 
     auto vbuf_sz = sizeof(float) * buf.size();
     auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
     vbuf->ReadFromMemory(buf.data(), vbuf_sz, 0);
     va->SetVertexBuffer(vbuf);
 
+    auto ibuf = dev.CreateIndexBuffer(ur::BufferUsageHint::StaticDraw, 0);
+    auto ibuf_sz = sizeof(unsigned short) * indices.size();
+    ibuf->SetCount(indices.size());
+    ibuf->Reserve(ibuf_sz);
+    ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
+    ibuf->SetDataType(ur::IndexBufferDataType::UnsignedShort);
+    va->SetIndexBuffer(ibuf);
+
     std::vector<std::shared_ptr<ur::VertexInputAttribute>> vbuf_attrs;
-    setup_vert_attr_list(VertexType::PosNormTex2, vbuf, vbuf_attrs);
+    setup_vert_attr_list(VertexType::Pos, vbuf, vbuf_attrs);
     va->SetVertexBufferAttrs(vbuf_attrs);
 
     auto d_prim = std::make_shared<gltf::Primitive>();

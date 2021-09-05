@@ -26,6 +26,7 @@ public:
     // brush -> polymesh
     enum class VertexType
     {
+        Pos,
         PosNorm,
         PosNormTex,
         PosNormTex2,
