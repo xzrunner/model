@@ -30,6 +30,16 @@ void dump_vert_buf(model::BrushBuilder::VertexType type,
             }
         }
         break;
+    case model::BrushBuilder::VertexType::PosMaterialOffset:
+        for (auto& p : src)
+        {
+            for (int i = 0; i < 3; ++i) {
+                dst.push_back(p.pos.xyz[i]);
+            }
+            dst.push_back(p.mat_id);
+            dst.push_back(p.offset);
+        }
+        break;
     case model::BrushBuilder::VertexType::PosNorm:
         for (auto& p : src)
         {
@@ -101,6 +111,21 @@ void setup_vert_attr_list(model::BrushBuilder::VertexType type, const std::share
         // pos
         vbuf_attrs[0] = std::make_shared<ur::VertexInputAttribute>(
             0, ur::ComponentDataType::Float, 3, 0, 12
+            );
+        break;
+    case model::BrushBuilder::VertexType::PosMaterialOffset:
+        vbuf_attrs.resize(3);
+        // pos
+        vbuf_attrs[0] = std::make_shared<ur::VertexInputAttribute>(
+            0, ur::ComponentDataType::Float, 3, 0, 20
+            );
+        // mat_id
+        vbuf_attrs[1] = std::make_shared<ur::VertexInputAttribute>(
+            1, ur::ComponentDataType::Float, 1, 12, 20
+            );
+        // offset
+        vbuf_attrs[2] = std::make_shared<ur::VertexInputAttribute>(
+            2, ur::ComponentDataType::Float, 1, 16, 20
             );
         break;
     case model::BrushBuilder::VertexType::PosNorm:
@@ -346,7 +371,8 @@ BrushBuilder::PolymeshFromBrushPNC(const ur::Device& dev, const model::BrushMode
     return PolymeshFromBrush(dev, VertexType::PosNormCol, brush_model, std::vector<std::vector<std::vector<sm::vec2>>>(), colors);
 }
 
-void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& src, gltf::Model& dst)
+void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& src, 
+                                     const std::vector<int>& materials, const std::vector<float>& offsets, gltf::Model& dst)
 {
     auto model = std::make_unique<Model>(&dev);
 
@@ -363,6 +389,8 @@ void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<st
 	std::vector<Vertex> vertices;
     std::vector<unsigned short> indices;
 
+    assert(src.size() == materials.size() && assert(src.size() == offsets.size()));
+
 	sm::cube aabb;
 	int start_idx = 0;
     for (int i = 0, n = src.size(); i < n; ++i)
@@ -370,8 +398,11 @@ void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<st
         auto& b = src[i];
 
         auto& points = b->Points();
-        for (auto& p : points) {
+        for (auto& p : points) 
+        {
             auto vert = create_vertex(p->pos, sm::vec3(), {}, {}, 0, 0, 0, aabb);
+            vert.mat_id = materials.empty() ? 0 : materials[i];
+            vert.offset = offsets.empty() ? 0 : offsets[i];
             vertices.push_back(vert);
         }
 
@@ -392,7 +423,7 @@ void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<st
     auto va = dev.CreateVertexArray();
 
     std::vector<float> buf;
-    dump_vert_buf(VertexType::Pos, vertices, buf);
+    dump_vert_buf(VertexType::PosMaterialOffset, vertices, buf);
 
     auto vbuf_sz = sizeof(float) * buf.size();
     auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
@@ -408,7 +439,7 @@ void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<st
     va->SetIndexBuffer(ibuf);
 
     std::vector<std::shared_ptr<ur::VertexInputAttribute>> vbuf_attrs;
-    setup_vert_attr_list(VertexType::Pos, vbuf, vbuf_attrs);
+    setup_vert_attr_list(VertexType::PosMaterialOffset, vbuf, vbuf_attrs);
     va->SetVertexBufferAttrs(vbuf_attrs);
 
     auto d_prim = std::make_shared<gltf::Primitive>();

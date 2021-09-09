@@ -27,6 +27,7 @@ public:
     enum class VertexType
     {
         Pos,
+        PosMaterialOffset,
         PosNorm,
         PosNormTex,
         PosNormTex2,
@@ -47,7 +48,8 @@ public:
         const std::vector<std::vector<std::vector<sm::vec3>>>& colors
     );
 
-    static void PolymeshFromBrush(const ur::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& src, gltf::Model& dst);
+    static void PolymeshFromBrush(const ur::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& src, 
+        const std::vector<int>& materials, const std::vector<float>& offsets, gltf::Model& dst);
 
 private:
     static std::unique_ptr<Model> PolymeshFromBrush(
@@ -77,6 +79,8 @@ public:
         sm::vec3 normal;
         sm::vec2 texcoord, texcoord2;
         sm::vec3 color;
+        unsigned char mat_id = 0;
+        float offset = 0;
     };
 
     static void CreateMeshRenderBuf(const ur::Device& dev, VertexType type, model::Model::Mesh& mesh, const std::vector<Vertex>& vertices);
