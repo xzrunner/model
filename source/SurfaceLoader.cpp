@@ -3,6 +3,7 @@
 #include "model/Surface.h"
 #include "model/typedef.h"
 #include "model/Model.h"
+#include "model/gltf/Model.h"
 
 #include <unirender/Device.h>
 #include <unirender/VertexArray.h>
@@ -88,6 +89,53 @@ SurfaceLoader::CreateMesh(const ur::Device& dev, const std::string& name, sm::cu
 	}
 
     return std::move(mesh);
+}
+
+void SurfaceLoader::BuildPolymesh(const ur::Device& dev, const Surface& src, gltf::Model& dst)
+{
+    const int vertex_type = VERTEX_FLAG_NORMALS | VERTEX_FLAG_TEXCOORDS0;
+
+    auto va = dev.CreateVertexArray();
+
+    std::vector<unsigned short> indices;
+    src.GenerateTriangleIndices(indices);
+    auto ibuf_sz = sizeof(unsigned short) * indices.size();
+    auto ibuf = dev.CreateIndexBuffer(ur::BufferUsageHint::StaticDraw, ibuf_sz);
+    ibuf->SetCount(indices.size());
+    ibuf->Reserve(ibuf_sz);
+    ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
+    ibuf->SetDataType(ur::IndexBufferDataType::UnsignedShort);
+    va->SetIndexBuffer(ibuf);
+
+    std::vector<float> vertices;
+    src.GenerateVertices(vertex_type, vertices);
+    auto vbuf_sz = sizeof(float) * vertices.size();
+    auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
+    vbuf->ReadFromMemory(vertices.data(), vbuf_sz, 0);
+    va->SetVertexBuffer(vbuf);
+
+    std::vector<std::shared_ptr<ur::VertexInputAttribute>> vbuf_attrs(3);
+    // pos
+    vbuf_attrs[0] = std::make_shared<ur::VertexInputAttribute>(0, ur::ComponentDataType::Float, 3, 0, 32);
+    // normal
+    vbuf_attrs[1] = std::make_shared<ur::VertexInputAttribute>(1, ur::ComponentDataType::Float, 3, 12, 32);
+    // texcoord
+    vbuf_attrs[2] = std::make_shared<ur::VertexInputAttribute>(2, ur::ComponentDataType::Float, 2, 24, 32);
+    va->SetVertexBufferAttrs(vbuf_attrs);
+
+    auto d_prim = std::make_shared<gltf::Primitive>();
+    d_prim->va = va;
+    //d_prim->size = aabb.Size();
+    d_prim->material = std::make_shared<gltf::Material>();
+    auto d_mesh = std::make_shared<gltf::Mesh>();
+    d_mesh->primitives.push_back(d_prim);
+    auto d_node = std::make_shared<gltf::Node>();
+    d_node->mesh = d_mesh;
+    auto d_scene = std::make_shared<gltf::Scene>();
+    d_scene->nodes.push_back(d_node);
+    dst.scenes.push_back(d_scene);
+
+    dst.scene = d_scene;
 }
 
 }
