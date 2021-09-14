@@ -60,6 +60,8 @@ public:
 
 	virtual sm::vec3 Evaluate(const sm::vec2& domain) const override;
 
+	float GetRadius() const { return m_radius; }
+
 	static const char* const TYPE_NAME;
 
 private:
