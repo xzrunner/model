@@ -389,7 +389,7 @@ void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<st
 	std::vector<Vertex> vertices;
     std::vector<unsigned short> indices;
 
-    assert(src.size() == materials.size() && assert(src.size() == offsets.size()));
+    assert(src.size() == materials.size() && src.size() == offsets.size());
 
 	sm::cube aabb;
 	int start_idx = 0;
