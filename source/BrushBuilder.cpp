@@ -110,7 +110,7 @@ void setup_vert_attr_list(model::BrushBuilder::VertexType type, const std::share
     switch (type)
     {
     case model::BrushBuilder::VertexType::Pos:
-        vbuf_attrs.resize(2);
+        vbuf_attrs.resize(1);
         // pos
         vbuf_attrs[0] = std::make_shared<ur::VertexInputAttribute>(
             0, ur::ComponentDataType::Float, 3, 0, 12
@@ -398,11 +398,12 @@ void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<st
 
     assert(src.size() == materials.size() && src.size() == offsets.size());
 
-	sm::cube aabb;
 	int start_idx = 0;
     for (int i = 0, n = src.size(); i < n; ++i)
     {
         auto& b = src[i];
+
+        sm::cube aabb;
 
         auto& points = b->Points();
         for (auto& p : points) 
@@ -459,7 +460,7 @@ void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<st
 
     auto d_prim = std::make_shared<gltf::Primitive>();
     d_prim->va = va;
-    d_prim->size = aabb.Size();
+    //d_prim->size = aabb.Size();
     d_prim->material = std::make_shared<gltf::Material>();
     auto d_mesh = std::make_shared<gltf::Mesh>();
     d_mesh->primitives.push_back(d_prim);
@@ -755,7 +756,11 @@ BrushBuilder::Triangulation(const std::vector<pm3::Polytope::PointPtr>& verts,
     std::vector<size_t> ret;
 
     std::vector<sm::vec2> tris;
-    sm::triangulate_holes(border2, holes2, tris);
+    try {
+        sm::triangulate_holes(border2, holes2, tris);
+    } catch (...) {
+        return {};
+    }
     assert(tris.size() % 3 == 0);
     ret.reserve(tris.size());
     for (size_t i = 0, n = tris.size(); i < n; )
