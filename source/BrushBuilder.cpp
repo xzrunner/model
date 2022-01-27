@@ -737,7 +737,7 @@ BrushBuilder::Triangulation(const std::vector<pm3::Polytope::PointPtr>& verts,
             auto p3_rot = rot * pos3;
             sm::vec2 pos2(p3_rot.x, p3_rot.z);
             auto status = pos2idx.insert({ pos2, idx });
-            assert(status.second);
+//            assert(status.second);
 
             loop2.push_back(pos2);
         }
@@ -770,8 +770,25 @@ BrushBuilder::Triangulation(const std::vector<pm3::Polytope::PointPtr>& verts,
         for (size_t j = 0; j < 3; ++j)
         {
             auto itr = pos2idx.find(*tri[j]);
-            assert(itr != pos2idx.end());
-            ret.push_back(itr->second);
+            if (itr == pos2idx.end())
+            {
+                float min_dist = FLT_MAX;
+                int min_idx = -1;
+                for (auto itr = pos2idx.begin(); itr != pos2idx.end(); ++itr) 
+                {
+                    float d = sm::dis_pos_to_pos(*tri[j], itr->first);
+                    if (d < min_dist) {
+                        min_dist = d;
+                        min_idx = itr->second;
+                    }
+                }
+                assert(min_idx >= 0);
+                ret.push_back(static_cast<size_t>(min_idx));
+            }
+            else
+            {
+                ret.push_back(itr->second);
+            }
         }
     }
 
