@@ -69,6 +69,24 @@ private:
 
 }; // Sphere
 
+class Ellipsoid : public ParametricSurface
+{
+public:
+	Ellipsoid(const sm::vec3& radius);
+
+	virtual const char* Type() const override { return TYPE_NAME; }
+
+	virtual sm::vec3 Evaluate(const sm::vec2& domain) const override;
+
+	auto& GetRadius() const { return m_radius; }
+
+	static const char* const TYPE_NAME;
+
+private:
+	sm::vec3 m_radius;
+
+}; // Ellipsoid
+
 class Torus : public ParametricSurface
 {
 public:

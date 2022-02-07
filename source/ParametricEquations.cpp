@@ -267,6 +267,26 @@ sm::vec3 Sphere::Evaluate(const sm::vec2& domain) const
 	return sm::vec3(x, y, z);
 }
 
+// Ellipsoid
+
+const char* const Ellipsoid::TYPE_NAME = "Ellipsoid";
+
+Ellipsoid::Ellipsoid(const sm::vec3& radius)
+    : m_radius(radius)
+{
+    ParametricInterval interval = { sm::ivec2(20, 20), sm::vec2(SM_PI, SM_TWO_PI), sm::vec2(20, 35) };
+    SetInterval(interval);
+}
+
+sm::vec3 Ellipsoid::Evaluate(const sm::vec2& domain) const
+{
+    float u = domain.x, v = domain.y;
+    float x = m_radius.x * sin(u) * cos(v);
+    float y = m_radius.y * cos(u);
+    float z = m_radius.z * -sin(u) * sin(v);
+    return sm::vec3(x, y, z);
+}
+
 // Torus
 
 const char* const Torus::TYPE_NAME = "Torus";
