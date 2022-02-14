@@ -1,5 +1,6 @@
 #include "model/BrushBuilder.h"
 #include "model/typedef.h"
+#include "model/Adjacencies.h"
 #include "model/gltf/Model.h"
 
 #include <SM_Calc.h>
@@ -379,7 +380,7 @@ BrushBuilder::PolymeshFromBrushPNC(const ur::Device& dev, const model::BrushMode
 }
 
 void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& src, 
-                                     const std::vector<int>& materials, const std::vector<float>& offsets, const std::vector<int>& colors, gltf::Model& dst)
+                                     const std::vector<int>& materials, const std::vector<float>& offsets, const std::vector<int>& colors, bool adjacencies, gltf::Model& dst)
 {
     auto model = std::make_unique<Model>(&dev);
 
@@ -434,6 +435,10 @@ void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<st
     }
     if (vertices.empty()) {
         return;
+    }
+
+    if (adjacencies) {
+        indices = Adjacencies::Build(indices);
     }
 
     auto va = dev.CreateVertexArray();

@@ -49,7 +49,7 @@ public:
     );
 
     static void PolymeshFromBrush(const ur::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& src, 
-        const std::vector<int>& materials, const std::vector<float>& offsets, const std::vector<int>& colors, gltf::Model& dst);
+        const std::vector<int>& materials, const std::vector<float>& offsets, const std::vector<int>& colors, bool adjacencies, gltf::Model& dst);
 
 private:
     static std::unique_ptr<Model> PolymeshFromBrush(

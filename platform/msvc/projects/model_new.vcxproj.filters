@@ -135,6 +135,9 @@
     <ClCompile Include="..\..\..\source\GltfLoader.cpp">
       <Filter>loader</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\include\model\Adjacencies.cpp">
+      <Filter>loader\geo</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\include\model\ParametricEquations.h">
@@ -250,6 +253,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\include\model\gltf\Model.h">
       <Filter>dataset\gltf</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\include\model\Adjacencies.h">
+      <Filter>loader\geo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

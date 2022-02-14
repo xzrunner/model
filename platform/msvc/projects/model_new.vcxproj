@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\include\model\Adjacencies.cpp" />
     <ClCompile Include="..\..\..\source\AnimIK.cpp" />
     <ClCompile Include="..\..\..\source\AssimpExporter.cpp" />
     <ClCompile Include="..\..\..\source\AssimpHelper.cpp" />
@@ -57,6 +58,7 @@
     <ClInclude Include="..\..\..\include\model\BrushBuilder.h" />
     <ClInclude Include="..\..\..\include\model\BrushModel.h" />
     <ClInclude Include="..\..\..\include\model\FbxLoader.h" />
+    <ClInclude Include="..\..\..\include\model\Adjacencies.h" />
     <ClInclude Include="..\..\..\include\model\GltfLoader.h" />
     <ClInclude Include="..\..\..\include\model\gltf\Model.h" />
     <ClInclude Include="..\..\..\include\model\MeshBuider.h" />
