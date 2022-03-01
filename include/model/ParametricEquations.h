@@ -54,7 +54,7 @@ private:
 class Sphere : public ParametricSurface
 {
 public:
-	Sphere(float radius);
+	Sphere(float radius, const sm::ivec2& divisions = sm::ivec2(20, 20));
 
 	virtual const char* Type() const override { return TYPE_NAME; }
 

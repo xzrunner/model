@@ -251,11 +251,11 @@ sm::vec3 Cone::Evaluate(const sm::vec2& domain) const
 
 const char* const Sphere::TYPE_NAME = "Sphere";
 
-Sphere::Sphere(float radius)
-	: m_radius(radius)
+Sphere::Sphere(float radius, const sm::ivec2& divisions)
+    : m_radius(radius)
 {
-	ParametricInterval interval = { sm::ivec2(20, 20), sm::vec2(SM_PI, SM_TWO_PI), sm::vec2(20, 35) };
-	SetInterval(interval);
+    ParametricInterval interval = { divisions, sm::vec2(SM_PI, SM_TWO_PI), sm::vec2(20, 35) };
+    SetInterval(interval);
 }
 
 sm::vec3 Sphere::Evaluate(const sm::vec2& domain) const
