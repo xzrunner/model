@@ -94,7 +94,6 @@ public:
         std::vector<Vertex>& vertices, std::vector<Vertex>& border_vertices,
         std::vector<unsigned short>& border_indices, model::Model& dst);
 
-private:
     static std::vector<size_t> Triangulation(const std::vector<pm3::Polytope::PointPtr>& verts,
         const std::vector<size_t>& border, const std::vector<std::vector<size_t>>& holes);
 
