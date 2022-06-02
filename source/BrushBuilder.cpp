@@ -751,6 +751,9 @@ BrushBuilder::Triangulation(const std::vector<pm3::Polytope::PointPtr>& verts,
     };
 
     auto border2 = trans_loop3to2(verts, border);
+    if (border2.empty() || border2.front().x != border2.front().x) {
+        return std::vector<size_t>();
+    }
 
     std::vector<std::vector<sm::vec2>> holes2;
     holes2.resize(holes.size());
