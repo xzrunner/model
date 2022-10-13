@@ -424,10 +424,20 @@ void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<st
         }
 
         auto& faces  = b->Faces();
-        for (auto& f : faces) {
-            auto tris_idx = Triangulation(points, f->border, f->holes);
-            for (auto& idx : tris_idx) {
-                indices.push_back(start_idx + idx);
+        for (auto& f : faces) 
+        {
+            if (f->border.size() == 3 && f->holes.empty())
+            {
+                for (auto idx : f->border) {
+                    indices.push_back(start_idx + idx);
+                }
+            }
+            else
+            {
+                auto tris_idx = Triangulation(points, f->border, f->holes);
+                for (auto& idx : tris_idx) {
+                    indices.push_back(start_idx + idx);
+                }
             }
         }
 
