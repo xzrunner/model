@@ -20,6 +20,29 @@ void dump_vert_buf(model::BrushBuilder::VertexType type,
                    std::vector<float>& dst)
 {
     dst.clear();
+    switch (type)
+    {
+    case model::BrushBuilder::VertexType::Pos:
+        dst.reserve(src.size() * 3);
+        break;
+    case model::BrushBuilder::VertexType::PosColMaterialOffset:
+        dst.reserve(src.size() * 8);
+        break;
+    case model::BrushBuilder::VertexType::PosNorm:
+        dst.reserve(src.size() * 6);
+        break;
+    case model::BrushBuilder::VertexType::PosNormTex:
+        dst.reserve(src.size() * 8);
+        break;
+    case model::BrushBuilder::VertexType::PosNormTex2:
+        dst.reserve(src.size() * 10);
+        break;
+    case model::BrushBuilder::VertexType::PosNormCol:
+        dst.reserve(src.size() * 9);
+        break;
+    default:
+        assert(0);
+    }
 
     switch (type)
     {
