@@ -14,7 +14,7 @@ namespace ur { class Device; }
 namespace model
 {
 
-namespace gltf { struct Model; }
+namespace gltf { struct Model; struct Node; }
 
 class BrushBuilder
 {
@@ -62,6 +62,11 @@ private:
         const std::vector<std::vector<std::vector<sm::vec2>>>& texcoords,
         const std::vector<std::vector<std::vector<sm::vec3>>>& colors
     );
+
+    static std::shared_ptr<gltf::Node> PolyFaceFromBrush(const ur::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& src,
+        const std::vector<int>& materials, const std::vector<float>& offsets, const std::vector<int>& colors, bool adjacencies);
+    static std::shared_ptr<gltf::Node> PolyEdgeFromBrush(const ur::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& src,
+        const std::vector<int>& materials, const std::vector<float>& offsets, const std::vector<int>& colors);
 
 public:
 

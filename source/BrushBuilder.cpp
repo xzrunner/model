@@ -417,95 +417,12 @@ void BrushBuilder::PolymeshFromBrush(const ur::Device& dev, const std::vector<st
 	mat->diffuse_tex = -1;
 	model->materials.push_back(std::move(mat));
 
-	std::vector<Vertex> vertices;
-    std::vector<unsigned short> indices;
+    auto f_node = PolyFaceFromBrush(dev, src, materials, offsets, colors, adjacencies);
+    auto e_node = PolyEdgeFromBrush(dev, src, materials, offsets, colors);
 
-    assert(src.size() == materials.size() && src.size() == offsets.size());
-
-	int start_idx = 0;
-    for (int i = 0, n = src.size(); i < n; ++i)
-    {
-        auto& b = src[i];
-
-        sm::cube aabb;
-
-        auto& points = b->Points();
-        for (auto& p : points) 
-        {
-            auto vert = create_vertex(p->pos, sm::vec3(), {}, {}, 0, 0, 0, aabb);
-            vert.mat_id = materials.empty() ? 0 : materials[i];
-            vert.offset = offsets.empty() ? 0 : offsets[i];
-            if (!colors.empty()) 
-            {
-                auto& rgb = colors[i];
-                float r = ((rgb >> 16) & 0xff) / 255.0f;
-                float g = ((rgb >> 8) & 0xff) / 255.0f;
-                float b = (rgb & 0xff) / 255.0f;
-                vert.color.Set(r, g, b);
-            }
-            vertices.push_back(vert);
-        }
-
-        auto& faces  = b->Faces();
-        for (auto& f : faces) 
-        {
-            if (f->border.size() == 3 && f->holes.empty())
-            {
-                for (auto idx : f->border) {
-                    indices.push_back(start_idx + idx);
-                }
-            }
-            else
-            {
-                auto tris_idx = Triangulation(points, f->border, f->holes);
-                for (auto& idx : tris_idx) {
-                    indices.push_back(start_idx + idx);
-                }
-            }
-        }
-
-        start_idx += points.size();
-    }
-    if (vertices.empty()) {
-        return;
-    }
-
-    if (adjacencies) {
-        indices = Adjacencies::Build(indices);
-    }
-
-    auto va = dev.CreateVertexArray();
-
-    std::vector<float> buf;
-    dump_vert_buf(VertexType::PosColMaterialOffset, vertices, buf);
-
-    auto vbuf_sz = sizeof(float) * buf.size();
-    auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
-    vbuf->ReadFromMemory(buf.data(), vbuf_sz, 0);
-    va->SetVertexBuffer(vbuf);
-
-    auto ibuf = dev.CreateIndexBuffer(ur::BufferUsageHint::StaticDraw, 0);
-    auto ibuf_sz = sizeof(unsigned short) * indices.size();
-    ibuf->SetCount(indices.size());
-    ibuf->Reserve(ibuf_sz);
-    ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
-    ibuf->SetDataType(ur::IndexBufferDataType::UnsignedShort);
-    va->SetIndexBuffer(ibuf);
-
-    std::vector<std::shared_ptr<ur::VertexInputAttribute>> vbuf_attrs;
-    setup_vert_attr_list(VertexType::PosColMaterialOffset, vbuf, vbuf_attrs);
-    va->SetVertexBufferAttrs(vbuf_attrs);
-
-    auto d_prim = std::make_shared<gltf::Primitive>();
-    d_prim->va = va;
-    //d_prim->size = aabb.Size();
-    d_prim->material = std::make_shared<gltf::Material>();
-    auto d_mesh = std::make_shared<gltf::Mesh>();
-    d_mesh->primitives.push_back(d_prim);
-    auto d_node = std::make_shared<gltf::Node>();
-    d_node->mesh = d_mesh;
     auto d_scene = std::make_shared<gltf::Scene>();
-    d_scene->nodes.push_back(d_node);
+    d_scene->nodes.push_back(f_node);
+    d_scene->nodes.push_back(e_node);
     dst.scenes.push_back(d_scene);
 
     dst.scene = d_scene;
@@ -583,6 +500,187 @@ BrushBuilder::PolymeshFromBrush(const ur::Device& dev, VertexType type, const mo
         brushes.push_back(b.impl);
     }
     return PolymeshFromBrush(dev, type, brushes, texcoords, colors);
+}
+
+std::shared_ptr<gltf::Node> 
+BrushBuilder::PolyFaceFromBrush(const ur::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& src,
+                                const std::vector<int>& materials, const std::vector<float>& offsets, 
+                                const std::vector<int>& colors, bool adjacencies)
+{
+    std::vector<Vertex> vertices;
+    std::vector<unsigned short> indices;
+
+    assert(src.size() == materials.size() && src.size() == offsets.size());
+
+    int start_idx = 0;
+    for (int i = 0, n = src.size(); i < n; ++i)
+    {
+        auto& b = src[i];
+
+        sm::cube aabb;
+
+        auto& points = b->Points();
+        for (auto& p : points)
+        {
+            auto vert = create_vertex(p->pos, sm::vec3(), {}, {}, 0, 0, 0, aabb);
+            vert.mat_id = materials.empty() ? 0 : materials[i];
+            vert.offset = offsets.empty() ? 0 : offsets[i];
+            if (!colors.empty())
+            {
+                auto& rgb = colors[i];
+                float r = ((rgb >> 16) & 0xff) / 255.0f;
+                float g = ((rgb >> 8) & 0xff) / 255.0f;
+                float b = (rgb & 0xff) / 255.0f;
+                vert.color.Set(r, g, b);
+            }
+            vertices.push_back(vert);
+        }
+
+        auto& faces = b->Faces();
+        for (auto& f : faces)
+        {
+            if (f->border.size() == 3 && f->holes.empty())
+            {
+                for (auto idx : f->border) {
+                    indices.push_back(start_idx + idx);
+                }
+            }
+            else
+            {
+                auto tris_idx = Triangulation(points, f->border, f->holes);
+                for (auto& idx : tris_idx) {
+                    indices.push_back(start_idx + idx);
+                }
+            }
+        }
+
+        start_idx += points.size();
+    }
+    if (vertices.empty()) {
+        return nullptr;
+    }
+
+    if (adjacencies) {
+        indices = Adjacencies::Build(indices);
+    }
+
+    auto va = dev.CreateVertexArray();
+
+    std::vector<float> buf;
+    dump_vert_buf(VertexType::PosColMaterialOffset, vertices, buf);
+
+    auto vbuf_sz = sizeof(float) * buf.size();
+    auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
+    vbuf->ReadFromMemory(buf.data(), vbuf_sz, 0);
+    va->SetVertexBuffer(vbuf);
+
+    auto ibuf = dev.CreateIndexBuffer(ur::BufferUsageHint::StaticDraw, 0);
+    auto ibuf_sz = sizeof(unsigned short) * indices.size();
+    ibuf->SetCount(indices.size());
+    ibuf->Reserve(ibuf_sz);
+    ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
+    ibuf->SetDataType(ur::IndexBufferDataType::UnsignedShort);
+    va->SetIndexBuffer(ibuf);
+
+    std::vector<std::shared_ptr<ur::VertexInputAttribute>> vbuf_attrs;
+    setup_vert_attr_list(VertexType::PosColMaterialOffset, vbuf, vbuf_attrs);
+    va->SetVertexBufferAttrs(vbuf_attrs);
+
+    auto d_prim = std::make_shared<gltf::Primitive>();
+    d_prim->va = va;
+    //d_prim->size = aabb.Size();
+    d_prim->material = std::make_shared<gltf::Material>();
+    auto d_mesh = std::make_shared<gltf::Mesh>();
+    d_mesh->primitives.push_back(d_prim);
+    auto d_node = std::make_shared<gltf::Node>();
+    d_node->mesh = d_mesh;
+
+    return d_node;
+}
+
+std::shared_ptr<gltf::Node> 
+BrushBuilder::PolyEdgeFromBrush(const ur::Device& dev, const std::vector<std::shared_ptr<pm3::Polytope>>& src,
+                                const std::vector<int>& materials, const std::vector<float>& offsets, const std::vector<int>& colors)
+{
+    std::vector<Vertex> vertices;
+    std::vector<unsigned short> indices;
+
+    assert(src.size() == materials.size() && src.size() == offsets.size());
+
+    int start_idx = 0;
+    for (int i = 0, n = src.size(); i < n; ++i)
+    {
+        auto& b = src[i];
+
+        sm::cube aabb;
+
+        auto& points = b->Points();
+        for (auto& p : points)
+        {
+            auto vert = create_vertex(p->pos, sm::vec3(), {}, {}, 0, 0, 0, aabb);
+            vert.mat_id = materials.empty() ? 0 : materials[i];
+            vert.offset = offsets.empty() ? 0 : offsets[i];
+            if (!colors.empty())
+            {
+                auto& rgb = colors[i];
+                float r = ((rgb >> 16) & 0xff) / 255.0f;
+                float g = ((rgb >> 8) & 0xff) / 255.0f;
+                float b = (rgb & 0xff) / 255.0f;
+                vert.color.Set(r, g, b);
+            }
+            vertices.push_back(vert);
+        }
+
+        auto& faces = b->Faces();
+        for (auto& f : faces)
+        {
+            for (int i = 0, n = f->border.size(); i < n; ++i)
+            {
+                const int idx0 = f->border[i];
+                const int idx1 = f->border[(i + 1) % n];
+                indices.push_back(start_idx + idx0);
+                indices.push_back(start_idx + idx1);
+            }
+        }
+
+        start_idx += points.size();
+    }
+    if (vertices.empty()) {
+        return nullptr;
+    }
+
+    auto va = dev.CreateVertexArray();
+
+    std::vector<float> buf;
+    dump_vert_buf(VertexType::PosColMaterialOffset, vertices, buf);
+
+    auto vbuf_sz = sizeof(float) * buf.size();
+    auto vbuf = dev.CreateVertexBuffer(ur::BufferUsageHint::StaticDraw, vbuf_sz);
+    vbuf->ReadFromMemory(buf.data(), vbuf_sz, 0);
+    va->SetVertexBuffer(vbuf);
+
+    auto ibuf = dev.CreateIndexBuffer(ur::BufferUsageHint::StaticDraw, 0);
+    auto ibuf_sz = sizeof(unsigned short) * indices.size();
+    ibuf->SetCount(indices.size());
+    ibuf->Reserve(ibuf_sz);
+    ibuf->ReadFromMemory(indices.data(), ibuf_sz, 0);
+    ibuf->SetDataType(ur::IndexBufferDataType::UnsignedShort);
+    va->SetIndexBuffer(ibuf);
+
+    std::vector<std::shared_ptr<ur::VertexInputAttribute>> vbuf_attrs;
+    setup_vert_attr_list(VertexType::PosColMaterialOffset, vbuf, vbuf_attrs);
+    va->SetVertexBufferAttrs(vbuf_attrs);
+
+    auto d_prim = std::make_shared<gltf::Primitive>();
+    d_prim->va = va;
+    //d_prim->size = aabb.Size();
+    d_prim->material = std::make_shared<gltf::Material>();
+    auto d_mesh = std::make_shared<gltf::Mesh>();
+    d_mesh->primitives.push_back(d_prim);
+    auto d_node = std::make_shared<gltf::Node>();
+    d_node->mesh = d_mesh;
+
+    return d_node;
 }
 
 std::unique_ptr<Model>
