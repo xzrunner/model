@@ -539,7 +539,13 @@ BrushBuilder::PolyFaceFromBrush(const ur::Device& dev, const std::vector<std::sh
         auto& faces = b->Faces();
         for (auto& f : faces)
         {
-            if (f->border.size() == 3 && f->holes.empty())
+            if (f->border.size() < 3)
+            {
+                for (auto idx : f->border) {
+                    indices.push_back(start_idx + idx);
+                }
+            }
+            else if (f->border.size() == 3 && f->holes.empty())
             {
                 for (auto idx : f->border) {
                     indices.push_back(start_idx + idx);
@@ -556,7 +562,7 @@ BrushBuilder::PolyFaceFromBrush(const ur::Device& dev, const std::vector<std::sh
 
         start_idx += points.size();
     }
-    if (vertices.empty()) {
+    if (vertices.empty() || indices.empty()) {
         return nullptr;
     }
 
@@ -634,18 +640,32 @@ BrushBuilder::PolyEdgeFromBrush(const ur::Device& dev, const std::vector<std::sh
         auto& faces = b->Faces();
         for (auto& f : faces)
         {
-            for (int i = 0, n = f->border.size(); i < n; ++i)
+            if (f->border.size() < 2)
             {
-                const int idx0 = f->border[i];
-                const int idx1 = f->border[(i + 1) % n];
+                continue;
+            }
+            else if (f->border.size() == 2)
+            {
+                const int idx0 = f->border[0];
+                const int idx1 = f->border[1];
                 indices.push_back(start_idx + idx0);
                 indices.push_back(start_idx + idx1);
+            }
+            else
+            {
+                for (int i = 0, n = f->border.size(); i < n; ++i)
+                {
+                    const int idx0 = f->border[i];
+                    const int idx1 = f->border[(i + 1) % n];
+                    indices.push_back(start_idx + idx0);
+                    indices.push_back(start_idx + idx1);
+                }
             }
         }
 
         start_idx += points.size();
     }
-    if (vertices.empty()) {
+    if (vertices.empty() || indices.empty()) {
         return nullptr;
     }
 
