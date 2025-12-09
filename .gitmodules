@@ -1,3 +1,27 @@
 [submodule "external/tinygltf"]
 	path = external/tinygltf
 	url = git@github.com:syoyo/tinygltf.git
+[submodule "external/sm"]
+	path = external/sm
+	url = git@github.com:xzrunner/sm.git
+[submodule "external/unirender"]
+	path = external/unirender
+	url = git@github.com:xzrunner/unirender.git
+[submodule "external/guard"]
+	path = external/guard
+	url = git@github.com:xzrunner/guard.git
+[submodule "external/polymesh3"]
+	path = external/polymesh3
+	url = git@github.com:xzrunner/polymesh3.git
+[submodule "external/halfedge"]
+	path = external/halfedge
+	url = git@github.com:xzrunner/halfedge.git
+[submodule "external/assimp"]
+	path = external/assimp
+	url = git@github.com:assimp/assimp.git
+[submodule "external/tinyobjloader"]
+	path = external/tinyobjloader
+	url = git@github.com:tinyobjloader/tinyobjloader.git
+[submodule "external/gimg"]
+	path = external/gimg
+	url = git@github.com:xzrunner/gimg.git

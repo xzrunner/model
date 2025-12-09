@@ -5,6 +5,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <string>
 
 //#define BLENDSHAPE_COMPRESS_FLOAT
 //#define BLENDSHAPE_COMPRESS_TO8
