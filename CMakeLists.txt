@@ -159,19 +159,8 @@ set(ALL_FILES
 # Target
 ################################################################################
 
-include_directories(${CMAKE_SOURCE_DIR}/include)
-include_directories(${CMAKE_SOURCE_DIR}/external/sm)
-include_directories(${CMAKE_SOURCE_DIR}/external/unirender/include)
-include_directories(${CMAKE_SOURCE_DIR}/external/rapidxml)
-include_directories(${CMAKE_SOURCE_DIR}/external/guard/include)
-include_directories(${CMAKE_SOURCE_DIR}/external/polymesh3/include)
-include_directories(${CMAKE_SOURCE_DIR}/external/halfedge/include)
-include_directories(${CMAKE_SOURCE_DIR}/external/assimp/include)
-include_directories(${CMAKE_SOURCE_DIR}/external/fbxsdk/include)
-include_directories(${CMAKE_SOURCE_DIR}/external/tinygltf)
-include_directories(${CMAKE_SOURCE_DIR}/external/tinyobjloader)
-include_directories(${CMAKE_SOURCE_DIR}/external/gimg)
-
 set(CMAKE_CXX_STANDARD 17)
 
 add_library(${PROJECT_NAME} STATIC ${ALL_FILES})
+
+target_include_directories(${PROJECT_NAME} PRIVATE include external/sm external/unirender/include external/rapidxml external/guard/include external/polymesh3/include external/halfedge/include external/assimp/include external/fbxsdk/include external/tinygltf external/tinyobjloader external/gimg)
