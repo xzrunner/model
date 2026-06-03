@@ -161,6 +161,12 @@ set(ALL_FILES
 
 set(CMAKE_CXX_STANDARD 17)
 
+if(APPLE)
+    # No macOS Autodesk FBX SDK available; exclude the FBX loader (assimp still
+    # handles .fbx meshes; only FBX blendshape import is unavailable on macOS).
+    list(REMOVE_ITEM ALL_FILES "source/FbxLoader.cpp")
+endif()
+
 add_library(${PROJECT_NAME} STATIC ${ALL_FILES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC include)

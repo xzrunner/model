@@ -50,12 +50,14 @@ bool Model::LoadFromFile(const std::string& filepath)
 		bool ret = AssimpHelper::Load(*dev, *this, filepath);
 
         // load blendshape
+#ifndef __APPLE__ // FBX SDK is Windows-only here; .fbx meshes still load via assimp above
         if (ext == ".fbx")
         {
             std::vector<std::unique_ptr<BlendShapeLoader::MeshData>> meshes;
             FbxLoader::LoadBlendShapeMeshes(meshes, filepath);
             BlendShapeLoader::Load(*this, meshes);
         }
+#endif
 
         return ret;
 	}
