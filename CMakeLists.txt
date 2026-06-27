@@ -8,6 +8,19 @@ add_definitions(
     -DNO_MESHLAB
 )
 
+# FBX import requires the Autodesk FBX SDK (closed-source, separate install,
+# no macOS build). Default ON where the SDK is available, OFF on Apple. When
+# OFF we define NO_FBX, which compiles out the FBX loader; assimp still loads
+# .fbx meshes, only FBX blendshape import is unavailable.
+if(APPLE)
+    option(USE_FBX_SDK "Enable FBX import via Autodesk FBX SDK" OFF)
+else()
+    option(USE_FBX_SDK "Enable FBX import via Autodesk FBX SDK" ON)
+endif()
+if(NOT USE_FBX_SDK)
+    add_definitions(-DNO_FBX)
+endif()
+
 ################################################################################
 # Source groups
 ################################################################################
@@ -160,12 +173,6 @@ set(ALL_FILES
 ################################################################################
 
 set(CMAKE_CXX_STANDARD 17)
-
-if(APPLE)
-    # No macOS Autodesk FBX SDK available; exclude the FBX loader (assimp still
-    # handles .fbx meshes; only FBX blendshape import is unavailable on macOS).
-    list(REMOVE_ITEM ALL_FILES "source/FbxLoader.cpp")
-endif()
 
 add_library(${PROJECT_NAME} STATIC ${ALL_FILES})
 

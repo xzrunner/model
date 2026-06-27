@@ -7,7 +7,9 @@
 #include "model/MdlLoader.h"
 #include "model/BspLoader.h"
 #include "model/MapBuilder.h"
+#ifndef NO_FBX
 #include "model/FbxLoader.h"
+#endif
 #include "model/GltfLoader.h"
 
 #include <guard/check.h>
@@ -50,7 +52,7 @@ bool Model::LoadFromFile(const std::string& filepath)
 		bool ret = AssimpHelper::Load(*dev, *this, filepath);
 
         // load blendshape
-#ifndef __APPLE__ // FBX SDK is Windows-only here; .fbx meshes still load via assimp above
+#ifndef NO_FBX // FBX blendshape import needs the Autodesk FBX SDK; .fbx meshes still load via assimp above
         if (ext == ".fbx")
         {
             std::vector<std::unique_ptr<BlendShapeLoader::MeshData>> meshes;

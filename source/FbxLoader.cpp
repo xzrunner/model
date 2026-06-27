@@ -1,3 +1,5 @@
+#ifndef NO_FBX
+
 #include "model/FbxLoader.h"
 #include "model/MeshGeometry.h"
 #include "model/Model.h"
@@ -1242,3 +1244,5 @@ int FbxLoader::LoadNodesRecursive(fbxsdk::FbxNode* fbx_node, Model& model,
 }
 
 }
+
+#endif // NO_FBX
