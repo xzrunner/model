@@ -17,13 +17,13 @@ ur::TexturePtr
 TextureLoader::LoadFromFile(const ur::Device& dev, const char* filepath, int mipmap_levels)
 {
 	if (!std::filesystem::is_regular_file(filepath)) {
-		return false;
+		return nullptr;
 	}
 
 	int w, h, fmt;
 	uint8_t* pixels = gimg_import(filepath, &w, &h, &fmt);
 	if (!pixels) {
-		return false;
+		return nullptr;
 	}
 
 	//if (tf == GPF_RGBA8 && gum::Config::Instance()->GetPreMulAlpha()) {

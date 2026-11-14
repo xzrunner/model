@@ -3,6 +3,8 @@
 #include <SM_Matrix.h>
 #include <unirender/noncopyable.h>
 
+#include <vector>
+#include <utility>
 #include <unordered_map>
 #include <memory>
 #include <string>
